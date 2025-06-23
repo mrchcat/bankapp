@@ -1,16 +1,32 @@
 server.port: 8080
 
+application:
+  bank_accounts_url: http://localhost:8081
+
 spring:
+  application:
+    name: bank_front
   datasource:
     url: jdbc:postgresql://localhost:5432/bankapp
     username: postgres
     password: Inushing1980
-    driver: org.postgresql.Driver
-  sql:
-    init:
+  sql.init:
       mode: always
       schema-locations: classpath:database/schema.sql
       data-locations: classpath:database/data.sql
+  security:
+    oauth2:
+        client:
+          provider:
+            keycloak:
+              issuer-uri: http://localhost:8090/realms/bankapp
+          registration:
+            bank_front:
+              provider: keycloak
+              authorizationGrantType: client_credentials
+              client-id: bank_front
+              client-secret: wKWXOS1YJgNvFHt6jHL2mjgmHHvGu2r0
+              clientAuthenticationMethod: client_secret_post
 
 logging:
   pattern.file: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"

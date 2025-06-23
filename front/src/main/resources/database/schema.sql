@@ -7,10 +7,13 @@ CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   full_name VARCHAR(256) NOT NULL,
   birth_day DATE NOT NULL,
-  email VARCHAR(256) NOT NULL,
+  email VARCHAR(256) NOT NULL UNIQUE,
+  username VARCHAR(256) NOT NULL UNIQUE,
   password VARCHAR(1000) NOT NULL,
-  created_at timestamp NOT NULL,
-  updated_at timestamp NOT NULL
+  roles VARCHAR(256) NOT NULL,
+  enabled boolean NOT NULL DEFAULT true,
+  created_at timestamp NOT NULL DEFAULT NOW(),
+  updated_at timestamp
 );
 
 CREATE TABLE IF NOT EXISTS currencies (
@@ -21,17 +24,17 @@ CREATE TABLE IF NOT EXISTS currencies (
 
 CREATE TABLE IF NOT EXISTS accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  number VARCHAR(256) NOT NULL,
+  number VARCHAR(256) NOT NULL UNIQUE,
   amount NUMERIC(14,2) NOT NULL,
   currency_id INT NOT NULL REFERENCES currencies(id),
   user_id UUID NOT NULL REFERENCES users(id),
-  created_at timestamp NOT NULL,
+  created_at timestamp NOT NULL DEFAULT NOW(),
   is_active boolean NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS transactions_log (
-  id UUID PRIMARY KEY,
-  created_at timestamp NOT NULL,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at timestamp NOT NULL DEFAULT NOW(),
   transaction_type VARCHAR(10) NOT NULL,
   from_account UUID NOT NULL REFERENCES accounts(id),
   to_account UUID NOT NULL REFERENCES accounts(id),

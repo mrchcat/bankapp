@@ -1,0 +1,22 @@
+server.port: 8081
+
+spring:
+  application:
+    name: bank_accounts
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bankapp
+    username: postgres
+    password: Inushing1980
+  sql:
+    init.mode: NEVER
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8090/realms/bankapp
+
+logging:
+  pattern.file: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"
+  level:
+    root: DEBUG
+    org.zalando.logbook: DEBUG
