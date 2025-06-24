@@ -6,26 +6,42 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-#      KC_IMPORT: /opt/jboss/keycloak/imports/realm-export.json
+      KC_IMPORT: /opt/jboss/keycloak/imports/realm-export.json
     command:
       - start-dev
-#      - --import-realm
+      - --import-realm
     ports:
       - "8090:8080"
-#    volumes:
-#      - ./keycloak/config/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    volumes:
+      - ./keycloak/config/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
     restart: unless-stopped
-#    healthcheck:
-#      test:
-#        [
-#          "CMD-SHELL",
-#          'exec 3<>/dev/tcp/localhost/8080; echo -e "GET /health/ready HTTP/1.1\nhost: localhost:8080\n" >&3; timeout --preserve-status 1 cat <&3 | grep -m 1 status | grep -m 1 UP; ERROR=$?; exec 3<&-; exec 3>&-; exit $ERROR'
-#        ]
-#      interval: 10s
-#      timeout: 10s
-#      retries: 3
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'exec 3<>/dev/tcp/localhost/8080; echo -e "GET /health/ready HTTP/1.1\nhost: localhost:8080\n" >&3; timeout --preserve-status 1 cat <&3 | grep -m 1 status | grep -m 1 UP; ERROR=$?; exec 3<&-; exec 3>&-; exit $ERROR'
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 3
     networks:
       - backend
+
+  consul:
+    container_name: consul
+    image: hashicorp/consul:1.21.0
+    hostname: consul-server
+    restart: unless-stopped
+    volumes:
+      - ./consul/key_value.json:/consul/tmp/key_value.json
+    ports:
+      - "8500:8500"
+    command: "agent -dev -node=myNode -client=0.0.0.0 -log-level=INFO"
+    #   consul kv import @consul/tmp/key_value.json
+    networks:
+      - backend
+
+
 
 networks:
   backend:

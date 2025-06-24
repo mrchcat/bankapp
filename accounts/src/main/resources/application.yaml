@@ -1,5 +1,8 @@
 server.port: 8081
 
+application:
+  bank_notifications_url: http://localhost:8082
+
 spring:
   application:
     name: bank_accounts
@@ -7,13 +10,35 @@ spring:
     url: jdbc:postgresql://localhost:5432/bankapp
     username: postgres
     password: Inushing1980
-  sql:
-    init.mode: NEVER
+  sql.init:
+    mode: always
+    schema-locations: classpath:database/schema.sql
+    data-locations: classpath:database/data.sql
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8090/realms/bankapp
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8090/realms/bankapp
+        registration:
+          bank_accounts:
+            provider: keycloak
+            authorizationGrantType: client_credentials
+            client-id: bank_accounts
+            client-secret: EF3owQYOVaDIDnBr14jkSt3kuResW6x0
+            clientAuthenticationMethod: client_secret_post
+  cloud:
+    consul:
+      discovery:
+        hostname: localhost
+        port: 8500
+        prefer-ip-address: true
+        health-check-url: http://host.docker.internal:${server.port}/actuator/health
+
+management.endpoints.web.exposure.include: info, health,refresh
 
 logging:
   pattern.file: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"

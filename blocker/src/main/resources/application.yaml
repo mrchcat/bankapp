@@ -1,0 +1,25 @@
+server.port: 8083
+
+spring:
+  application:
+    name: bank_blocker
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8090/realms/bankapp
+  cloud:
+    consul:
+      discovery:
+        hostname: localhost
+        port: 8500
+        prefer-ip-address: true
+        health-check-url: http://host.docker.internal:${server.port}/actuator/health
+
+management.endpoints.web.exposure.include: info, health,refresh
+
+logging:
+  pattern.file: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"
+  level:
+    root: DEBUG
+    org.zalando.logbook: DEBUG
