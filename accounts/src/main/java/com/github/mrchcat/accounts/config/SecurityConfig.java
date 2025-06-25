@@ -1,5 +1,6 @@
 package com.github.mrchcat.accounts.config;
 
+import org.springframework.boot.autoconfigure.web.client.RestClientBuilderConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -18,8 +19,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**").permitAll()
-                        .anyRequest().hasAuthority("SCOPE_accounts")
+                                .requestMatchers("/actuator/**").permitAll()
+                                .anyRequest().hasAuthority("SCOPE_accounts")
+//                                .anyRequest().permitAll()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2ResourceServer(oauth2 ->
@@ -33,4 +35,12 @@ public class SecurityConfig {
         OAuth2ClientHttpRequestInterceptor requestInterceptor = new OAuth2ClientHttpRequestInterceptor(authorizedClientManager);
         return builder.requestInterceptor(requestInterceptor).build();
     }
+
+//    @Bean
+//    public RestClient.Builder restClientBuilder(RestClientBuilderConfigurer configurer,
+//                                                OAuth2AuthorizedClientManager authorizedClientManager) {
+//        var requestInterceptor = new OAuth2ClientHttpRequestInterceptor(authorizedClientManager);
+//        return configurer.configure(RestClient.builder())
+//                .requestInterceptor(requestInterceptor);
+//    }
 }

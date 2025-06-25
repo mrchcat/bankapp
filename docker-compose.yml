@@ -1,6 +1,6 @@
 services:
 
-  bank-authorisation-server:
+  bank-keycloak:
     container_name: bank-keycloak
     image: quay.io/keycloak/keycloak:26.2.5
     environment:
@@ -27,20 +27,53 @@ services:
     networks:
       - backend
 
-  consul:
-    container_name: consul
+  bank-consul:
+    container_name: bank-consul
     image: hashicorp/consul:1.21.0
-    hostname: consul-server
+    hostname: consul-server1
     restart: unless-stopped
     volumes:
-      - ./consul/key_value.json:/consul/tmp/key_value.json
+      - ./consul/config/key_value.json:/consul/tmp/key_value.json
     ports:
       - "8500:8500"
     command: "agent -dev -node=myNode -client=0.0.0.0 -log-level=INFO"
-    #   consul kv import @consul/tmp/key_value.json
+#     consul kv import @consul/tmp/key_value.json
     networks:
       - backend
 
+  bank_front:
+    build: front/.
+    image: bank_front
+    container_name: bank_front
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_CLOUD_CONSUL_HOST=bank-consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER-URI=http://bank-keycloak:8080/realms/master
+    depends_on:
+      bank-keycloak:
+        condition: service_started
+
+    networks:
+      - backend
+
+  bank_accounts:
+    build: accounts/.
+    image: bank_accounts
+    container_name: bank_accounts
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_CLOUD_CONSUL_HOST=bank-consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER-URI=http://bank-keycloak:8080/realms/master
+    depends_on:
+      bank-keycloak:
+        condition: service_started
+
+    networks:
+      - backend
 
 
 networks:

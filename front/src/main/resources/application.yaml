@@ -1,8 +1,5 @@
 server.port: 8080
 
-application:
-  bank_accounts_url: http://localhost:8081
-
 spring:
   application:
     name: bank_front
@@ -22,10 +19,8 @@ spring:
   cloud:
     consul:
       discovery:
-        hostname: localhost
-        port: 8500
         prefer-ip-address: true
-        health-check-url: http://host.docker.internal:${server.port}/actuator/health
+        health-check-path: /actuator/health
 
 management.endpoints.web.exposure.include: info, health,refresh
 

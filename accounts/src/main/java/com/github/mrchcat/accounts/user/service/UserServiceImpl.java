@@ -1,10 +1,9 @@
 package com.github.mrchcat.accounts.user.service;
 
+import com.github.mrchcat.accounts.user.dto.BankNotificationDto;
 import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.repository.UserRepository;
-import com.github.mrchcat.notifications.domain.BankNotification;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -19,15 +18,16 @@ import static org.springframework.security.oauth2.client.web.client.RequestAttri
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    //    private final RestClient.Builder restClientBuilder;
     private final RestClient restClient;
-    @Value("${application.bank_notifications_url}")
-    private  String ACCOUNT_SERVICE_URL;
+    //    private String ACCOUNT_SERVICE = "bank_notifications";
+    private String ACCOUNT_SERVICE = "localhost:8082";
     private final String NOTIFICATION_POST_MESSAGE = "/notification";
     private final String CLIENT_REGISTRATION_ID = "bank_accounts";
 
     @Override
     public UserDetails getUserDetails(String username) {
-        BankNotification notification = BankNotification.builder()
+        BankNotificationDto notification = BankNotificationDto.builder()
                 .id(UUID.randomUUID())
                 .email("anna@mail.ru")
                 .fullName("Anna")
@@ -39,11 +39,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
-    private void sendBankNotification(BankNotification notification) {
+    private void sendBankNotification(BankNotificationDto notification) {
         try {
             System.out.println("пытаемся отправить");
-            var responce = restClient.post()
-                    .uri(ACCOUNT_SERVICE_URL + NOTIFICATION_POST_MESSAGE)
+            var responce = restClient
+                    .post()
+                    .uri("http://localhost:8082" + NOTIFICATION_POST_MESSAGE)
                     .attributes(clientRegistrationId(CLIENT_REGISTRATION_ID))
                     .body(notification)
                     .retrieve()

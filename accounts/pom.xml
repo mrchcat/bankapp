@@ -18,13 +18,6 @@
     </properties>
 
     <dependencies>
-        <!--module-->
-        <dependency>
-            <groupId>com.github.mrchcat</groupId>
-            <artifactId>notifications</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
         <!--database-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
