@@ -5,17 +5,23 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -68,6 +74,20 @@ public class SecurityConfig {
     @LoadBalanced  // Делает RestTemplate "discovery-aware"
     public RestTemplate restTemplate() {
         return new RestTemplate();
+    }
+
+    String CLIENT_REGISTRATION_ID = "bank_front";
+
+    HttpHeaders authHeaders(OAuth2AuthorizedClientManager authorizedClientManager) {
+        String token = authorizedClientManager.authorize(OAuth2AuthorizeRequest
+                        .withClientRegistrationId(CLIENT_REGISTRATION_ID)
+                        .principal("system")
+                        .build())
+                .getAccessToken()
+                .getTokenValue();
+        return new HttpHeaders(MultiValueMap
+                .fromSingleValue(Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token)));
+
     }
 
 }
