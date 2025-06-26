@@ -1,5 +1,6 @@
 package com.github.mrchcat.accounts.user.service;
 
+import com.github.mrchcat.accounts.user.domain.BankUser;
 import com.github.mrchcat.accounts.user.dto.BankNotificationDto;
 import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.repository.UserRepository;
@@ -10,6 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.security.oauth2.client.web.client.RequestAttributeClientRegistrationIdResolver.clientRegistrationId;
@@ -32,7 +36,17 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
-//    private void sendBankNotification(BankNotificationDto notification) {
+    @Override
+    public UserDetails updateUserDetails(String username, String password) {
+        UUID userId = userRepository.findByUsername(username)
+                .map(BankUser::getId)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+        userRepository.updateUserPassword(userId, password)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+        return getUserDetails(username);
+    }
+
+    //    private void sendBankNotification(BankNotificationDto notification) {
 //        try {
 //            System.out.println("пытаемся отправить");
 //            var responce = restClient
