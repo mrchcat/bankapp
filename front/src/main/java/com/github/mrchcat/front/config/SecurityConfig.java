@@ -33,11 +33,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/logout/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().hasAuthority("CLIENT")
                 )
                 .oauth2Client(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults())
-                .logout(Customizer.withDefaults())
+                .formLogin(cst -> cst
+                        .defaultSuccessUrl("/main", true)
+                )
+                .logout(cst -> cst
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID"))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                         .maximumSessions(1)

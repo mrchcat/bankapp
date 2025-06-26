@@ -10,7 +10,7 @@ public class UserMapper {
         return User.builder()
                 .username(bankUser.getUsername())
                 .password(bankUser.getPassword())
-                .authorities(bankUser.getRoles())
+                .authorities(bankUser.getRoles().split(";"))
                 .disabled(!bankUser.isEnabled())
                 .build();
     }

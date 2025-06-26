@@ -21,6 +21,7 @@ spring:
       discovery:
         prefer-ip-address: true
         health-check-path: /actuator/health
+        healthCheckInterval: 15s
 
 management.endpoints.web.exposure.include: info, health,refresh
 

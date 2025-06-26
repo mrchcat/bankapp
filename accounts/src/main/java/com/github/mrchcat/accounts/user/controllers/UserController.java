@@ -14,6 +14,9 @@ public class UserController {
 
     @GetMapping("/credentials/{username}")
     UserDetails getUserDenails(@PathVariable String username) {
+        UserDetails userDetails = userService.getUserDetails(username);
+        System.out.println("вернулся=" + username + " размер=" + userDetails.getAuthorities().size());
+        System.out.println("вернулся=" + userDetails);
         return userService.getUserDetails(username);
     }
 }

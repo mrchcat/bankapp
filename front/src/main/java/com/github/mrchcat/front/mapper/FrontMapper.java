@@ -8,24 +8,23 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FrontMapper {
 
-    public static UserDetails toUserDetails(UserDetailsDto dto){
+    public static UserDetails toUserDetails(UserDetailsDto dto) {
         return User.builder()
                 .username(dto.getUsername())
                 .password(dto.getPassword())
-                .authorities(FrontMapper.toGrantedAuthority(dto.getAuthorities()))
+                .authorities(dto.getAuthorities()
+                        .stream()
+                        .map(go -> new SimpleGrantedAuthority(go.authority()))
+                        .toList()
+                )
                 .disabled(!dto.isEnabled())
                 .accountExpired(!dto.isAccountNonExpired())
                 .accountLocked(!dto.isAccountNonLocked())
                 .credentialsExpired(!dto.isCredentialsNonExpired())
                 .build();
-    }
-
-    private static Collection<SimpleGrantedAuthority> toGrantedAuthority(List<GrantedAuthorityDto> list){
-        return list.stream()
-                .map(dto->new SimpleGrantedAuthority(dto.getAuthority()))
-                .toList();
     }
 }
