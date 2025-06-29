@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS users (
   username VARCHAR(256) NOT NULL UNIQUE,
   password VARCHAR(1000) NOT NULL,
   roles VARCHAR(256) NOT NULL,
-  enabled boolean NOT NULL DEFAULT true,
-  created_at timestamp NOT NULL DEFAULT NOW(),
+  enabled boolean DEFAULT true,
+  created_at timestamp DEFAULT NOW(),
   updated_at timestamp
 );
 
@@ -47,6 +47,3 @@ CREATE TABLE IF NOT EXISTS transactions_log (
 INSERT INTO currencies (id, short_name, full_name)
 VALUES (1,'RUR','рубль'), (2,'USD', 'доллар США'), (3,'CNY','юань')
 ON CONFLICT DO NOTHING;
-
-INSERT INTO users (full_name, birth_day,email,username,password,roles)
-VALUES ('Ivanov I.I. ','1977-02-03','ivanov@bank.ru','ivanov','12345','MANAGER')

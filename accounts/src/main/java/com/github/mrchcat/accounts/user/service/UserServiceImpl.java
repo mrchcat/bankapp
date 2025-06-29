@@ -1,22 +1,20 @@
 package com.github.mrchcat.accounts.user.service;
 
-import com.github.mrchcat.accounts.user.domain.BankUser;
-import com.github.mrchcat.accounts.user.dto.BankNotificationDto;
+import com.github.mrchcat.accounts.exceptions.UserNotUniqueProperties;
+import com.github.mrchcat.accounts.user.model.BankUser;
+import com.github.mrchcat.accounts.user.model.UserRole;
+import com.github.mrchcat.accounts.user.dto.CreateNewClientDto;
 import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-
-import static org.springframework.security.oauth2.client.web.client.RequestAttributeClientRegistrationIdResolver.clientRegistrationId;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +42,38 @@ public class UserServiceImpl implements UserService {
         userRepository.updateUserPassword(userId, password)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
         return getUserDetails(username);
+    }
+
+    @Override
+    public UserDetails registerNewClient(CreateNewClientDto upDto) {
+        validateNewClientProperties(upDto);
+        BankUser newClient = BankUser.builder()
+                .fullName(upDto.fullName())
+                .birthDay(upDto.birthDay())
+                .email(upDto.email())
+                .username(upDto.username())
+                .password(upDto.password())
+                .roles(UserRole.CLIENT.roleName)
+                .enabled(true)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        userRepository.save(newClient);
+        return getUserDetails(upDto.username());
+    }
+
+
+    private final void validateNewClientProperties(CreateNewClientDto upDto) {
+        List<String> propertyUniquenessCheckResult = new ArrayList<>();
+        if(userRepository.findByUsername(upDto.username()).isPresent()){
+            propertyUniquenessCheckResult.add("username");
+        }
+        if(userRepository.isEmailExists(upDto.email())) {
+            propertyUniquenessCheckResult.add("email");
+        }
+        if (!propertyUniquenessCheckResult.isEmpty()) {
+            throw new UserNotUniqueProperties(propertyUniquenessCheckResult);
+        }
     }
 
     //    private void sendBankNotification(BankNotificationDto notification) {

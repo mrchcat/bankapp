@@ -1,4 +1,4 @@
-package com.github.mrchcat.front.domain;
+package com.github.mrchcat.front.model;
 
 public enum UserRole {
     ADMIN("ADMIN", "/adminPanel"),

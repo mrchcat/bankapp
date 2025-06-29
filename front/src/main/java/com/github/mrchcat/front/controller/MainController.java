@@ -1,17 +1,12 @@
 package com.github.mrchcat.front.controller;
 
-import com.github.mrchcat.front.domain.UserRole;
-import com.github.mrchcat.front.dto.PasswordUpdateFrontDto;
-import com.github.mrchcat.front.dto.UserDetailsDto;
+import com.github.mrchcat.front.model.UserRole;
+import com.github.mrchcat.front.dto.PasswordUpdateDto;
 import com.github.mrchcat.front.service.FrontService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.minidev.json.JSONUtil;
-import org.springframework.boot.SpringApplication;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,7 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.w3c.dom.ls.LSOutput;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -32,7 +26,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-public class FrontController {
+public class MainController {
     private final FrontService frontService;
 
     /**
@@ -56,12 +50,14 @@ public class FrontController {
     @GetMapping("/main")
     String getMain(Model model, Principal principal) {
         model.addAttribute("login", principal.getName());
+//        String fullName=(cache.containsKey("fullName"))?cache.get("fullName"):
+
         return "/main";
     }
 
     @PostMapping("/user/{username}/editPassword")
     String editClientPassword(@PathVariable @NotNull @NotBlank String username,
-                              @ModelAttribute @Valid PasswordUpdateFrontDto passwordDto,
+                              @ModelAttribute @Valid PasswordUpdateDto passwordDto,
                               BindingResult bindingResult,
                               Model model,
                               Principal principal) {
@@ -83,10 +79,4 @@ public class FrontController {
         }
         return getMain(model, principal);
     }
-
-    @GetMapping("/registration")
-    String registerNewClient() {
-        return "/signup";
-    }
-
 }

@@ -1,6 +1,8 @@
 package com.github.mrchcat.front.mapper;
 
+import com.github.mrchcat.front.dto.CreateNewClientRequestDto;
 import com.github.mrchcat.front.dto.GrantedAuthorityDto;
+import com.github.mrchcat.front.dto.NewClientRegisterDto;
 import com.github.mrchcat.front.dto.UserDetailsDto;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -27,4 +29,15 @@ public class FrontMapper {
                 .credentialsExpired(!dto.isCredentialsNonExpired())
                 .build();
     }
+
+    public static CreateNewClientRequestDto toCreateNewClientRequestDto(NewClientRegisterDto dto, String passwordHash) {
+        return CreateNewClientRequestDto.builder()
+                .fullName(dto.fullName())
+                .email(dto.email())
+                .username(dto.login())
+                .password(passwordHash)
+                .birthDay(dto.birthDate())
+                .build();
+    }
+
 }

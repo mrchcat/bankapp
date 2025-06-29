@@ -1,4 +1,4 @@
-package com.github.mrchcat.accounts.user.domain;
+package com.github.mrchcat.accounts.user.model;
 
 public enum UserRole {
     ADMIN("ADMIN", "/adminPanel"),

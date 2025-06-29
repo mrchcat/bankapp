@@ -15,4 +15,12 @@ public class GlobalExceptionHandler {
         return ErrorResponse.create(ex, HttpStatus.NOT_FOUND, message);
     }
 
+    @ExceptionHandler(UserNotUniqueProperties.class)
+    public ErrorResponse handleUserNotUniqueProperties(UserNotUniqueProperties ex) {
+        return ErrorResponse.builder(ex,HttpStatus.BAD_REQUEST,"свойства не уникальны")
+                .header("X-not-unique",String.join(";",ex.duplicateProperties))
+                .build();
+    }
+
+
 }

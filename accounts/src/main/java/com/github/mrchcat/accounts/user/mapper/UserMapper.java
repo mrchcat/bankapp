@@ -1,6 +1,6 @@
 package com.github.mrchcat.accounts.user.mapper;
 
-import com.github.mrchcat.accounts.user.domain.BankUser;
+import com.github.mrchcat.accounts.user.model.BankUser;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 

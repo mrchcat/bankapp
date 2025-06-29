@@ -1,11 +1,10 @@
 package com.github.mrchcat.accounts.user.repository;
 
-import com.github.mrchcat.accounts.user.domain.BankUser;
+import com.github.mrchcat.accounts.user.model.BankUser;
 
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,5 +19,15 @@ public interface UserRepository extends CrudRepository<BankUser, UUID> {
             RETURNING id
             """)
     Optional<UUID> updateUserPassword(UUID userId, String password);
+
+    @Query(value = """
+            SELECT EXISTS(
+            	SELECT *
+            	FROM users
+            	WHERE lower(email)=lower(:email)
+            	LIMIT 1
+            )
+            """)
+    boolean isEmailExists(String email);
 
 }

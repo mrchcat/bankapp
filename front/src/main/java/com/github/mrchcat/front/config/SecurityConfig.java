@@ -10,6 +10,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
@@ -20,6 +21,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/logout/**").permitAll()
                         .requestMatchers("/registration").hasAuthority("MANAGER")
                         .anyRequest().hasAnyAuthority("CLIENT", "MANAGER")
+//                                .anyRequest().permitAll()
                 )
                 .oauth2Client(Customizer.withDefaults())
                 .formLogin(cst -> cst
@@ -50,9 +53,15 @@ public class SecurityConfig {
         return http.build();
     }
 
+//    @Bean
+//    PasswordEncoder getEncoder() {
+//        return NoOpPasswordEncoder.getInstance();
+//    }
+
     @Bean
-    PasswordEncoder getEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+    BCryptPasswordEncoder getEncoder() {
+        int strength = 10;
+        return new BCryptPasswordEncoder(strength, new SecureRandom());
     }
 
 //    @Bean
@@ -73,12 +82,6 @@ public class SecurityConfig {
     @Bean
     RestClient.Builder restClientBuilder() {
         return RestClient.builder();
-    }
-
-    @Bean
-    @LoadBalanced  // Делает RestTemplate "discovery-aware"
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
     }
 
     String CLIENT_REGISTRATION_ID = "bank_front";
