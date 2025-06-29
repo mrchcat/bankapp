@@ -31,13 +31,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/logout/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        .anyRequest().hasAuthority("CLIENT")
+                        .requestMatchers("/login", "/logout/**").permitAll()
+                        .requestMatchers("/registration").hasAuthority("MANAGER")
+                        .anyRequest().hasAnyAuthority("CLIENT", "MANAGER")
                 )
                 .oauth2Client(Customizer.withDefaults())
                 .formLogin(cst -> cst
-                        .defaultSuccessUrl("/main", true)
+                        .defaultSuccessUrl("/defaultAfterLogin", true)
                 )
                 .logout(cst -> cst
                         .invalidateHttpSession(true)

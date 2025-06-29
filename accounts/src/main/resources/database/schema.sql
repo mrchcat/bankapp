@@ -49,4 +49,4 @@ VALUES (1,'RUR','рубль'), (2,'USD', 'доллар США'), (3,'CNY','юа�
 ON CONFLICT DO NOTHING;
 
 INSERT INTO users (full_name, birth_day,email,username,password,roles)
-VALUES ('Admin','2000-01-01','admin@admin.ru','admin','admin','CLIENT;ADMIN')
+VALUES ('Ivanov I.I. ','1977-02-03','ivanov@bank.ru','ivanov','12345','MANAGER')
