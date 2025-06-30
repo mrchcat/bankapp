@@ -63,7 +63,7 @@ public class CredentialsService implements UserDetailsService, UserDetailsPasswo
                     .post()
                     .uri("http://" + ACCOUNT_SERVICE + ACCOUNTS_UPDATE_USER_PASSWORD_API + "/" + user.getUsername())
                     .header(oAuthHeader.name(), oAuthHeader.value())
-                    .body(new PasswordUpdateRequestDto(newPassword))
+                    .body(new PasswordUpdateRequestDto(passwordHash))
                     .retrieve()
                     .body(UserDetailsDto.class);
             if (response == null) {

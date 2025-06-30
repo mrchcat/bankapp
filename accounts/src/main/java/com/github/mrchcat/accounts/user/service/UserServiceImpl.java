@@ -1,10 +1,11 @@
 package com.github.mrchcat.accounts.user.service;
 
+import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
 import com.github.mrchcat.accounts.exceptions.UserNotUniqueProperties;
-import com.github.mrchcat.accounts.user.model.BankUser;
-import com.github.mrchcat.accounts.user.model.UserRole;
 import com.github.mrchcat.accounts.user.dto.CreateNewClientDto;
 import com.github.mrchcat.accounts.user.mapper.UserMapper;
+import com.github.mrchcat.accounts.user.model.BankUser;
+import com.github.mrchcat.accounts.user.model.UserRole;
 import com.github.mrchcat.accounts.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -46,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails registerNewClient(CreateNewClientDto upDto) {
-        validateNewClientProperties(upDto);
+        validateIfClientPropertiesExistAlready(upDto);
         BankUser newClient = BankUser.builder()
                 .fullName(upDto.fullName())
                 .birthDay(upDto.birthDay())
@@ -63,16 +64,55 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private final void validateNewClientProperties(CreateNewClientDto upDto) {
+    private void validateIfClientPropertiesExistAlready(CreateNewClientDto upDto) {
         List<String> propertyUniquenessCheckResult = new ArrayList<>();
-        if(userRepository.findByUsername(upDto.username()).isPresent()){
+        String username = upDto.username();
+        if (username != null && userRepository.findByUsername(username).isPresent()) {
             propertyUniquenessCheckResult.add("username");
         }
-        if(userRepository.isEmailExists(upDto.email())) {
+        String email = upDto.username();
+        if (email != null && userRepository.isEmailExists(email)) {
             propertyUniquenessCheckResult.add("email");
         }
         if (!propertyUniquenessCheckResult.isEmpty()) {
             throw new UserNotUniqueProperties(propertyUniquenessCheckResult);
+        }
+    }
+
+    @Override
+    public BankUser getClient(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+    }
+
+    @Override
+    public void editClientData(String username, EditUserAccountDto dto) {
+        System.out.println("получили " + dto);
+        BankUser client = getClient(username);
+        boolean hasNewProperties = false;
+        String newEmail = dto.email();
+        if (newEmail != null && !newEmail.isBlank()) {
+            newEmail = newEmail.trim();
+            if (!newEmail.equals(client.getEmail())) {
+                validateIfEmailAlreadyExists(newEmail);
+                client.setEmail(newEmail);
+                hasNewProperties = true;
+            }
+        }
+        String newFullName = dto.fullName();
+        if (newFullName != null) {
+            client.setFullName(newFullName);
+            hasNewProperties = true;
+        }
+        if (hasNewProperties) {
+            client.setUpdatedAt(LocalDateTime.now());
+            userRepository.save(client);
+        }
+    }
+
+    private void validateIfEmailAlreadyExists(String email) {
+        if (userRepository.isEmailExists(email)) {
+            throw new UserNotUniqueProperties(List.of("email"));
         }
     }
 

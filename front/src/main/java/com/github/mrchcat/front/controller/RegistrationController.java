@@ -47,9 +47,7 @@ public class RegistrationController {
             return "/signup";
         }
         try {
-            System.out.println("контроллер перед: frontService.registerNewClient");
             UserDetails newUserDetails = frontService.registerNewClient(newClientRegisterDto);
-            System.out.println("вернулся " + newUserDetails);
             model.addAttribute("isNewClientRegistered", true);
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {

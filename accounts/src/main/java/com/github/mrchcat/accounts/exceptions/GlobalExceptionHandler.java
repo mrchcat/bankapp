@@ -17,9 +17,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotUniqueProperties.class)
     public ErrorResponse handleUserNotUniqueProperties(UserNotUniqueProperties ex) {
-        return ErrorResponse.builder(ex,HttpStatus.BAD_REQUEST,"свойства не уникальны")
-                .header("X-not-unique",String.join(";",ex.duplicateProperties))
+        return ErrorResponse.builder(ex, HttpStatus.BAD_REQUEST, "свойства не уникальны")
+                .header("X-not-unique", String.join(";", ex.duplicateProperties))
                 .build();
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ErrorResponse handleIllegalArgument(IllegalArgumentException ex) {
+        String message = String.format("Некорректный запрос", ex.getMessage());
+        return ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, message);
     }
 
 

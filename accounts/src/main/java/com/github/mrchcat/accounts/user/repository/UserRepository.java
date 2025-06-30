@@ -30,4 +30,5 @@ public interface UserRepository extends CrudRepository<BankUser, UUID> {
             """)
     boolean isEmailExists(String email);
 
+
 }

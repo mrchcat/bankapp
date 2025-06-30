@@ -39,11 +39,11 @@
 <table style="width:70%;margin-left:auto;margin-right:auto;">
     <tr>
         <td style="padding:2px;">
-            <div th:replace="~{fragments/change_password::change_password(${login},${passwordErrors},${isPasswordUpdated})}"></div>
+            <div th:replace="~{fragments/changePassword::changePassword(${login},${passwordErrors},${isPasswordUpdated})}"></div>
         </td>
     <tr>
         <td style="padding:2px;">
-            <div th:replace="~{fragments/personal_and_accounts::personal_and_accounts(${fullName},${birthDate},${accounts})}"></div>
+            <div th:replace="~{fragments/personalAndAccounts::personalAndAccounts(${fullName},${birthDate},${email},${accounts})}"></div>
         </td>
     </tr>
     <tr>

@@ -17,20 +17,20 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS currencies (
-  id INT PRIMARY KEY,
-  short_name VARCHAR(3) NOT NULL UNIQUE,
-  full_name VARCHAR(10) NOT NULL UNIQUE
+  string_code_iso4217 VARCHAR(5) PRIMARY KEY,
+  digital_code_iso4217 int NOT NULL UNIQUE,
+  ru_name VARCHAR(50) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  number VARCHAR(256) NOT NULL UNIQUE,
+  number VARCHAR(256) NOT NULL,
   balance NUMERIC(14,2) NOT NULL CHECK(balance>=0),
-  currency_id INT NOT NULL REFERENCES currencies(id),
+  currency_string_code_iso4217 VARCHAR(5) NOT NULL REFERENCES currencies(string_code_iso4217),
   user_id UUID NOT NULL REFERENCES users(id),
-  created_at timestamp NOT NULL DEFAULT NOW(),
-  updated_at timestamp,
-  is_active boolean NOT NULL DEFAULT true
+  created_at timestamp DEFAULT NOW(),
+  updated_at timestamp NOT NULL,
+  is_active boolean DEFAULT true
 );
 
 CREATE TABLE IF NOT EXISTS transactions_log (
@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS transactions_log (
   is_succeed boolean NOT NULL
 );
 
-INSERT INTO currencies (id, short_name, full_name)
-VALUES (1,'RUR','рубль'), (2,'USD', 'доллар США'), (3,'CNY','юань')
+INSERT INTO currencies (string_code_iso4217, digital_code_iso4217, ru_name)
+VALUES ('RUB',643,'рубли'), ('USD', 840,'доллары США'), ('CNY',156,'юани')
 ON CONFLICT DO NOTHING;
+
