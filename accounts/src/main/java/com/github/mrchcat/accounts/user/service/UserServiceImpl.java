@@ -100,8 +100,8 @@ public class UserServiceImpl implements UserService {
             }
         }
         String newFullName = dto.fullName();
-        if (newFullName != null) {
-            client.setFullName(newFullName);
+        if (newFullName != null && !newFullName.isBlank()) {
+            client.setFullName(newFullName.trim());
             hasNewProperties = true;
         }
         if (hasNewProperties) {
