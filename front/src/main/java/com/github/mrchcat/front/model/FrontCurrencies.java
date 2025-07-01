@@ -10,6 +10,7 @@ import java.util.Map;
 
 public class FrontCurrencies {
     private static final List<BankCurrency> frontCurrencies = new ArrayList<>();
+    private static final Map<String,Boolean> accountsMap=new HashMap<>();
 
     static {
         frontCurrencies.addAll(Arrays.asList(BankCurrency.values()));
@@ -18,6 +19,13 @@ public class FrontCurrencies {
     public static List<BankCurrency> getCurrencyList() {
         return frontCurrencies;
     }
+
+    public static Map<String,Boolean> getaccountsMap() {
+        accountsMap.clear();
+        frontCurrencies.forEach(currency->accountsMap.put(currency.name(),false));
+        return accountsMap;
+    }
+
 
     public enum BankCurrency {
         RUB("рубли"),

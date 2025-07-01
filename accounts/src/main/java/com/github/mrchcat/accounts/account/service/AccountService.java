@@ -15,5 +15,6 @@ public interface AccountService {
 
     BankUserDto getClient(String username);
 
-    BankUserDto editClientAccounts(String username, EditUserAccountDto editUserAccountDto);
+    void editClientAccounts(String username, EditUserAccountDto editUserAccountDto);
+
 }

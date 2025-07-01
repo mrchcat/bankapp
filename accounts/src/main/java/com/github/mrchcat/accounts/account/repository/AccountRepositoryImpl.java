@@ -1,9 +1,11 @@
 package com.github.mrchcat.accounts.account.repository;
 
 import com.github.mrchcat.accounts.account.model.Account;
+import com.github.mrchcat.accounts.account.model.BankCurrency;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -31,7 +33,43 @@ public class AccountRepositoryImpl implements AccountRepository {
         return jdbc.query(query, accountRowMapper, userId);
     }
 
-//    @Override
+    @Override
+    public List<Account> findAllAccountsByUser(UUID userId) {
+        String query = """
+                SELECT id, number,balance, currency_string_code_iso4217, user_id, created_at, updated_at,is_active
+                FROM accounts
+                WHERE user_id=?;
+                """;
+        return jdbc.query(query, accountRowMapper, userId);
+    }
+
+    @Override
+    public void setAccountActivation(UUID accountId, boolean isActive) {
+        String query = """
+                UPDATE accounts
+                SET is_Active=?
+                WHERE id=?
+                """;
+        jdbc.update(query, isActive, accountId);
+    }
+
+    @Override
+    public void createNewAccount(Account account) {
+        String query = """
+                INSERT INTO accounts(number,currency_string_code_iso4217,user_id,updated_at)
+                VALUES (?,CAST(? AS currency),?,NOW())
+                """;
+        jdbc.update(query, new PreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps) throws SQLException {
+                ps.setString(1,account.getNumber());
+                ps.setString(2,account.getCurrency().name());
+                ps.setObject(3,account.getUserId());
+            }
+        });
+    }
+
+    //    @Override
 //    public void deactivateEmptyAccounts(List<UUID> accountsId) {
 //        String query = """
 //                UPDATE accounts

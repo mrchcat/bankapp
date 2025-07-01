@@ -23,11 +23,12 @@
                 </td>
             </tr>
             <tr th:each="account : ${accounts}">
+
                 <td style="font-weight:bold;" th:text="${account.currencyTitle()}"/>
                 <td th:text="${account.isActive() ? (account.balance()+' '+account.currencyStringCode()) : ''}"/>
+
                 <td style="text-align:right">
-                    <input name="account" type="checkbox" th:checked="${account.isActive()}"
-                           th:value="${account.currencyStringCode()}"/>
+                    <input name="account" type="checkbox" th:checked="${account.isActive()}" th:value="${account.currencyStringCode()}"/>
                 </td>
             </tr>
             <tr>

@@ -3,17 +3,23 @@ package com.github.mrchcat.front.mapper;
 import com.github.mrchcat.front.dto.AccountDto;
 import com.github.mrchcat.front.dto.BankUserDto;
 import com.github.mrchcat.front.dto.CreateNewClientRequestDto;
+import com.github.mrchcat.front.dto.EditUserAccountDto;
+import com.github.mrchcat.front.dto.EditUserAccountRequestDto;
 import com.github.mrchcat.front.dto.FrontAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
 import com.github.mrchcat.front.dto.UserDetailsDto;
 import com.github.mrchcat.front.model.FrontCurrencies;
+import net.minidev.json.JSONUtil;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.w3c.dom.ls.LSOutput;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class FrontMapper {
 
@@ -75,5 +81,27 @@ public class FrontMapper {
             }
         }
         return null;
+    }
+
+    public static EditUserAccountRequestDto toRequestDto(EditUserAccountDto dto) {
+        System.out.println("внутри Mapper");
+        List<String> accountDtos = dto.account();
+        Map<String, Boolean> accountMap = FrontCurrencies.getaccountsMap();
+        System.out.println("accountMap до равно=" + accountMap);
+        if (accountDtos != null && !accountDtos.isEmpty()) {
+            System.out.println("внутри цикла");
+            for (String currencyStringCode : dto.account()) {
+                if (!accountMap.containsKey(currencyStringCode)) {
+                    throw new IllegalArgumentException("валюта отсутствует в справочнике");
+                }
+                accountMap.replace(currencyStringCode, true);
+            }
+        }
+        System.out.println("accountMap после равно=" + accountMap);
+        return EditUserAccountRequestDto.builder()
+                .fullName(dto.fullName())
+                .email(dto.email())
+                .accounts(accountMap)
+                .build();
     }
 }

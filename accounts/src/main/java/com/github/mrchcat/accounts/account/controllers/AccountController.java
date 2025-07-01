@@ -45,9 +45,25 @@ public class AccountController {
     BankUserDto editClientAccountsAndPersonalData(@PathVariable @NotNull @NotBlank String username,
                                                   @RequestBody @Valid EditUserAccountDto editUserAccountDto) {
         System.out.println("получили username=" + username + " ;" + "editUserAccountDto=" + editUserAccountDto);
-        userService.editClientData(username, editUserAccountDto);
-//        accountService.editClientAccounts(username, editUserAccountDto);
-        return accountService.getClient(username);
+        if (!validateIfAllPropertiesEmpty(editUserAccountDto)) {
+            userService.editClientData(username, editUserAccountDto);
+        }
+        accountService.editClientAccounts(username, editUserAccountDto);
+        var client=accountService.getClient(username);
+        System.out.println("на отправку "+client);
+        return client;
+    }
+
+    private final boolean validateIfAllPropertiesEmpty(EditUserAccountDto editUserAccountDto) {
+        String email = editUserAccountDto.email();
+        if (email != null && !email.isBlank()) {
+            return false;
+        }
+        String fullName = editUserAccountDto.fullName();
+        if (fullName != null && !fullName.isBlank()) {
+            return false;
+        }
+        return true;
     }
 
 }

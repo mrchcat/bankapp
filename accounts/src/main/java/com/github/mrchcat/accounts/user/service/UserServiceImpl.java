@@ -63,7 +63,6 @@ public class UserServiceImpl implements UserService {
         return getUserDetails(upDto.username());
     }
 
-
     private void validateIfClientPropertiesExistAlready(CreateNewClientDto upDto) {
         List<String> propertyUniquenessCheckResult = new ArrayList<>();
         String username = upDto.username();

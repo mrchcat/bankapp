@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.client.RestClient;
 
 @Service
@@ -44,7 +43,6 @@ public class FrontServiceImpl implements FrontService {
     public UserDetails registerNewClient(NewClientRegisterDto ncrdto) throws AuthException {
         String passwordHash = encoder.encode(ncrdto.password());
         var newClientRequestDto = FrontMapper.toCreateNewClientRequestDto(ncrdto, passwordHash);
-        System.out.println("отправляем на сохранение " + newClientRequestDto);
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         var response = restClientBuilder.build()
                 .post()
@@ -77,16 +75,15 @@ public class FrontServiceImpl implements FrontService {
 
     @Override
     public BankUserDto editUserAccount(String username, EditUserAccountDto editUserAccountDto) throws AuthException {
-        System.out.println("Зашли в editUserAccount");
+        System.out.println("должны отправить " + FrontMapper.toRequestDto(editUserAccountDto));
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         var response = restClientBuilder.build()
                 .patch()
                 .uri("http://" + ACCOUNT_SERVICE + ACCOUNTS_PATCH_CLIENT_API + "/" + username)
                 .header(oAuthHeader.name(), oAuthHeader.value())
-                .body(editUserAccountDto)
+                .body(FrontMapper.toRequestDto(editUserAccountDto))
                 .retrieve()
                 .body(BankUserDto.class);
-        System.out.println("получили response response");
         if (response == null) {
             throw new UsernameNotFoundException("сервис accounts вернул пустой ответ");
         }

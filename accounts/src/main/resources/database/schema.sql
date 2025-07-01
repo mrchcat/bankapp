@@ -21,7 +21,7 @@ CREATE TYPE currency AS ENUM ('RUB','USD','CNY');
 CREATE TABLE IF NOT EXISTS accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   number VARCHAR(256) NOT NULL,
-  balance NUMERIC(14,2) NOT NULL CHECK(balance>=0),
+  balance NUMERIC(14,2) NOT NULL CHECK(balance>=0) DEFAULT 0,
   currency_string_code_iso4217 currency NOT NULL,
   user_id UUID NOT NULL REFERENCES users(id),
   created_at timestamp DEFAULT NOW(),

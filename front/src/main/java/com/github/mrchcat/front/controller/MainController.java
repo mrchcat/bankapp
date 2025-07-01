@@ -41,9 +41,7 @@ import java.util.List;
 public class MainController {
     private final FrontService frontService;
 
-    /**
-     * после авторизации загружаются разные страницы в зависимости от роли
-     */
+    /** после авторизации загружаются разные страницы в зависимости от роли */
     @GetMapping("/defaultAfterLogin")
     String getDefaultUrlAfter(Authentication authentication) {
         var authorities = authentication.getAuthorities();
@@ -55,9 +53,7 @@ public class MainController {
         return "redirect:/main";
     }
 
-    /**
-     * основная страница
-     */
+    /** основная страница */
     @GetMapping(path = {"/main", "/"})
     String getMain(Model model, Principal principal) {
         String username = principal.getName();
@@ -73,9 +69,7 @@ public class MainController {
         return "/main";
     }
 
-    /**
-     * контроллер обновления пароля
-     */
+    /** контроллер обновления пароля */
     @PostMapping("/user/{username}/editPassword")
     RedirectView editClientPassword(@PathVariable @NotNull @NotBlank String username,
                                     @ModelAttribute @Valid PasswordUpdateDto passwordDto,
@@ -103,15 +97,14 @@ public class MainController {
         return redirectView;
     }
 
-    /**
-     * контроллер обновления личных данных и данных об аккаунтах
-     */
+    /** контроллер обновления личных данных и данных об аккаунтах */
     @PostMapping("/user/{username}/editUserAccounts")
     RedirectView editUserAccounts(@PathVariable @NotNull @NotBlank String username,
                                   @ModelAttribute @Valid EditUserAccountDto editUserAccountDto,
                                   BindingResult bindingResult,
                                   RedirectAttributes redirectAttributes
     ) {
+        System.out.println("получили " + editUserAccountDto);
         RedirectView redirectView = new RedirectView();
         redirectView.setContextRelative(true);
         redirectView.setUrl("/main");
