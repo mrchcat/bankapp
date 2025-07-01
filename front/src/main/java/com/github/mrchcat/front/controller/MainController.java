@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 import org.w3c.dom.ls.LSOutput;
 
 import java.security.Principal;
@@ -72,63 +74,63 @@ public class MainController {
      * контроллер обновления пароля
      */
     @PostMapping("/user/{username}/editPassword")
-    String editClientPassword(@PathVariable @NotNull @NotBlank String username,
-                              @ModelAttribute @Valid PasswordUpdateDto passwordDto,
-                              BindingResult bindingResult,
-                              Model model,
-                              Principal principal) {
+    RedirectView editClientPassword(@PathVariable @NotNull @NotBlank String username,
+                                    @ModelAttribute @Valid PasswordUpdateDto passwordDto,
+                                    BindingResult bindingResult,
+                                    RedirectAttributes redirectAttributes) {
+        RedirectView redirectView = new RedirectView();
+        redirectView.setContextRelative(true);
+        redirectView.setUrl("/main");
         List<String> passwordErrors = new ArrayList<>();
-        model.addAttribute("passwordErrors", passwordErrors);
-        model.addAttribute("isPasswordUpdated", false);
+        redirectAttributes.addFlashAttribute("passwordErrors", passwordErrors);
+        redirectAttributes.addFlashAttribute("isPasswordUpdated", false);
         if (bindingResult.hasErrors()) {
             bindingResult.getAllErrors()
                     .stream()
                     .map(ObjectError::getDefaultMessage)
                     .forEach(passwordErrors::add);
-            return getMain(model, principal);
+            return redirectView;
         }
         try {
             UserDetails newUserDetails = frontService.editClientPassword(username, passwordDto.password());
-            model.addAttribute("isPasswordUpdated", true);
+            redirectAttributes.addFlashAttribute("isPasswordUpdated", true);
         } catch (Exception ex) {
             passwordErrors.add(ex.getMessage());
         }
-        return getMain(model, principal);
+        return redirectView;
     }
 
     /**
      * контроллер обновления личных данных и данных об аккаунтах
      */
     @PostMapping("/user/{username}/editUserAccounts")
-    String editUserAccounts(@PathVariable @NotNull @NotBlank String username,
+    RedirectView editUserAccounts(@PathVariable @NotNull @NotBlank String username,
                             @ModelAttribute @Valid EditUserAccountDto editUserAccountDto,
                             BindingResult bindingResult,
-                            Model model,
-                            Principal principal) {
-        System.out.println("зашли в editUserAccounts");
-        System.out.println("на входе " + editUserAccountDto);
-        System.out.println("email isBlank=" + editUserAccountDto.email().isBlank());
-        System.out.println("fullName isBlank=" + editUserAccountDto.fullName().isBlank());
-
-        List<String> errors = new ArrayList<>();
-        model.addAttribute("userAccountsErrors", errors);
+                            RedirectAttributes redirectAttributes
+                            ) {
+        RedirectView redirectView = new RedirectView();
+        redirectView.setContextRelative(true);
+        redirectView.setUrl("/main");
+        List<String> userAccountsErrors = new ArrayList<>();
+        redirectAttributes.addFlashAttribute("userAccountsErrors", userAccountsErrors);
         if (bindingResult.hasErrors()) {
             bindingResult.getAllErrors()
                     .stream()
                     .map(ObjectError::getDefaultMessage)
-                    .forEach(errors::add);
-            return getMain(model, principal);
+                    .forEach(userAccountsErrors::add);
+            return redirectView;
         }
         try {
             frontService.editUserAccount(username, editUserAccountDto);
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
                 String notUniqueProperties = ex.getResponseHeaders().get("X-not-unique").get(0);
-                errors.add("Ошибка, указанные свойства не уникальны: " + notUniqueProperties);
+                userAccountsErrors.add("Ошибка, указанные свойства не уникальны: " + notUniqueProperties);
             }
         } catch (Exception ex) {
-            errors.add(ex.getMessage());
+            userAccountsErrors.add(ex.getMessage());
         }
-        return getMain(model, principal);
+        return redirectView;
     }
 }
