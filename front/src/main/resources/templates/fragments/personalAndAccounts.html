@@ -22,14 +22,14 @@
                     <input name="email" type="email" style="width:100%"/>
                 </td>
             </tr>
-<!--            <tr th:each="account : ${accounts}">-->
-<!--                <td style="font-weight:bold;" th:text="${account.getCurrencyRuName()}"/>-->
-<!--                <td th:text="${account.isExists() ? (account.getBalance()+' '+account.getCurrency().name()) : ''}"/>-->
-<!--                <td style="text-align:right">-->
-<!--                    <input name="account" type="checkbox" th:checked="${account.isExists()}"-->
-<!--                           th:value="${account.getCurrency().name()}"/>-->
-<!--                </td>-->
-<!--            </tr>-->
+            <tr th:each="account : ${accounts}">
+                <td style="font-weight:bold;" th:text="${account.currencyTitle()}"/>
+                <td th:text="${account.isActive() ? (account.balance()+' '+account.currencyStringCode()) : ''}"/>
+                <td style="text-align:right">
+                    <input name="account" type="checkbox" th:checked="${account.isActive()}"
+                           th:value="${account.currencyStringCode()}"/>
+                </td>
+            </tr>
             <tr>
                 <td style="text-align:right" colspan="3">
                     <button>Сохранить изменения</button>

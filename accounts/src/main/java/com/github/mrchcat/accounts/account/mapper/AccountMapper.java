@@ -12,8 +12,7 @@ public class AccountMapper {
                 .id(account.getId())
                 .number(account.getNumber())
                 .balance(account.getBalance())
-                .currencyStringCode(account.getCurrency().getString_code_iso4217())
-                .currencyRuName(account.getCurrency().getRu_name())
+                .currencyStringCode(account.getCurrency().name())
                 .build();
     }
 
@@ -22,6 +21,4 @@ public class AccountMapper {
                 .map(AccountMapper::toDto)
                 .toList();
     }
-
-
 }

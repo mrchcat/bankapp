@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS transactions_log CASCADE;
 DROP TABLE IF EXISTS accounts CASCADE;
-DROP TABLE IF EXISTS currencies CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
+DROP TYPE currency;
 
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -16,17 +16,13 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at timestamp
 );
 
-CREATE TABLE IF NOT EXISTS currencies (
-  string_code_iso4217 VARCHAR(5) PRIMARY KEY,
-  digital_code_iso4217 int NOT NULL UNIQUE,
-  ru_name VARCHAR(50) NOT NULL UNIQUE
-);
+CREATE TYPE currency AS ENUM ('RUB','USD','CNY');
 
 CREATE TABLE IF NOT EXISTS accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   number VARCHAR(256) NOT NULL,
   balance NUMERIC(14,2) NOT NULL CHECK(balance>=0),
-  currency_string_code_iso4217 VARCHAR(5) NOT NULL REFERENCES currencies(string_code_iso4217),
+  currency_string_code_iso4217 currency NOT NULL,
   user_id UUID NOT NULL REFERENCES users(id),
   created_at timestamp DEFAULT NOW(),
   updated_at timestamp NOT NULL,
@@ -43,8 +39,3 @@ CREATE TABLE IF NOT EXISTS transactions_log (
   amount_to NUMERIC(14,2) NOT NULL,
   is_succeed boolean NOT NULL
 );
-
-INSERT INTO currencies (string_code_iso4217, digital_code_iso4217, ru_name)
-VALUES ('RUB',643,'рубли'), ('USD', 840,'доллары США'), ('CNY',156,'юани')
-ON CONFLICT DO NOTHING;
-

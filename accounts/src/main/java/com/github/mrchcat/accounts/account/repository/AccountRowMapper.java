@@ -13,17 +13,11 @@ import java.util.UUID;
 public class AccountRowMapper implements RowMapper<Account> {
     @Override
     public Account mapRow(ResultSet rs, int rowNum) throws SQLException {
-        var accountCurrency = BankCurrency.builder()
-                .string_code_iso4217(rs.getString("string_code_iso4217"))
-                .digital_code_iso4217(rs.getInt("digital_code_iso4217"))
-                .ru_name(rs.getString("ru_name"))
-                .build();
-
         return Account.builder()
                 .id(rs.getObject("id", UUID.class))
                 .number(rs.getString("number"))
                 .balance(rs.getBigDecimal("balance"))
-                .currency(accountCurrency)
+                .currency(BankCurrency.valueOf(rs.getString("currency_string_code_iso4217")))
                 .userId(rs.getObject("user_id", UUID.class))
                 .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                 .updatedAt(rs.getTimestamp("updated_at").toLocalDateTime())

@@ -2,6 +2,7 @@ package com.github.mrchcat.front.service;
 
 import com.github.mrchcat.front.dto.BankUserDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
+import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
 import com.github.mrchcat.front.dto.UserDetailsDto;
 import com.github.mrchcat.front.mapper.FrontMapper;
@@ -60,18 +61,18 @@ public class FrontServiceImpl implements FrontService {
 
     @Override
     @SneakyThrows
-    public BankUserDto getClientDetailsAndAccounts(String username) {
+    public FrontBankUserDto getClientDetailsAndAccounts(String username) {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
-        var response = restClientBuilder.build()
+        BankUserDto bankUserDto = restClientBuilder.build()
                 .get()
                 .uri("http://" + ACCOUNT_SERVICE + ACCOUNTS_GET_CLIENT_API + "/" + username)
                 .header(oAuthHeader.name(), oAuthHeader.value())
                 .retrieve()
                 .body(BankUserDto.class);
-        if (response == null) {
+        if (bankUserDto == null) {
             throw new UsernameNotFoundException("сервис accounts вернул пустой ответ");
         }
-        return response;
+        return FrontMapper.toFrontDto(bankUserDto);
     }
 
     @Override

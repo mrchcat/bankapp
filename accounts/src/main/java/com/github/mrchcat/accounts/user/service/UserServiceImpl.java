@@ -87,7 +87,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void editClientData(String username, EditUserAccountDto dto) {
-        System.out.println("получили " + dto);
         BankUser client = getClient(username);
         boolean hasNewProperties = false;
         String newEmail = dto.email();

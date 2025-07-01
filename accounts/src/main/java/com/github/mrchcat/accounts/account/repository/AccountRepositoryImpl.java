@@ -24,10 +24,9 @@ public class AccountRepositoryImpl implements AccountRepository {
     @Override
     public List<Account> findAllActiveAccountsByUser(UUID userId) {
         String query = """
-                SELECT a.id,a.number,a.balance, cr.string_code_iso4217, cr.digital_code_iso4217, cr.ru_name,
-                a.user_id,a.created_at,a.updated_at, a.is_active
-                FROM accounts AS a JOIN currencies AS cr ON a.currency_string_code_iso4217=cr.string_code_iso4217
-                WHERE a.user_id=? AND is_active=true;
+                SELECT id, number,balance, currency_string_code_iso4217, user_id, created_at, updated_at,is_active
+                FROM accounts
+                WHERE user_id=? AND is_active=true;
                 """;
         return jdbc.query(query, accountRowMapper, userId);
     }

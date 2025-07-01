@@ -2,6 +2,8 @@ package com.github.mrchcat.front.controller;
 
 import com.github.mrchcat.front.dto.BankUserDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
+import com.github.mrchcat.front.dto.FrontAccountDto;
+import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.model.UserRole;
 import com.github.mrchcat.front.dto.PasswordUpdateDto;
 import com.github.mrchcat.front.service.FrontService;
@@ -61,7 +63,8 @@ public class MainController {
         String username = principal.getName();
         model.addAttribute("login", username);
 
-        BankUserDto clientDetailsAndAccounts = frontService.getClientDetailsAndAccounts(username);
+        FrontBankUserDto clientDetailsAndAccounts = frontService.getClientDetailsAndAccounts(username);
+        System.out.println("получили clientDetailsAndAccounts=" + clientDetailsAndAccounts);
         model.addAttribute("fullName", clientDetailsAndAccounts.fullName());
         model.addAttribute("birthDate", clientDetailsAndAccounts.birthDay());
         model.addAttribute("email", clientDetailsAndAccounts.email());
@@ -105,10 +108,10 @@ public class MainController {
      */
     @PostMapping("/user/{username}/editUserAccounts")
     RedirectView editUserAccounts(@PathVariable @NotNull @NotBlank String username,
-                            @ModelAttribute @Valid EditUserAccountDto editUserAccountDto,
-                            BindingResult bindingResult,
-                            RedirectAttributes redirectAttributes
-                            ) {
+                                  @ModelAttribute @Valid EditUserAccountDto editUserAccountDto,
+                                  BindingResult bindingResult,
+                                  RedirectAttributes redirectAttributes
+    ) {
         RedirectView redirectView = new RedirectView();
         redirectView.setContextRelative(true);
         redirectView.setUrl("/main");

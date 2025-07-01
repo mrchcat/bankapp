@@ -1,16 +1,19 @@
 package com.github.mrchcat.front.mapper;
 
+import com.github.mrchcat.front.dto.AccountDto;
+import com.github.mrchcat.front.dto.BankUserDto;
 import com.github.mrchcat.front.dto.CreateNewClientRequestDto;
-import com.github.mrchcat.front.dto.GrantedAuthorityDto;
+import com.github.mrchcat.front.dto.FrontAccountDto;
+import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
 import com.github.mrchcat.front.dto.UserDetailsDto;
+import com.github.mrchcat.front.model.FrontCurrencies;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class FrontMapper {
 
@@ -40,4 +43,37 @@ public class FrontMapper {
                 .build();
     }
 
+    public static FrontBankUserDto toFrontDto(BankUserDto dto) {
+        return FrontBankUserDto.builder()
+                .fullName(dto.fullName())
+                .birthDay(dto.birthDay())
+                .email(dto.email())
+                .accounts(toFrontDto(dto.accounts()))
+                .build();
+    }
+
+    public static List<FrontAccountDto> toFrontDto(List<AccountDto> dtos) {
+        List<FrontAccountDto> frontAccountDtos = new ArrayList<>();
+        for (FrontCurrencies.BankCurrency currency : FrontCurrencies.getCurrencyList()) {
+            String frontCurrencyStringCode = currency.name();
+            AccountDto desiredAccountDto = findFirstByCurrencyCode(frontCurrencyStringCode, dtos);
+            FrontAccountDto frontAccountDto = FrontAccountDto.builder()
+                    .currencyStringCode(frontCurrencyStringCode)
+                    .currencyTitle(currency.title)
+                    .isActive(desiredAccountDto != null)
+                    .balance(desiredAccountDto != null ? desiredAccountDto.balance() : null)
+                    .build();
+            frontAccountDtos.add(frontAccountDto);
+        }
+        return frontAccountDtos;
+    }
+
+    private static AccountDto findFirstByCurrencyCode(String frontCurrencyStringCode, List<AccountDto> dtos) {
+        for (AccountDto accountDto : dtos) {
+            if (accountDto.currencyStringCode().equals(frontCurrencyStringCode)) {
+                return accountDto;
+            }
+        }
+        return null;
+    }
 }

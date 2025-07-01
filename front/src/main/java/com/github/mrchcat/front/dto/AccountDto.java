@@ -9,6 +9,5 @@ import java.util.UUID;
 public record AccountDto(UUID id,
                          String number,
                          BigDecimal balance,
-                         String currencyStringCode,
-                         String currencyRuName) {
+                         String currencyStringCode) {
 }
