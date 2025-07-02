@@ -1,10 +1,8 @@
 server.port: 8084
 
-application:
-
 spring:
   application:
-    name: bank_cash
+    name: bankCash
 
   security:
     oauth2:
@@ -25,8 +23,6 @@ spring:
   cloud:
     consul:
       discovery:
-        hostname: localhost
-        port: 8500
         prefer-ip-address: true
         health-check-url: http://host.docker.internal:${server.port}/actuator/health
 

@@ -1,18 +1,18 @@
 package com.github.mrchcat.front.controller;
 
-import com.github.mrchcat.front.dto.BankUserDto;
+import com.github.mrchcat.front.dto.CashOperationDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
+import com.github.mrchcat.front.model.CashAction;
+import com.github.mrchcat.front.model.FrontCurrencies;
 import com.github.mrchcat.front.model.UserRole;
 import com.github.mrchcat.front.dto.PasswordUpdateDto;
 import com.github.mrchcat.front.service.FrontService;
-import jakarta.security.auth.message.AuthException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import net.minidev.json.JSONUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,15 +25,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
-import org.w3c.dom.ls.LSOutput;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -41,7 +41,9 @@ import java.util.List;
 public class MainController {
     private final FrontService frontService;
 
-    /** после авторизации загружаются разные страницы в зависимости от роли */
+    /**
+     * после авторизации загружаются разные страницы в зависимости от роли
+     */
     @GetMapping("/defaultAfterLogin")
     String getDefaultUrlAfter(Authentication authentication) {
         var authorities = authentication.getAuthorities();
@@ -53,23 +55,32 @@ public class MainController {
         return "redirect:/main";
     }
 
-    /** основная страница */
+    /**
+     * основная страница
+     */
     @GetMapping(path = {"/main", "/"})
     String getMain(Model model, Principal principal) {
         String username = principal.getName();
         model.addAttribute("login", username);
 
         FrontBankUserDto clientDetailsAndAccounts = frontService.getClientDetailsAndAccounts(username);
-        System.out.println("получили clientDetailsAndAccounts=" + clientDetailsAndAccounts);
         model.addAttribute("fullName", clientDetailsAndAccounts.fullName());
         model.addAttribute("birthDate", clientDetailsAndAccounts.birthDay());
         model.addAttribute("email", clientDetailsAndAccounts.email());
         model.addAttribute("accounts", clientDetailsAndAccounts.accounts());
 
+        model.addAttribute("currency", FrontCurrencies.BankCurrency.values());
+
+//        for(FrontCurrencies.BankCurrency d:FrontCurrencies.BankCurrency.values()){
+//            d.getTitle()
+//        }
+
         return "/main";
     }
 
-    /** контроллер обновления пароля */
+    /**
+     * контроллер обновления пароля
+     */
     @PostMapping("/user/{username}/editPassword")
     RedirectView editClientPassword(@PathVariable @NotNull @NotBlank String username,
                                     @ModelAttribute @Valid PasswordUpdateDto passwordDto,
@@ -97,14 +108,15 @@ public class MainController {
         return redirectView;
     }
 
-    /** контроллер обновления личных данных и данных об аккаунтах */
+    /**
+     * контроллер обновления личных данных и данных об аккаунтах
+     */
     @PostMapping("/user/{username}/editUserAccounts")
     RedirectView editUserAccounts(@PathVariable @NotNull @NotBlank String username,
                                   @ModelAttribute @Valid EditUserAccountDto editUserAccountDto,
                                   BindingResult bindingResult,
                                   RedirectAttributes redirectAttributes
     ) {
-        System.out.println("получили " + editUserAccountDto);
         RedirectView redirectView = new RedirectView();
         redirectView.setContextRelative(true);
         redirectView.setUrl("/main");
@@ -115,6 +127,9 @@ public class MainController {
                     .stream()
                     .map(ObjectError::getDefaultMessage)
                     .forEach(userAccountsErrors::add);
+        }
+        validateCheckBoxes(username, editUserAccountDto, userAccountsErrors);
+        if (!userAccountsErrors.isEmpty()) {
             return redirectView;
         }
         try {
@@ -129,4 +144,64 @@ public class MainController {
         }
         return redirectView;
     }
+
+    private void validateCheckBoxes(String username, EditUserAccountDto editUserAccountDto, List<String> userAccountsErrors) {
+        List<String> activeAccountsFromFront = (editUserAccountDto.account() == null) ? Collections.emptyList() : editUserAccountDto.account();
+        List<FrontAccountDto> existingAccounts = frontService.getClientDetailsAndAccounts(username).accounts();
+        List<String> notEmptyAccounts = frontService.getClientDetailsAndAccounts(username)
+                .accounts().stream()
+                .filter(account -> account.balance() != null)
+                .filter(account -> account.balance().compareTo(BigDecimal.ZERO) > 0)
+                .map(FrontAccountDto::currencyStringCode)
+                .filter(currencyStringCode -> !activeAccountsFromFront.contains(currencyStringCode))
+                .toList();
+        if (notEmptyAccounts.isEmpty()) {
+            return;
+        }
+        String message = "Ошибка: невозможно удалить следующие аккаунты, т.к. они баланс не пуст: "
+                + String.join(",", notEmptyAccounts);
+        userAccountsErrors.add(message);
+    }
+
+
+    /**
+     * контроллер для работы с наличными
+     */
+
+    @PostMapping(path = "/user/{username}/сash")
+    RedirectView depositCash(@PathVariable @NotNull @NotBlank String username,
+                             @ModelAttribute @Valid CashOperationDto cashOperationDto,
+                             @RequestParam("action") @NotNull CashAction action,
+                             BindingResult bindingResult,
+                             RedirectAttributes redirectAttributes) {
+        RedirectView redirectView = new RedirectView();
+        redirectView.setContextRelative(true);
+        redirectView.setUrl("/main");
+        List<String> cashErrors = new ArrayList<>();
+        redirectAttributes.addFlashAttribute("cashErrors", cashErrors);
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors()
+                    .stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .forEach(cashErrors::add);
+            return redirectView;
+        }
+        try {
+            frontService.processCashOperation(username, cashOperationDto, action);
+            redirectAttributes.addFlashAttribute("isCashOperationSucceed", true);
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+//                "описать"
+//                String notUniqueProperties = ex.getResponseHeaders().get("X-not-unique").get(0);
+//                cashErrors.add("Ошибка, указанные свойства не уникальны: " + notUniqueProperties);
+            }
+        } catch (Exception ex) {
+            cashErrors.add(ex.getMessage());
+        }
+        return redirectView;
+    }
+
+
+
+
 }

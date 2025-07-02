@@ -38,5 +38,8 @@ public class FrontCurrencies {
             this.title = title;
         }
 
+        public String getTitle() {
+            return title;
+        }
     }
 }

@@ -1,11 +1,14 @@
 package com.github.mrchcat.front.service;
 
 import com.github.mrchcat.front.dto.BankUserDto;
+import com.github.mrchcat.front.dto.CashOperationDto;
+import com.github.mrchcat.front.dto.CashOperationRequestDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
 import com.github.mrchcat.front.dto.UserDetailsDto;
 import com.github.mrchcat.front.mapper.FrontMapper;
+import com.github.mrchcat.front.model.CashAction;
 import com.github.mrchcat.front.security.OAuthHeaderGetter;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +24,13 @@ import org.springframework.web.client.RestClient;
 @Service
 @RequiredArgsConstructor
 public class FrontServiceImpl implements FrontService {
-    String ACCOUNT_SERVICE = "bankAccounts";
-    String ACCOUNTS_REGISTER_NEW_CLIENT_API = "/registration";
-    String ACCOUNTS_GET_CLIENT_API = "/account";
-    String ACCOUNTS_PATCH_CLIENT_API = "/account";
+    private final String ACCOUNT_SERVICE = "bankAccounts";
+    private final String ACCOUNTS_REGISTER_NEW_CLIENT_API = "/registration";
+    private final String ACCOUNTS_GET_CLIENT_API = "/account";
+    private final String ACCOUNTS_PATCH_CLIENT_API = "/account";
 
+    private final String CASH_SERVICE = "bankCash";
+    private final String CASH_PROCESS_API = "/cash";
 
     private final UserDetailsPasswordService userDetailsPasswordService;
     private final UserDetailsService userDetailsService;
@@ -88,5 +93,25 @@ public class FrontServiceImpl implements FrontService {
             throw new UsernameNotFoundException("сервис accounts вернул пустой ответ");
         }
         return response;
+    }
+
+    @Override
+    public void processCashOperation(String username, CashOperationDto cashOperationDto, CashAction action) throws AuthException {
+        CashOperationRequestDto requestDto = FrontMapper.torequestDto(username,cashOperationDto, action);
+        System.out.println("отправляем " + requestDto + " " + action);
+        var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
+        try {
+            var response = restClientBuilder.build()
+                    .post()
+                    .uri("http://" + CASH_SERVICE+CASH_PROCESS_API)
+                    .header(oAuthHeader.name(), oAuthHeader.value())
+                    .body(requestDto)
+                    .retrieve()
+                    .body(String.class);
+            System.out.println("получили "+response);
+        } catch (Exception e) {
+            System.out.println("ошибка " + e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 }

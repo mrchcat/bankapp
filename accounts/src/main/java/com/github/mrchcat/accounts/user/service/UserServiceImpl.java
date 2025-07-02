@@ -63,21 +63,6 @@ public class UserServiceImpl implements UserService {
         return getUserDetails(upDto.username());
     }
 
-    private void validateIfClientPropertiesExistAlready(CreateNewClientDto upDto) {
-        List<String> propertyUniquenessCheckResult = new ArrayList<>();
-        String username = upDto.username();
-        if (username != null && userRepository.findByUsername(username).isPresent()) {
-            propertyUniquenessCheckResult.add("username");
-        }
-        String email = upDto.username();
-        if (email != null && userRepository.isEmailExists(email)) {
-            propertyUniquenessCheckResult.add("email");
-        }
-        if (!propertyUniquenessCheckResult.isEmpty()) {
-            throw new UserNotUniqueProperties(propertyUniquenessCheckResult);
-        }
-    }
-
     @Override
     public BankUser getClient(String username) {
         return userRepository.findByUsername(username)
@@ -111,6 +96,21 @@ public class UserServiceImpl implements UserService {
     private void validateIfEmailAlreadyExists(String email) {
         if (userRepository.isEmailExists(email)) {
             throw new UserNotUniqueProperties(List.of("email"));
+        }
+    }
+
+    private void validateIfClientPropertiesExistAlready(CreateNewClientDto upDto) {
+        List<String> propertyUniquenessCheckResult = new ArrayList<>();
+        String username = upDto.username();
+        if (username != null && userRepository.findByUsername(username).isPresent()) {
+            propertyUniquenessCheckResult.add("username");
+        }
+        String email = upDto.username();
+        if (email != null && userRepository.isEmailExists(email)) {
+            propertyUniquenessCheckResult.add("email");
+        }
+        if (!propertyUniquenessCheckResult.isEmpty()) {
+            throw new UserNotUniqueProperties(propertyUniquenessCheckResult);
         }
     }
 

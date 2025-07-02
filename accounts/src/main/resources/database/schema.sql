@@ -29,13 +29,13 @@ CREATE TABLE IF NOT EXISTS accounts (
   is_active boolean DEFAULT true
 );
 
-CREATE TABLE IF NOT EXISTS transactions_log (
+CREATE TABLE IF NOT EXISTS log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at timestamp NOT NULL DEFAULT NOW(),
   transaction_type VARCHAR(10) NOT NULL,
-  from_account UUID NOT NULL REFERENCES accounts(id),
-  to_account UUID NOT NULL REFERENCES accounts(id),
-  amount_from NUMERIC(14,2) NOT NULL,
-  amount_to NUMERIC(14,2) NOT NULL,
+  from_account_id UUID REFERENCES accounts(id),
+  to_account_id UUID REFERENCES accounts(id),
+  amount_from NUMERIC(14,2) ,
+  amount_to NUMERIC(14,2) ,
   is_succeed boolean NOT NULL
 );

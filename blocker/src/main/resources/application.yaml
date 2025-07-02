@@ -2,7 +2,7 @@ server.port: 8083
 
 spring:
   application:
-    name: bank_blocker
+    name: bankBlocker
   security:
     oauth2:
       resourceserver:
@@ -11,8 +11,6 @@ spring:
   cloud:
     consul:
       discovery:
-        hostname: localhost
-        port: 8500
         prefer-ip-address: true
         health-check-url: http://host.docker.internal:${server.port}/actuator/health
 

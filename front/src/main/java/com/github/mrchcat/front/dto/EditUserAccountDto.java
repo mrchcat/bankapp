@@ -20,11 +20,6 @@ public record EditUserAccountDto(
             "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
 
 
-//    @AssertFalse(message = "ошибка: нет данных для сохранения; все поля пустые")
-//    boolean isAllEmpty() {
-//        return (fullName == null || fullName.isBlank()) && (email == null || email.isBlank());
-//    }
-
     @AssertTrue(message = "ошибка: некорректный формат e-mail")
     boolean isEmailCorrectIfExist() {
         if (email != null && !email.isBlank()) {
