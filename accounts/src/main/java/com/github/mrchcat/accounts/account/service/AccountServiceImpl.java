@@ -1,8 +1,8 @@
 package com.github.mrchcat.accounts.account.service;
 
-import com.github.mrchcat.accounts.account.dto.AccountListDto;
-import com.github.mrchcat.accounts.account.dto.BankCurrencyListDto;
+import com.github.mrchcat.accounts.account.dto.CashTransactionDto;
 import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
+import com.github.mrchcat.accounts.account.dto.TransactionConfirmation;
 import com.github.mrchcat.accounts.account.model.Account;
 import com.github.mrchcat.accounts.account.model.BankCurrency;
 import com.github.mrchcat.accounts.account.repository.AccountRepository;
@@ -11,16 +11,12 @@ import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.model.BankUser;
 import com.github.mrchcat.accounts.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -29,16 +25,17 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final UserService userService;
 
-
     @Override
-    public List<Account> findAllActiveAccountsByUser(UUID userId) {
-        return accountRepository.findAllActiveAccountsByUser(userId);
+    public BankUserDto getClient(String username, BankCurrency currency) {
+        BankUser client = userService.getClient(username);
+        List<Account> accounts = accountRepository.findAllActiveAccountsByUser(client.getId(), currency);
+        return UserMapper.toDto(client, accounts);
     }
 
     @Override
     public BankUserDto getClient(String username) {
         BankUser client = userService.getClient(username);
-        List<Account> accounts = findAllActiveAccountsByUser(client.getId());
+        List<Account> accounts = accountRepository.findAllActiveAccountsByUser(client.getId());
         return UserMapper.toDto(client, accounts);
     }
 
@@ -88,23 +85,8 @@ public class AccountServiceImpl implements AccountService {
         accountRepository.createNewAccount(newAccount);
     }
 
-//    number VARCHAR(256) NOT NULL,
-//    balance NUMERIC(14,2) NOT NULL CHECK(balance>=0) DEFAULT 0,
-//    currency_string_code_iso4217 currency NOT NULL,
-//    user_id UUID NOT NULL REFERENCES users(id),
-//    created_at timestamp DEFAULT NOW(),
-//    updated_at timestamp NOT NULL,
-//    is_active boolean DEFAULT true
-//
-
-
-//    @Override
-//    public BankUserDto createAccounts(String username, BankCurrencyListDto bankCurrencyListDto) {
-//        return ;
-//    }
-//
-//    @Override
-//    public void deleteAccounts(AccountListDto accountListDto) {
-//        accountRepository.deactivateEmptyAccounts(accountListDto.accountsId());
-//    }
+    @Override
+    public TransactionConfirmation processCashTransaction(CashTransactionDto cashTransactionDto) {
+        return new TransactionConfirmation(cashTransactionDto.transactionId(), cashTransactionDto.status());
+    }
 }

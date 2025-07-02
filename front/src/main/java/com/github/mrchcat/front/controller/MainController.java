@@ -1,13 +1,13 @@
 package com.github.mrchcat.front.controller;
 
-import com.github.mrchcat.front.dto.CashOperationDto;
+import com.github.mrchcat.front.dto.CashTransactionDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
+import com.github.mrchcat.front.dto.PasswordUpdateDto;
 import com.github.mrchcat.front.model.CashAction;
 import com.github.mrchcat.front.model.FrontCurrencies;
 import com.github.mrchcat.front.model.UserRole;
-import com.github.mrchcat.front.dto.PasswordUpdateDto;
 import com.github.mrchcat.front.service.FrontService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -35,6 +35,8 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+//TODO добавить проверку, что username действительно соответствует авторизированнному пользователю
 
 @Controller
 @RequiredArgsConstructor
@@ -170,7 +172,7 @@ public class MainController {
 
     @PostMapping(path = "/user/{username}/сash")
     RedirectView depositCash(@PathVariable @NotNull @NotBlank String username,
-                             @ModelAttribute @Valid CashOperationDto cashOperationDto,
+                             @ModelAttribute @Valid CashTransactionDto cashOperationDto,
                              @RequestParam("action") @NotNull CashAction action,
                              BindingResult bindingResult,
                              RedirectAttributes redirectAttributes) {

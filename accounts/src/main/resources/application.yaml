@@ -4,7 +4,7 @@ spring:
   application:
     name: bankAccounts
   datasource:
-    url: jdbc:postgresql://localhost:5432/bankapp
+    url: jdbc:postgresql://localhost:5432/accountapp
     username: postgres
     password: Inushing1980
   sql.init:

@@ -1,5 +1,5 @@
 package com.github.mrchcat.cash.model;
 
-public enum CashOperation {
+public enum CashAction {
     DEPOSIT,WITHDRAWAL
 }

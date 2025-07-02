@@ -1,8 +1,8 @@
 package com.github.mrchcat.front.service;
 
 import com.github.mrchcat.front.dto.BankUserDto;
-import com.github.mrchcat.front.dto.CashOperationDto;
-import com.github.mrchcat.front.dto.CashOperationRequestDto;
+import com.github.mrchcat.front.dto.CashTransactionDto;
+import com.github.mrchcat.front.dto.CashTransactionRequestDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
@@ -96,8 +96,8 @@ public class FrontServiceImpl implements FrontService {
     }
 
     @Override
-    public void processCashOperation(String username, CashOperationDto cashOperationDto, CashAction action) throws AuthException {
-        CashOperationRequestDto requestDto = FrontMapper.torequestDto(username,cashOperationDto, action);
+    public void processCashOperation(String username, CashTransactionDto cashOperationDto, CashAction action) throws AuthException {
+        CashTransactionRequestDto requestDto = FrontMapper.torequestDto(username,cashOperationDto, action);
         System.out.println("отправляем " + requestDto + " " + action);
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         try {

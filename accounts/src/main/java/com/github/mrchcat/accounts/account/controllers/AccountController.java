@@ -1,6 +1,9 @@
 package com.github.mrchcat.accounts.account.controllers;
 
+import com.github.mrchcat.accounts.account.dto.CashTransactionDto;
 import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
+import com.github.mrchcat.accounts.account.dto.TransactionConfirmation;
+import com.github.mrchcat.accounts.account.model.BankCurrency;
 import com.github.mrchcat.accounts.account.service.AccountService;
 import com.github.mrchcat.accounts.user.dto.BankUserDto;
 import com.github.mrchcat.accounts.user.service.UserService;
@@ -11,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,37 +25,31 @@ public class AccountController {
     private final AccountService accountService;
     private final UserService userService;
 
-//    @PostMapping("/account/{username}")
-//    BankUserDto createAccounts(@PathVariable @NotNull @NotBlank String username,
-//                               @RequestBody @Valid BankCurrencyListDto bankCurrencyListDto) {
-//        return accountService.createAccounts(username, bankCurrencyListDto);
-//    }
-//
-//    @DeleteMapping("/account/{username}")
-//    BankUserDto deleteAccounts(@PathVariable @NotNull @NotBlank String username,
-//                               @RequestBody @Valid AccountListDto accountListDto) {
-//        accountService.deleteAccounts(accountListDto);
-//        return userService.getClient(username);
-//    }
-
     /**
-     * получение информации о клиенте банка
+     * получение информации о клиенте банка для фронта
      */
     @GetMapping("/account/{username}")
-    BankUserDto getClientAccountsAndPersonalData(@PathVariable @NotNull @NotBlank String username) {
-        return accountService.getClient(username);
+    BankUserDto getClientAccountsAndPersonalData(@PathVariable @NotNull @NotBlank String username,
+                                                 @RequestParam(name = "currency", required = false) BankCurrency currency
+    ) {
+        if (currency == null) {
+            return accountService.getClient(username);
+        } else {
+            return accountService.getClient(username, currency);
+        }
     }
 
+    /**
+     * корректировка информации о клиенте банка по запросу фронта
+     */
     @PatchMapping("/account/{username}")
     BankUserDto editClientAccountsAndPersonalData(@PathVariable @NotNull @NotBlank String username,
                                                   @RequestBody @Valid EditUserAccountDto editUserAccountDto) {
-        System.out.println("получили username=" + username + " ;" + "editUserAccountDto=" + editUserAccountDto);
         if (!validateIfAllPropertiesEmpty(editUserAccountDto)) {
             userService.editClientData(username, editUserAccountDto);
         }
         accountService.editClientAccounts(username, editUserAccountDto);
-        var client=accountService.getClient(username);
-        System.out.println("на отправку "+client);
+        var client = accountService.getClient(username);
         return client;
     }
 
@@ -65,5 +64,15 @@ public class AccountController {
         }
         return true;
     }
+
+    /**
+     * выполнение транзакции от сервиса выдачи денег
+     */
+    @PostMapping("/account/cash")
+    TransactionConfirmation processCashTransaction(@RequestBody @Valid CashTransactionDto cashTransactionDto) {
+        System.out.println("получили "+cashTransactionDto);
+        return accountService.processCashTransaction(cashTransactionDto);
+    }
+
 
 }

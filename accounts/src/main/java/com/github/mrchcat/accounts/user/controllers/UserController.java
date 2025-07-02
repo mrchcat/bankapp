@@ -1,6 +1,5 @@
 package com.github.mrchcat.accounts.user.controllers;
 
-import com.github.mrchcat.accounts.user.dto.BankUserDto;
 import com.github.mrchcat.accounts.user.dto.CreateNewClientDto;
 import com.github.mrchcat.accounts.user.dto.UpdatePasswordRequestDto;
 import com.github.mrchcat.accounts.user.service.UserService;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor

@@ -1,6 +1,5 @@
-package com.github.mrchcat.accounts.user.dto;
+package com.github.mrchcat.cash.dto;
 
-import com.github.mrchcat.accounts.account.dto.AccountDto;
 import lombok.Builder;
 
 import java.time.LocalDate;

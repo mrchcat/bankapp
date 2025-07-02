@@ -1,7 +1,7 @@
 package com.github.mrchcat.front.service;
 
 import com.github.mrchcat.front.dto.BankUserDto;
-import com.github.mrchcat.front.dto.CashOperationDto;
+import com.github.mrchcat.front.dto.CashTransactionDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
@@ -19,6 +19,6 @@ public interface FrontService {
 
     BankUserDto editUserAccount(String username, EditUserAccountDto editUserAccountDto) throws AuthException;
 
-    void processCashOperation(String username, CashOperationDto cashOperationDto, CashAction action) throws AuthException ;
+    void processCashOperation(String username, CashTransactionDto cashOperationDto, CashAction action) throws AuthException ;
 
 }

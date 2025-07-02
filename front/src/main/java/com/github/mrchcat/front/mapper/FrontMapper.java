@@ -2,8 +2,8 @@ package com.github.mrchcat.front.mapper;
 
 import com.github.mrchcat.front.dto.AccountDto;
 import com.github.mrchcat.front.dto.BankUserDto;
-import com.github.mrchcat.front.dto.CashOperationRequestDto;
-import com.github.mrchcat.front.dto.CashOperationDto;
+import com.github.mrchcat.front.dto.CashTransactionDto;
+import com.github.mrchcat.front.dto.CashTransactionRequestDto;
 import com.github.mrchcat.front.dto.CreateNewClientRequestDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.EditUserAccountRequestDto;
@@ -101,8 +101,8 @@ public class FrontMapper {
                 .build();
     }
 
-    public static CashOperationRequestDto torequestDto(String username, CashOperationDto cashOperationDto, CashAction operationType) {
-        return CashOperationRequestDto.builder()
+    public static CashTransactionRequestDto torequestDto(String username, CashTransactionDto cashOperationDto, CashAction operationType) {
+        return CashTransactionRequestDto.builder()
                 .username(username)
                 .value(cashOperationDto.value())
                 .currency(cashOperationDto.currency())

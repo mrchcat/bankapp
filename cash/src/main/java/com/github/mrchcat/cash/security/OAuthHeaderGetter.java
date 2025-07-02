@@ -1,4 +1,5 @@
-package com.github.mrchcat.front.security;
+package com.github.mrchcat.cash.security;
+
 
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +13,7 @@ import org.springframework.stereotype.Component;
 public class OAuthHeaderGetter {
     private final OAuth2AuthorizedClientManager authorizedClientManager;
 
-    //    @Value("${spring.security.oauth2.registration}")
-    String CLIENT_REGISTRATION_ID = "bank_front";
-
+    String CLIENT_REGISTRATION_ID = "bank_cash";
 
     public OAuthHeader getOAuthHeader() throws AuthException {
 
@@ -27,14 +26,4 @@ public class OAuthHeaderGetter {
         }
         return new OAuthHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken().getTokenValue());
     }
-
-//    public OAuthHeader getOAuthHeader() throws AuthException {
-//        var token = authorizedClient.getAccessToken();
-//        service.
-//
-//        if (token == null) {
-//            throw new AuthException("OAuth token is absent");
-//        }
-//        return new OAuthHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token.getTokenValue());
-//    }
 }

@@ -1,7 +1,7 @@
 package com.github.mrchcat.cash.dto;
 
 import com.github.mrchcat.cash.model.BankCurrency;
-import com.github.mrchcat.cash.model.CashOperation;
+import com.github.mrchcat.cash.model.CashAction;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -10,10 +10,10 @@ import lombok.Builder;
 import java.math.BigDecimal;
 
 @Builder
-public record CashOperationDto(
+public record CashTransactionDto(
 
-        @NotNull(message = "ошибка: не указана валюта")
-        @NotBlank(message = "ошибка: не указана валюта")
+        @NotNull(message = "ошибка: не указано имя")
+        @NotBlank(message = "ошибка: не указано имя")
         String username,
 
         @NotNull(message = "ошибка: сумма не может быть пустой")
@@ -23,8 +23,8 @@ public record CashOperationDto(
         @NotNull(message = "ошибка: не указана валюта")
         BankCurrency currency,
 
-        @NotNull(message = "ошибка: валюта не может быть пустой")
-        CashOperation operation
+        @NotNull(message = "ошибка: тип операции не может быть пуст")
+        CashAction action
 ) {
 }
 

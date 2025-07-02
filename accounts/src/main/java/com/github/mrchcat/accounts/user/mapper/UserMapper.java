@@ -22,6 +22,8 @@ public class UserMapper {
 
     public static BankUserDto toDto(BankUser bankUser, List<Account> accounts) {
         return BankUserDto.builder()
+                .id(bankUser.getId())
+                .username(bankUser.getUsername())
                 .fullName(bankUser.getFullName())
                 .birthDay(bankUser.getBirthDay())
                 .email(bankUser.getEmail())

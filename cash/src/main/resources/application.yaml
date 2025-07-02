@@ -3,6 +3,13 @@ server.port: 8084
 spring:
   application:
     name: bankCash
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cashapp
+    username: postgres
+    password: Inushing1980
+  sql.init:
+    mode: always
+    schema-locations: classpath:schema.sql
 
   security:
     oauth2:

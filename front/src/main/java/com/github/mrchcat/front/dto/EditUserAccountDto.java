@@ -1,13 +1,7 @@
 package com.github.mrchcat.front.dto;
 
-import jakarta.validation.constraints.AssertFalse;
 import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.Length;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public record EditUserAccountDto(
