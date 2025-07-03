@@ -70,7 +70,6 @@ public class AccountController {
      */
     @PostMapping("/account/cash")
     TransactionConfirmation processCashTransaction(@RequestBody @Valid CashTransactionDto cashTransactionDto) {
-        System.out.println("получили "+cashTransactionDto);
         return accountService.processCashTransaction(cashTransactionDto);
     }
 

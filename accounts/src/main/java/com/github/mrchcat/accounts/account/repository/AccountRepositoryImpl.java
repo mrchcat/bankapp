@@ -4,11 +4,8 @@ import com.github.mrchcat.accounts.account.model.Account;
 import com.github.mrchcat.accounts.account.model.BankCurrency;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
@@ -65,13 +62,10 @@ public class AccountRepositoryImpl implements AccountRepository {
                 INSERT INTO accounts(number,currency_string_code_iso4217,user_id,updated_at)
                 VALUES (?,CAST(? AS currency),?,NOW())
                 """;
-        jdbc.update(query, new PreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement ps) throws SQLException {
-                ps.setString(1,account.getNumber());
-                ps.setString(2,account.getCurrency().name());
-                ps.setObject(3,account.getUserId());
-            }
+        jdbc.update(query, ps -> {
+            ps.setString(1,account.getNumber());
+            ps.setString(2,account.getCurrency().name());
+            ps.setObject(3,account.getUserId());
         });
     }
 

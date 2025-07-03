@@ -21,7 +21,6 @@ public record EditUserAccountDto(
     @AssertTrue(message = "ошибка: некорректный формат e-mail")
     boolean isEmailCorrectIfExist() {
         if (email != null && !email.isBlank()) {
-            System.out.println("проверка =" + (email != null && !email.isBlank()));
             return email.matches(regexPattern);
         }
         return true;

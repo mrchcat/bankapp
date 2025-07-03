@@ -106,7 +106,7 @@ public class FrontMapper {
                 .username(username)
                 .value(cashOperationDto.value())
                 .currency(cashOperationDto.currency())
-                .operation(operationType)
+                .action(operationType)
                 .build();
     }
 

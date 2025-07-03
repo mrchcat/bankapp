@@ -14,7 +14,7 @@ public class TransactionRecord {
     UUID id;
 
     @Column("created_at")
-    LocalDateTime created_at;
+    LocalDateTime createdAt;
 
     @Column("transaction_type")
     String transactionType;
@@ -26,11 +26,11 @@ public class TransactionRecord {
     UUID toAccountId;
 
     @Column("amount_from")
-    BigDecimal amount_from;
+    BigDecimal amountFrom;
 
     @Column("amount_to")
-    BigDecimal amount_to;
+    BigDecimal amountTo;
 
     @Column("is_succeed")
-    boolean is_succeed;
+    boolean isSucceed;
 }

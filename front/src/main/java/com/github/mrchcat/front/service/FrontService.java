@@ -19,6 +19,6 @@ public interface FrontService {
 
     BankUserDto editUserAccount(String username, EditUserAccountDto editUserAccountDto) throws AuthException;
 
-    void processCashOperation(String username, CashTransactionDto cashOperationDto, CashAction action) throws AuthException ;
+    void processCashOperation(String username, CashTransactionDto cashOperationDto, CashAction action) throws AuthException;
 
 }

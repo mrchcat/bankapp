@@ -14,7 +14,6 @@ import com.github.mrchcat.cash.repository.CashRepository;
 import com.github.mrchcat.cash.security.OAuthHeaderGetter;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
-import net.minidev.json.JSONUtil;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -54,7 +53,7 @@ public class CashServiceImpl implements CashService {
                 .userId(client.id())
                 .username(client.username())
                 .accountId(processedAccount.id())
-                .currency_string_code_iso4217(BankCurrency.valueOf(processedAccount.currencyStringCode()))
+                .currencyStringCodeIso4217(BankCurrency.valueOf(processedAccount.currencyStringCode()))
                 .amount(cashOperationDto.value())
                 .build();
         var newTransaction = cashRepository.createNewTransaction(transaction);
@@ -72,10 +71,7 @@ public class CashServiceImpl implements CashService {
         if (!transaction.getTransactionId().equals(confirmation.transactionId())) {
             return false;
         }
-        if (!transaction.getStatus().equals(confirmation.status())) {
-            return false;
-        }
-        return true;
+        return transaction.getStatus().equals(confirmation.status());
     }
 
     private TransactionConfirmation sendTransaction(CashTransactionRequestDto cashTransactionRequestDto) throws AuthException, ServiceUnavailableException {

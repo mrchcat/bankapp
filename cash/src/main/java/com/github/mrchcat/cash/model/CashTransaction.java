@@ -18,7 +18,7 @@ public class CashTransaction {
     UUID userId;
     String username;
     UUID accountId;
-    BankCurrency currency_string_code_iso4217;
+    BankCurrency currencyStringCodeIso4217;
     BigDecimal amount;
     TransactionStatus status;
     LocalDateTime createdAt;

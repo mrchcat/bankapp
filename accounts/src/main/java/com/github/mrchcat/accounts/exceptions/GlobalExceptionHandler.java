@@ -24,9 +24,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ErrorResponse handleIllegalArgument(IllegalArgumentException ex) {
-        String message = String.format("Некорректный запрос", ex.getMessage());
-        return ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, message);
+        return ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, "Некорректный запрос " + ex.getMessage());
     }
-
-
 }
