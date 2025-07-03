@@ -46,5 +46,8 @@ CREATE TABLE IF NOT EXISTS account_blocks (
   blocking_transaction_id UUID NOT NULL,
   account_id UUID NOT NULL REFERENCES accounts(id),
   amount NUMERIC(14,2) NOT NULL CHECK(amount>=0) DEFAULT 0,
-  created_at timestamp DEFAULT NOW()
+  boolean isActive NOT NULL DEFAULT true,
+  created_at timestamp DEFAULT NOW(),
+  updated_at timestamp
+
 )

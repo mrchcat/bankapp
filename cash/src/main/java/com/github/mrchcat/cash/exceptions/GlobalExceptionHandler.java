@@ -27,4 +27,15 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleIllegalArgument(BlockerException ex) {
         return ErrorResponse.create(ex, HttpStatus.FORBIDDEN, "Операция запрещена по причине: " + ex.getMessage());
     }
+
+    @ExceptionHandler(NotEnoughMoney.class)
+    public ErrorResponse handleIllegalArgument(NotEnoughMoney ex) {
+        return ErrorResponse.create(ex, HttpStatus.FORBIDDEN, "Не хватает средств для проведения операции");
+    }
+
+    @ExceptionHandler(NotEnoughMoney.class)
+    public ErrorResponse handleIllegalArgument(RejectedByClient ex) {
+        return ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, "Деньги были возвращены в банкомат");
+    }
+
 }

@@ -7,6 +7,7 @@ import com.github.mrchcat.cash.dto.CashTransactionRequestDto;
 import com.github.mrchcat.cash.dto.TransactionConfirmation;
 import com.github.mrchcat.cash.dto.BlockerResponseDto;
 import com.github.mrchcat.cash.exceptions.BlockerException;
+import com.github.mrchcat.cash.exceptions.RejectedByClient;
 import com.github.mrchcat.cash.mapper.CashMapper;
 import com.github.mrchcat.cash.model.BankCurrency;
 import com.github.mrchcat.cash.model.CashAction;
@@ -85,17 +86,15 @@ public class CashServiceImpl implements CashService {
                 .amount(cashOperationDto.value())
                 .build();
         var newTransaction = cashRepository.createNewTransaction(transaction);
-        System.out.println("сохраненная транзакция" + newTransaction);
         var confirmation = sendTransactionToAccountService(CashMapper.toRequestDto(newTransaction, TransactionStatus.STARTED));
-        System.out.println("подтверждение" + confirmation);
-        if (isTransactionDoneByAccountService(newTransaction, confirmation)) {
-            cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.APPROVED);
+        if (validateTransaction(newTransaction, confirmation)) {
+            cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.SUCCESS);
         } else {
             throw new RuntimeException("ошибка: операция внесения денег не подтверждена");
         }
     }
 
-    private boolean isTransactionDoneByAccountService(CashTransaction transaction, TransactionConfirmation confirmation) {
+    private boolean validateTransaction(CashTransaction transaction, TransactionConfirmation confirmation) {
         if (!transaction.getTransactionId().equals(confirmation.transactionId())) {
             return false;
         }
@@ -118,12 +117,6 @@ public class CashServiceImpl implements CashService {
         }
         return confirmation;
     }
-
-
-    private void withdrawal(BankUserDto client, CashTransactionDto cashOperationDto) {
-
-    }
-
 
     private BankUserDto getClient(String username, BankCurrency currency) throws AuthException {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
@@ -150,6 +143,52 @@ public class CashServiceImpl implements CashService {
             }
         }
         return null;
+    }
+
+    private void withdrawal(BankUserDto client, CashTransactionDto cashOperationDto) throws AuthException, ServiceUnavailableException {
+        AccountDto processedAccount = client.accounts().get(0);
+        CashTransaction transaction = CashTransaction.builder()
+                .transactionId(UUID.randomUUID())
+                .action(CashAction.WITHDRAWAL)
+                .userId(client.id())
+                .username(client.username())
+                .accountId(processedAccount.id())
+                .currencyStringCodeIso4217(BankCurrency.valueOf(processedAccount.currencyStringCode()))
+                .amount(cashOperationDto.value())
+                .build();
+        //        создаем новую транзакцию
+        var newTransaction = cashRepository.createNewTransaction(transaction);
+        //        блокируем деньги на счету
+        try {
+            TransactionConfirmation confirmation = sendTransactionToAccountService(CashMapper.toRequestDto(newTransaction, TransactionStatus.STARTED));
+            if (validateTransaction(newTransaction, confirmation)) {
+                cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.BLOCK);
+            } else {
+                cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.CANCELED);
+                throw new RuntimeException("ошибка: операция внесения денег не подтверждена");
+            }
+        } catch (Exception e) {
+            cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.CANCELED);
+            throw new RuntimeException("ошибка: операция внесения денег не подтверждена");
+        }
+
+//        проверяем, что деньги забрали
+        if (isMoneyTakenFromATM(newTransaction.getTransactionId())) {
+            TransactionConfirmation confirmation = sendTransactionToAccountService(CashMapper.toRequestDto(newTransaction, TransactionStatus.SUCCESS));
+            //        списываем со счета
+            if (validateTransaction(newTransaction, confirmation)) {
+                cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.SUCCESS);
+            }
+        } else {
+            cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.CANCELED);
+            sendTransactionToAccountService(CashMapper.toRequestDto(newTransaction, TransactionStatus.CANCELED));
+            throw new RejectedByClient("");
+        }
+    }
+
+    private boolean isMoneyTakenFromATM(UUID transactionId) {
+        System.out.println("проверяем, что клиент физически забрал деньги из банкомата");
+        return true;
     }
 
 }

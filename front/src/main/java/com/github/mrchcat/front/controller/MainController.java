@@ -164,7 +164,6 @@ public class MainController {
     /**
      * контроллер для работы с наличными
      */
-
     @PostMapping(path = "/user/{username}/сash")
     RedirectView depositCash(@PathVariable @NotNull @NotBlank String username,
                              @ModelAttribute @Valid CashTransactionDto cashOperationDto,
