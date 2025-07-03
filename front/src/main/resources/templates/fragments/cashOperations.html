@@ -1,4 +1,4 @@
-<div th:fragment="cashOperations(login,currency)">
+<div th:fragment="cashOperations(login,accounts)">
     <form method="post" th:action="${'/user/'+login+'/сash'}">
         <table style="width:100%;margin-left:auto;margin-right:auto;border-radius:2%;padding:10px;background-color:whitesmoke;">
             <tr th:if="${cashErrors!=null}" th:each="cashError : ${cashErrors}">
@@ -13,9 +13,10 @@
                 <td style="font-weight:bold;">Наличные</td>
                 <td>
                     Валюта
-                    <select name="currency">
-                        <option th:each="eachCurrency : ${currency}" th:value="${eachCurrency.name()}"
-                                th:text="${eachCurrency.getTitle()}"/>
+                    <select name="accounts">
+                        <option th:each="eachAccount:${accounts}" th:if="${eachAccount.isActive()}"
+                                th:value="${eachAccount.currencyStringCode()}"
+                                th:text="${eachAccount.currencyTitle()}"/>
                     </select>
                 </td>
                 <td>

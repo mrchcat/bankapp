@@ -72,12 +72,6 @@ public class MainController {
         model.addAttribute("email", clientDetailsAndAccounts.email());
         model.addAttribute("accounts", clientDetailsAndAccounts.accounts());
 
-        model.addAttribute("currency", FrontCurrencies.BankCurrency.values());
-
-//        for(FrontCurrencies.BankCurrency d:FrontCurrencies.BankCurrency.values()){
-//            d.getTitle()
-//        }
-
         return "/main";
     }
 
