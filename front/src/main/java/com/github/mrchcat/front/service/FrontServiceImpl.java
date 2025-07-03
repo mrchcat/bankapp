@@ -98,20 +98,13 @@ public class FrontServiceImpl implements FrontService {
     @Override
     public void processCashOperation(String username, CashTransactionDto cashOperationDto, CashAction action) throws AuthException {
         CashTransactionRequestDto requestDto = FrontMapper.torequestDto(username, cashOperationDto, action);
-        System.out.println("отправляем " + requestDto + " " + action);
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
-        try {
-            var response = restClientBuilder.build()
-                    .post()
-                    .uri("http://" + CASH_SERVICE + CASH_PROCESS_API)
-                    .header(oAuthHeader.name(), oAuthHeader.value())
-                    .body(requestDto)
-                    .retrieve()
-                    .body(String.class);
-            System.out.println("получили " + response);
-        } catch (Exception e) {
-            System.out.println("ошибка " + e.getMessage());
-            throw new RuntimeException(e);
-        }
+        restClientBuilder.build()
+                .post()
+                .uri("http://" + CASH_SERVICE + CASH_PROCESS_API)
+                .header(oAuthHeader.name(), oAuthHeader.value())
+                .body(requestDto)
+                .retrieve()
+                .body(String.class);
     }
 }

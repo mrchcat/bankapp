@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Builder
 public record CashTransactionRequestDto(UUID transactionId,
-                                        UUID account,
+                                        UUID accountId,
                                         BigDecimal amount,
                                         CashAction action,
                                         TransactionStatus status) {

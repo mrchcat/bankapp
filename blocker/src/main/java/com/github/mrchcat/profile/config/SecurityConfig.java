@@ -15,7 +15,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**").permitAll()
+                                .requestMatchers("/actuator/**").permitAll()
+                                .anyRequest().permitAll()
 //                        .anyRequest().hasAuthority("SCOPE_blocker")
                 )
                 .csrf(AbstractHttpConfigurer::disable)

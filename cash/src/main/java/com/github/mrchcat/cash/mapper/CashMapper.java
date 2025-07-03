@@ -9,7 +9,7 @@ public class CashMapper {
     public static CashTransactionRequestDto toRequestDto(CashTransaction dto, TransactionStatus status) {
         return CashTransactionRequestDto.builder()
                 .transactionId(dto.getTransactionId())
-                .account(dto.getAccountId())
+                .accountId(dto.getAccountId())
                 .amount(dto.getAmount())
                 .action(dto.getAction())
                 .status(status)

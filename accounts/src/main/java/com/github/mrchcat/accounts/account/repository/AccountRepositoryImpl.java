@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +34,7 @@ public class AccountRepositoryImpl implements AccountRepository {
                 FROM accounts
                 WHERE user_id=? AND is_active=true AND currency_string_code_iso4217=CAST(? AS currency);
                 """;
-        return jdbc.query(query, accountRowMapper, userId,currency.name());
+        return jdbc.query(query, accountRowMapper, userId, currency.name());
     }
 
     @Override
@@ -63,56 +64,31 @@ public class AccountRepositoryImpl implements AccountRepository {
                 VALUES (?,CAST(? AS currency),?,NOW())
                 """;
         jdbc.update(query, ps -> {
-            ps.setString(1,account.getNumber());
-            ps.setString(2,account.getCurrency().name());
-            ps.setObject(3,account.getUserId());
+            ps.setString(1, account.getNumber());
+            ps.setString(2, account.getCurrency().name());
+            ps.setObject(3, account.getUserId());
         });
     }
 
-    //    @Override
-//    public void deactivateEmptyAccounts(List<UUID> accountsId) {
-//        String query = """
-//                UPDATE accounts
-//                SET is_active=false, updated_at=NOW()
-//                WHERE id=? AND balance=0 AND is_active=true;
-//                """;
-//        jdbc.batchUpdate(query, new BatchPreparedStatementSetter() {
-//            @Override
-//            public void setValues(PreparedStatement ps, int i) throws SQLException {
-//                ps.setString(1, accountsId.get(i).toString());
-//            }
-//
-//            @Override
-//            public int getBatchSize() {
-//                return accountsId.size();
-//            }
-//        });
-//    }
+    @Override
+    public void changeBalance(UUID accountId, BigDecimal amount) {
+        String query = """
+                UPDATE accounts
+                SET balance=balance+?
+                WHERE id=?
+                """;
+        jdbc.update(query, ps -> {
+            ps.setBigDecimal(1, amount);
+            ps.setObject(2, accountId);
+        });
+    }
 
-//    @Override
-//    public void deactivateEmptyAccounts(List<UUID> accountsId) {
-//        String query = """
-//                UPDATE accounts
-//                SET is_active=false, updated_at=NOW()
-//                WHERE id=? AND balance=0 AND is_active=true;
-//                """;
-//        int changedRows = jdbc.update(query, accountId);
-//        if (changedRows == 0) {
-//            throw new IllegalArgumentException("аккаунт id=" + accountId + "не существует или не пуст");
-//        }
-//    }
-
-
-    //    @Override
-//    public Optional<Account> findAccountById(UUID accountId) {
-//        String query = """
-//                SELECT a.id,a.number,a.balance, cr.string_code_iso4217, cr.digital_code_iso4217, cr.ru_name,
-//                a.user_id,a.created_at,a.updated_at, a.is_active
-//                FROM accounts AS a JOIN currencies AS cr ON a.currency_string_code_iso4217=cr.string_code_iso4217
-//                WHERE a.id=:?
-//                """;
-//        return Optional.ofNullable(jdbc.queryForObject(query, accountRowMapper, accountId));
-//    }
-
-
+    @Override
+    public Boolean isExistActive(UUID accountId) {
+        String query= """
+                SELECT EXISTS(
+                SELECT id FROM accounts WHERE id=? AND is_active=true)
+                """;
+        return jdbc.queryForObject(query,Boolean.class,accountId);
+    }
 }

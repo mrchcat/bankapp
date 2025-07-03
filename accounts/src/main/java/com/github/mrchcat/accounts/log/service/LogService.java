@@ -1,8 +1,8 @@
 package com.github.mrchcat.accounts.log.service;
 
-import com.github.mrchcat.accounts.log.model.TransactionRecord;
+import com.github.mrchcat.accounts.log.model.TransactionLog;
 
 public interface LogService {
 
-    void saveTransaction(TransactionRecord record);
+    void saveTransaction(TransactionLog record);
 }

@@ -3,6 +3,7 @@ package com.github.mrchcat.accounts.account.repository;
 import com.github.mrchcat.accounts.account.model.Account;
 import com.github.mrchcat.accounts.account.model.BankCurrency;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,9 +19,7 @@ public interface AccountRepository {
 
     void createNewAccount(Account account);
 
-//    Optional<Account> findAccountById(UUID accountId);
+    void changeBalance(UUID accountId, BigDecimal amount);
 
-//    void deactivateEmptyAccounts(List<UUID> accountsId);
-//
-//    void createOrActivateNewAccounts(String username);
+    Boolean isExistActive(UUID accountId);
 }

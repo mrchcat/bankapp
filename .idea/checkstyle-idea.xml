@@ -10,6 +10,7 @@
       <list>
         <ConfigurationLocation id="bundled-sun-checks" type="BUNDLED" scope="All" description="Sun Checks">(bundled)</ConfigurationLocation>
         <ConfigurationLocation id="bundled-google-checks" type="BUNDLED" scope="All" description="Google Checks">(bundled)</ConfigurationLocation>
+        <ConfigurationLocation id="67dd9b9c-1b1f-46b9-bfc6-43c694444e14" type="LOCAL_FILE" scope="All" description="Yandex">$PROJECT_DIR$/../../!!Jars/YandexCheckstyle/checkstyle.xml</ConfigurationLocation>
       </list>
     </option>
   </component>

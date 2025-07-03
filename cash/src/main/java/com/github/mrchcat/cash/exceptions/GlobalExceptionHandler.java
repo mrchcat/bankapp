@@ -7,6 +7,8 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import static org.zalando.logbook.core.Conditions.header;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -19,5 +21,10 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleIllegalArgument(UsernameNotFoundException ex) {
         String message = String.format("Клиент c username=%s не найден", ex.getMessage());
         return ErrorResponse.create(ex, HttpStatus.NOT_FOUND, message);
+    }
+
+    @ExceptionHandler(BlockerException.class)
+    public ErrorResponse handleIllegalArgument(BlockerException ex) {
+        return ErrorResponse.create(ex, HttpStatus.FORBIDDEN, "Операция запрещена по причине: " + ex.getMessage());
     }
 }

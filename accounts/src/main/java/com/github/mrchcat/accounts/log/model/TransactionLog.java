@@ -1,5 +1,8 @@
 package com.github.mrchcat.accounts.log.model;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -8,13 +11,16 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Builder
+@Getter
+@Setter
 @Table("log")
-public class TransactionRecord {
+public class TransactionLog {
     @Id
-    UUID id;
+    long id;
 
-    @Column("created_at")
-    LocalDateTime createdAt;
+    @Column("transaction_id")
+    UUID transactionId;
 
     @Column("transaction_type")
     String transactionType;
@@ -31,6 +37,7 @@ public class TransactionRecord {
     @Column("amount_to")
     BigDecimal amountTo;
 
-    @Column("is_succeed")
-    boolean isSucceed;
+    @Column("created_at")
+    LocalDateTime createdAt;
 }
+

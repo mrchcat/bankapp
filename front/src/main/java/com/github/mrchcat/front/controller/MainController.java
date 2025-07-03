@@ -14,6 +14,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -192,18 +193,17 @@ public class MainController {
             frontService.processCashOperation(username, cashOperationDto, action);
             redirectAttributes.addFlashAttribute("isCashOperationSucceed", true);
         } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-//                "описать"
-//                String notUniqueProperties = ex.getResponseHeaders().get("X-not-unique").get(0);
-//                cashErrors.add("Ошибка, указанные свойства не уникальны: " + notUniqueProperties);
+            if (ex.getStatusCode().equals(HttpStatus.FORBIDDEN)) {
+                var details = ex.getResponseBodyAs(ProblemDetail.class);
+                if(details!=null&&details.getDetail()!=null){
+                    cashErrors.add(details.getDetail());
+                }
             }
         } catch (Exception ex) {
             cashErrors.add(ex.getMessage());
         }
         return redirectView;
     }
-
-
 
 
 }

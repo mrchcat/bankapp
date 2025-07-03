@@ -13,7 +13,7 @@ public record CashTransactionDto(
         @NotNull
         UUID transactionId,
         @NotNull
-        UUID account,
+        UUID accountId,
         @NotNull
         BigDecimal amount,
         @NotNull

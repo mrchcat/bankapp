@@ -22,3 +22,4 @@ CREATE TABLE IF NOT EXISTS cash_transactions (
   created_at timestamp DEFAULT NOW(),
   updated_at timestamp NOT NULL
   )
+
