@@ -11,6 +11,7 @@ import com.github.mrchcat.front.dto.FrontAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
 import com.github.mrchcat.front.dto.UserDetailsDto;
+import com.github.mrchcat.front.model.BankCurrency;
 import com.github.mrchcat.front.model.CashAction;
 import com.github.mrchcat.front.model.FrontCurrencies;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -105,7 +106,7 @@ public class FrontMapper {
         return CashTransactionRequestDto.builder()
                 .username(username)
                 .value(cashOperationDto.value())
-                .currency(cashOperationDto.currency())
+                .currency(cashOperationDto.accountCurrency())
                 .action(operationType)
                 .build();
     }

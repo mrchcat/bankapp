@@ -3,9 +3,9 @@ DROP TYPE currency;
 DROP TYPE transaction_status;
 DROP TYPE cash_action;
 
-
 CREATE TYPE currency AS ENUM ('RUB','USD','CNY');
-CREATE TYPE transaction_status AS ENUM ('STARTED','SUM BLOCKED', 'APPROVED','CANCELED');
+CREATE TYPE transaction_status AS ENUM ('STARTED', 'BLOCKING_REQUEST', 'BLOCKED', 'CASH_RECEIVED', 'DEPOSIT_PROCESSED',
+ 'CASH_WAS_GIVEN', 'SUCCESS', 'CANCEL', 'ERROR');
 CREATE TYPE cash_action AS ENUM ('DEPOSIT','WITHDRAWAL');
 
 CREATE TABLE IF NOT EXISTS cash_transactions (
@@ -21,4 +21,3 @@ CREATE TABLE IF NOT EXISTS cash_transactions (
   created_at timestamp DEFAULT NOW(),
   updated_at timestamp NOT NULL
   )
-

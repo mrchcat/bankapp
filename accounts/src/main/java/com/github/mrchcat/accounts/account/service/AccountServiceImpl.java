@@ -100,7 +100,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    @Transactional
     public TransactionConfirmation processCashTransaction(CashTransactionDto cashTransactionDto) {
         System.out.println("зашли processCashTransaction" + cashTransactionDto);
         validateCashTransaction(cashTransactionDto);
@@ -121,7 +120,8 @@ public class AccountServiceImpl implements AccountService {
         cashWithdrawStatusChain.put(TransactionStatus.BLOCKING_REQUEST, Collections.emptyList());
         cashDepositStatusChain.put(TransactionStatus.CANCEL, List.of(TransactionStatus.BLOCKED));
         cashWithdrawStatusChain.put(TransactionStatus.CASH_WAS_GIVEN, List.of(TransactionStatus.BLOCKING_REQUEST));
-        cashWithdrawStatusChain.put(TransactionStatus.SUCCESS, List.of(TransactionStatus.CASH_WAS_GIVEN));
+        cashWithdrawStatusChain.put(TransactionStatus.SUCCESS,
+                List.of(TransactionStatus.DEPOSIT_PROCESSED, TransactionStatus.CASH_WAS_GIVEN));
     }
 
     private void validateCashTransaction(CashTransactionDto cashTransactionDto) {
@@ -195,11 +195,13 @@ public class AccountServiceImpl implements AccountService {
                         TransactionStatus.BLOCKED));
             }
             case CASH_WAS_GIVEN -> {
-                System.out.println("зашли в WITHDRAW");
+                System.out.println("CASH_WAS_GIVEN");
                 accountRepository.changeBalance(cashTransactionDto.accountId(), cashTransactionDto.amount().negate());
                 accountBlockService.free(cashTransactionDto.transactionId());
                 logService.saveTransactionLogRecord(LogMapper.toCashLogRecord(cashTransactionDto,
                         TransactionStatus.DEPOSIT_PROCESSED));
+                logService.saveTransactionLogRecord(LogMapper.toCashLogRecord(cashTransactionDto,
+                        TransactionStatus.SUCCESS));
             }
             case CANCEL -> {
                 System.out.println("зашли в CANCELED");

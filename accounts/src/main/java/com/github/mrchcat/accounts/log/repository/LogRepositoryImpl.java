@@ -6,9 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Repository;
+import org.w3c.dom.ls.LSOutput;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -43,5 +45,25 @@ public class LogRepositoryImpl implements LogRepository {
                     ps.setBigDecimal(7, record.getAmountTo());
                 }
         );
+    }
+
+    @Override
+    public boolean isCorrectStep(UUID transactionId, List<TransactionStatus> statuses) {
+        System.out.println("зашли в isCorrectStep");
+        String query = """
+                SELECT status
+                FROM log
+                WHERE transaction_id=?
+                """;
+        List<TransactionStatus> existingStatuses = jdbc.queryForList(query, TransactionStatus.class,transactionId);
+        if(statuses.isEmpty()&&existingStatuses.isEmpty()){
+            return true;
+        }
+        for (TransactionStatus s : statuses) {
+            if (existingStatuses.contains(s)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

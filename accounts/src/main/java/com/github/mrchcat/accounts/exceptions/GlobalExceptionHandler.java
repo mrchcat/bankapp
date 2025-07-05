@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotEnoughMoney.class)
     public ErrorResponse handleIllegalArgument(NotEnoughMoney ex) {
-        return ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, "Баланс на счету"+ex.getMessage() +"недостаточен");
+        return ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, "Недостаточно средств");
     }
 
     @ExceptionHandler(TransactionWasCompletedAlready.class)

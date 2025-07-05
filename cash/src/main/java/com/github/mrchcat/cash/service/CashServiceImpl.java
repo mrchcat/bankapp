@@ -6,7 +6,9 @@ import com.github.mrchcat.cash.dto.CashTransactionDto;
 import com.github.mrchcat.cash.dto.CashTransactionRequestDto;
 import com.github.mrchcat.cash.dto.TransactionConfirmation;
 import com.github.mrchcat.cash.dto.BlockerResponseDto;
+import com.github.mrchcat.cash.exceptions.AccountServiceException;
 import com.github.mrchcat.cash.exceptions.BlockerException;
+import com.github.mrchcat.cash.exceptions.NotEnoughMoney;
 import com.github.mrchcat.cash.exceptions.RejectedByClient;
 import com.github.mrchcat.cash.mapper.CashMapper;
 import com.github.mrchcat.cash.model.BankCurrency;
@@ -18,6 +20,7 @@ import com.github.mrchcat.cash.security.OAuthHeaderGetter;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +47,6 @@ public class CashServiceImpl implements CashService {
 
 
     @Override
-    @Transactional
     public void processCashOperation(CashTransactionDto cashOperationDto) throws AuthException, ServiceUnavailableException {
         BankUserDto client = getClient(cashOperationDto.username(), cashOperationDto.currency());
         var blockerResponse = checkCashTransaction(cashOperationDto);
@@ -93,9 +95,8 @@ public class CashServiceImpl implements CashService {
             //        если получили деньги
             cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.CASH_RECEIVED);
             var confirmation = sendTransactionToAccountService(CashMapper.toRequestDto(newTransaction, TransactionStatus.CASH_RECEIVED));
-            if (validateTransaction(newTransaction, confirmation)) {
+            if (validateTransaction(confirmation, newTransaction.getTransactionId(), TransactionStatus.CASH_RECEIVED)) {
                 cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.SUCCESS);
-                sendTransactionToAccountService(CashMapper.toRequestDto(newTransaction, TransactionStatus.ERROR));
             } else {
                 cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.ERROR);
                 throw new RuntimeException("ошибка: операция внесения денег не подтверждена");
@@ -107,11 +108,11 @@ public class CashServiceImpl implements CashService {
         }
     }
 
-    private boolean validateTransaction(CashTransaction transaction, TransactionConfirmation confirmation) {
-        if (!transaction.getTransactionId().equals(confirmation.transactionId())) {
+    private boolean validateTransaction(TransactionConfirmation confirmation, UUID transactionId, TransactionStatus status) {
+        if (!transactionId.equals(confirmation.transactionId())) {
             return false;
         }
-        return transaction.getStatus().equals(confirmation.status());
+        return status.equals(confirmation.status());
     }
 
     private TransactionConfirmation sendTransactionToAccountService(CashTransactionRequestDto cashTransactionRequestDto) throws AuthException, ServiceUnavailableException {
@@ -146,7 +147,7 @@ public class CashServiceImpl implements CashService {
                 throw new UsernameNotFoundException("Клиент не найден:" + username);
             }
             if (client.accounts().isEmpty()) {
-                String message = "Пользователь " + client.fullName() + "не имеет аккаунта в валюте " + currency.name();
+                String message = "Пользователь " + client.fullName() + " не имеет аккаунта в валюте " + currency.name();
                 throw new IllegalArgumentException(message);
             }
             return client;
@@ -175,12 +176,19 @@ public class CashServiceImpl implements CashService {
         //        блокируем деньги на счету
         try {
             TransactionConfirmation confirmation = sendTransactionToAccountService(CashMapper.toRequestDto(newTransaction, TransactionStatus.BLOCKING_REQUEST));
-            if (validateTransaction(newTransaction, confirmation)) {
+            if (validateTransaction(confirmation, newTransaction.getTransactionId(), TransactionStatus.BLOCKING_REQUEST)) {
                 cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.BLOCKED);
             } else {
                 cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.CANCEL);
                 sendTransactionToAccountService(CashMapper.toRequestDto(newTransaction, TransactionStatus.CANCEL));
                 throw new RuntimeException("ошибка: операция внесения денег не подтверждена");
+            }
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+                var details = ex.getResponseBodyAs(ProblemDetail.class);
+                if (details != null && details.getDetail() != null && details.getDetail().equals("Недостаточно средств")) {
+                    throw new NotEnoughMoney("");
+                }
             }
         } catch (Exception e) {
             cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.CANCEL);
@@ -192,9 +200,10 @@ public class CashServiceImpl implements CashService {
 //        если забрали
         if (isATMConfirmMoneyTransfer(newTransaction.getTransactionId())) {
             cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.CASH_WAS_GIVEN);
-            TransactionConfirmation confirmation = sendTransactionToAccountService(CashMapper.toRequestDto(newTransaction, TransactionStatus.CASH_WAS_GIVEN));
+            TransactionConfirmation confirmation = sendTransactionToAccountService(CashMapper.toRequestDto(newTransaction,
+                    TransactionStatus.CASH_WAS_GIVEN));
             //        списываем со счета
-            if (validateTransaction(newTransaction, confirmation)) {
+            if (validateTransaction(confirmation, newTransaction.getTransactionId(), newTransaction.getStatus())) {
                 cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.SUCCESS);
             }
 //          если не забрали

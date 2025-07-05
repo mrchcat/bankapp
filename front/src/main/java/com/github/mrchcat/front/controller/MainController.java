@@ -170,6 +170,7 @@ public class MainController {
                              @RequestParam("action") @NotNull CashAction action,
                              BindingResult bindingResult,
                              RedirectAttributes redirectAttributes) {
+        System.out.println("получили " +cashOperationDto);
         RedirectView redirectView = new RedirectView();
         redirectView.setContextRelative(true);
         redirectView.setUrl("/main");

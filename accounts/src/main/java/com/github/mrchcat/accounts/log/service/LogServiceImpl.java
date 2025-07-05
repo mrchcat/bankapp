@@ -26,7 +26,6 @@ public class LogServiceImpl implements LogService {
 
     @Override
     public boolean isCorrectStep(UUID transactionId, List<TransactionStatus> statuses) {
-        System.out.println("проверяем корректность операций transactionId=" + transactionId + " statuses=" + statuses);
-        return true;
+        return logRepository.isCorrectStep(transactionId, statuses);
     }
 }
