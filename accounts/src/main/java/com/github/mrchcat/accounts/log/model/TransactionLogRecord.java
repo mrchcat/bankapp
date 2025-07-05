@@ -1,5 +1,7 @@
 package com.github.mrchcat.accounts.log.model;
 
+import com.github.mrchcat.accounts.account.model.CashAction;
+import com.github.mrchcat.accounts.account.model.TransactionStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,30 +16,15 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
-@Table("log")
-public class TransactionLog {
-    @Id
+public class TransactionLogRecord {
     long id;
-
-    @Column("transaction_id")
     UUID transactionId;
-
-    @Column("transaction_type")
-    String transactionType;
-
-    @Column("from_account_id")
+    CashAction action;
+    TransactionStatus status;
     UUID fromAccountId;
-
-    @Column("to_account_id")
     UUID toAccountId;
-
-    @Column("amount_from")
     BigDecimal amountFrom;
-
-    @Column("amount_to")
     BigDecimal amountTo;
-
-    @Column("created_at")
     LocalDateTime createdAt;
 }
 

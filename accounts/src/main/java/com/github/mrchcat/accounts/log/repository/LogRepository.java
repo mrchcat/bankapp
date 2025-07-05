@@ -1,12 +1,12 @@
 package com.github.mrchcat.accounts.log.repository;
 
-import com.github.mrchcat.accounts.log.model.TransactionLog;
-import org.springframework.data.repository.CrudRepository;
+import com.github.mrchcat.accounts.account.model.TransactionStatus;
+import com.github.mrchcat.accounts.log.model.TransactionLogRecord;
 
 import java.util.UUID;
 
-public interface LogRepository extends CrudRepository<TransactionLog, Long> {
+public interface LogRepository {
+    Boolean existByTransaction(UUID transactionId, TransactionStatus status);
 
-    boolean existsByTransactionId(UUID transactionId);
-
+    void create(TransactionLogRecord record);
 }

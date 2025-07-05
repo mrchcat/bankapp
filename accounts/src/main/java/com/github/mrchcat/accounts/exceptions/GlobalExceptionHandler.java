@@ -29,6 +29,11 @@ public class GlobalExceptionHandler {
         return ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, "Некорректный запрос " + ex.getMessage());
     }
 
+    @ExceptionHandler(NotEnoughMoney.class)
+    public ErrorResponse handleIllegalArgument(NotEnoughMoney ex) {
+        return ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, "Баланс на счету"+ex.getMessage() +"недостаточен");
+    }
+
     @ExceptionHandler(TransactionWasCompletedAlready.class)
     public ErrorResponse handleUserNotUniqueProperties(TransactionWasCompletedAlready ex) {
         return ErrorResponse.builder(ex, HttpStatus.BAD_REQUEST, "транзакция уже есть в базе")

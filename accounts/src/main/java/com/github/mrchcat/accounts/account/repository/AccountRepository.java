@@ -5,6 +5,7 @@ import com.github.mrchcat.accounts.account.model.BankCurrency;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface AccountRepository {
@@ -22,4 +23,6 @@ public interface AccountRepository {
     void changeBalance(UUID accountId, BigDecimal amount);
 
     Boolean isExistActive(UUID accountId);
+
+    Optional<BigDecimal> getBalance(UUID accountId);
 }

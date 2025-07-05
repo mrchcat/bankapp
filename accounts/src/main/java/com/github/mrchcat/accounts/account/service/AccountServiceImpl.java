@@ -5,10 +5,14 @@ import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
 import com.github.mrchcat.accounts.account.dto.TransactionConfirmation;
 import com.github.mrchcat.accounts.account.model.Account;
 import com.github.mrchcat.accounts.account.model.BankCurrency;
+import com.github.mrchcat.accounts.account.model.TransactionStatus;
 import com.github.mrchcat.accounts.account.repository.AccountRepository;
+import com.github.mrchcat.accounts.blocks.model.AccountBlock;
+import com.github.mrchcat.accounts.blocks.service.AccountBlockService;
+import com.github.mrchcat.accounts.exceptions.NotEnoughMoney;
 import com.github.mrchcat.accounts.exceptions.TransactionWasCompletedAlready;
-import com.github.mrchcat.accounts.log.model.TransactionLog;
-import com.github.mrchcat.accounts.log.repository.LogRepository;
+import com.github.mrchcat.accounts.log.mapper.LogMapper;
+import com.github.mrchcat.accounts.log.service.LogService;
 import com.github.mrchcat.accounts.user.dto.BankUserDto;
 import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.model.BankUser;
@@ -18,6 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +36,8 @@ import java.util.UUID;
 public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final UserService userService;
-    private final LogRepository logRepository;
+    private final LogService logService;
+    private final AccountBlockService accountBlockService;
 
     @Override
     public BankUserDto getClient(String username, BankCurrency currency) {
@@ -98,44 +106,108 @@ public class AccountServiceImpl implements AccountService {
         validateCashTransaction(cashTransactionDto);
         return switch (cashTransactionDto.action()) {
             case DEPOSIT -> processCashDeposit(cashTransactionDto);
-            case WITHDRAWAL -> null;
-            default ->
-                    throw new UnsupportedOperationException("Ошибка: операция не поддерживается" + cashTransactionDto.action().name());
+            case WITHDRAWAL -> processCashWithdrawal(cashTransactionDto);
         };
     }
 
+    private final static Map<TransactionStatus, List<TransactionStatus>> cashDepositStatusChain = new HashMap<>();
+    private final static Map<TransactionStatus, List<TransactionStatus>> cashWithdrawStatusChain = new HashMap<>();
+
+    static {
+        cashDepositStatusChain.put(TransactionStatus.CASH_RECEIVED, Collections.emptyList());
+        cashDepositStatusChain.put(TransactionStatus.ERROR, List.of(TransactionStatus.CASH_RECEIVED));
+        cashDepositStatusChain.put(TransactionStatus.SUCCESS, List.of(TransactionStatus.CASH_RECEIVED));
+
+        cashWithdrawStatusChain.put(TransactionStatus.BLOCKING_REQUEST, Collections.emptyList());
+        cashDepositStatusChain.put(TransactionStatus.CANCEL, List.of(TransactionStatus.BLOCKED));
+        cashWithdrawStatusChain.put(TransactionStatus.CASH_WAS_GIVEN, List.of(TransactionStatus.BLOCKING_REQUEST));
+        cashWithdrawStatusChain.put(TransactionStatus.SUCCESS, List.of(TransactionStatus.CASH_WAS_GIVEN));
+    }
+
     private void validateCashTransaction(CashTransactionDto cashTransactionDto) {
-        UUID transactionId = cashTransactionDto.transactionId();
-        if (logRepository.existsByTransactionId(transactionId)) {
-            throw new TransactionWasCompletedAlready(transactionId.toString());
-        }
+        System.out.println("зашли в validateCashTransaction " + cashTransactionDto);
+        // отклоняем операцию, если аккаунт не активен или не существует
         UUID accountId = cashTransactionDto.accountId();
         if (!accountRepository.isExistActive(accountId)) {
+            System.out.println("validateCashTransaction нет аккаунта");
             throw new NoSuchElementException(accountId.toString());
+        }
+        // отклоняем операции, которые уже ранее были обработаны
+        UUID transactionId = cashTransactionDto.transactionId();
+        TransactionStatus status = cashTransactionDto.status();
+        if (logService.existByTransaction(transactionId, status)) {
+            System.out.println("validateCashTransaction транзакция есть в логах");
+            throw new TransactionWasCompletedAlready(transactionId.toString());
+        }
+        //проверяем корректность последовательности операций
+        boolean isCorrectOrder = switch (cashTransactionDto.action()) {
+            case DEPOSIT ->
+                    logService.isCorrectStep(transactionId, cashDepositStatusChain.get(cashTransactionDto.status()));
+            case WITHDRAWAL ->
+                    logService.isCorrectStep(transactionId, cashWithdrawStatusChain.get(cashTransactionDto.status()));
+        };
+        if (!isCorrectOrder) {
+            System.out.println("validateCashTransaction некорректная последовательность");
+            throw new IllegalArgumentException("некорректная последовательность операций");
         }
     }
 
     private TransactionConfirmation processCashDeposit(CashTransactionDto cashTransactionDto) {
-        System.out.println("зашли processCashTransaction" + cashTransactionDto);
-        accountRepository.changeBalance(cashTransactionDto.accountId(), cashTransactionDto.amount());
-        System.out.println("обновили баланс");
-        logCashWithdrawal(cashTransactionDto);
-        System.out.println("записали лог");
+        System.out.println("зашли в processCashDeposit " + cashTransactionDto);
+        logService.saveTransactionLogRecord(LogMapper.toCashLogRecord(cashTransactionDto));
+        switch (cashTransactionDto.status()) {
+            case CASH_RECEIVED -> {
+                System.out.println("зашли в DEPOSIT ");
+                accountRepository.changeBalance(cashTransactionDto.accountId(), cashTransactionDto.amount());
+                logService.saveTransactionLogRecord(LogMapper.toCashLogRecord(cashTransactionDto,
+                        TransactionStatus.DEPOSIT_PROCESSED));
+            }
+            case ERROR -> throw new UnsupportedOperationException(cashTransactionDto.status().name());
+        }
         return new TransactionConfirmation(cashTransactionDto.transactionId(), cashTransactionDto.status());
     }
 
-    private void logCashWithdrawal(CashTransactionDto cashTransactionDto) {
-        System.out.println("зашли в логирование");
-        TransactionLog logRecord = TransactionLog.builder()
-                .transactionId(cashTransactionDto.transactionId())
-                .transactionType(cashTransactionDto.action().name())
-                .fromAccountId(null)
-                .toAccountId(cashTransactionDto.accountId())
-                .amountFrom(null)
-                .amountTo(cashTransactionDto.amount())
-                .build();
-        logRepository.save(logRecord);
+    private TransactionConfirmation processCashWithdrawal(CashTransactionDto cashTransactionDto) {
+        System.out.println("зашли в processCashWithdrawal " + cashTransactionDto);
+        logService.saveTransactionLogRecord(LogMapper.toCashLogRecord(cashTransactionDto));
+        switch (cashTransactionDto.status()) {
+            case BLOCKING_REQUEST -> {
+                System.out.println("зашли в BLOCKING_REQUEST");
+                UUID accountId = cashTransactionDto.accountId();
+                BigDecimal balance = accountRepository.getBalance(accountId)
+                        .orElseThrow(() -> new NoSuchElementException(accountId.toString()));
+                System.out.println("баланс = " + balance.toString());
+                BigDecimal blockedAmount = accountBlockService.getBlockedAmount(accountId);
+                System.out.println("блокировано = " + blockedAmount.toString());
+                if (balance.subtract(blockedAmount).compareTo(cashTransactionDto.amount()) < 0) {
+                    throw new NotEnoughMoney(accountId.toString());
+                }
+                AccountBlock blockingRecord = AccountBlock.builder()
+                        .blockingTransactionId(cashTransactionDto.transactionId())
+                        .accountId(cashTransactionDto.accountId())
+                        .amount(cashTransactionDto.amount())
+                        .isActive(true)
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build();
+                accountBlockService.block(blockingRecord);
+                logService.saveTransactionLogRecord(LogMapper.toCashLogRecord(cashTransactionDto,
+                        TransactionStatus.BLOCKED));
+            }
+            case CASH_WAS_GIVEN -> {
+                System.out.println("зашли в WITHDRAW");
+                accountRepository.changeBalance(cashTransactionDto.accountId(), cashTransactionDto.amount().negate());
+                accountBlockService.free(cashTransactionDto.transactionId());
+                logService.saveTransactionLogRecord(LogMapper.toCashLogRecord(cashTransactionDto,
+                        TransactionStatus.DEPOSIT_PROCESSED));
+            }
+            case CANCEL -> {
+                System.out.println("зашли в CANCELED");
+                accountBlockService.free(cashTransactionDto.transactionId());
+            }
+            case ERROR, SUCCESS -> {
+            }
+        }
+        return new TransactionConfirmation(cashTransactionDto.transactionId(), cashTransactionDto.status());
     }
-
-
 }

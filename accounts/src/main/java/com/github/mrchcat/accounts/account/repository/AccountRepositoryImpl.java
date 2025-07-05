@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -85,10 +86,22 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     public Boolean isExistActive(UUID accountId) {
-        String query= """
+        String query = """
                 SELECT EXISTS(
                 SELECT id FROM accounts WHERE id=? AND is_active=true)
                 """;
-        return jdbc.queryForObject(query,Boolean.class,accountId);
+        return jdbc.queryForObject(query, Boolean.class, accountId);
+    }
+
+    @Override
+    public Optional<BigDecimal> getBalance(UUID accountId) {
+        String query = """
+                SELECT balance
+                FROM accounts
+                WHERE id=? AND is_active=true
+                """;
+        BigDecimal balance = jdbc.queryForObject(query, BigDecimal.class, accountId);
+        System.out.println("зашли в getBalance getBalance" +balance);
+        return Optional.ofNullable(balance);
     }
 }
