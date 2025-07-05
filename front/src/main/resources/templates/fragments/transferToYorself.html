@@ -1,0 +1,41 @@
+<div th:fragment="transferToYorself(login, accounts)">
+    <form method="post" th:action="${'/user/'+login+'/transfer'}">
+        <table style="width:100%;margin-left:auto;margin-right:auto;border-radius:2%;padding:10px;background-color:whitesmoke;">
+            <tr th:if="${transferYourselfErrors!=null}" th:each="transferError : ${transferYourselfErrors}">
+                <td style="color:red;" th:text="${transferError}"/>
+            </tr>
+            <td>
+                <p style="color:green;" th:if="${isTransferYourselfSucceed==true}">операция успешно проведена</p>
+            <td>
+            <tr>
+                <td style="font-weight:bold;">Перевод себе</td>
+                <td>
+                    Со счета
+                    <select name="fromCurrency">
+                        <option th:each="eachAccount : ${accounts}" th:if="${eachAccount.isActive()}"
+                                th:value="${eachAccount.currencyStringCode()}"
+                                th:text="${eachAccount.currencyStringCode()}"/>
+                    </select>
+
+                </td>
+                <td>
+                    На счет
+                    <select name="toCurrency">
+                        <option th:each="eachAccount : ${accounts}" th:if="${eachAccount.isActive()}"
+                                th:value="${eachAccount.currencyStringCode()}"
+                                th:text="${eachAccount.currencyStringCode()}"/>
+                    </select>
+                </td>
+                <td>
+                    <input name="amount" type="number" style="width:100%" required/>
+                </td>
+
+                <td style="text-align:right">
+                    <input hidden name="fromUsername" th:value="${login}"/>
+                    <input hidden name="direction" th:value="'YOURSELF'"/>
+                    <button>Перевести</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>

@@ -5,9 +5,13 @@ import com.github.mrchcat.front.dto.CashTransactionDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
+import com.github.mrchcat.front.dto.NonCashTransfer;
 import com.github.mrchcat.front.model.CashAction;
 import jakarta.security.auth.message.AuthException;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import javax.naming.ServiceUnavailableException;
+import java.util.List;
 
 public interface FrontService {
 
@@ -17,8 +21,12 @@ public interface FrontService {
 
     FrontBankUserDto getClientDetailsAndAccounts(String username);
 
+    List<FrontBankUserDto> getAllClientsWithActiveAccounts() throws AuthException, ServiceUnavailableException;
+
     BankUserDto editUserAccount(String username, EditUserAccountDto editUserAccountDto) throws AuthException;
 
     void processCashOperation(String username, CashTransactionDto cashOperationDto, CashAction action) throws AuthException;
+
+    void processNonCashOperation(NonCashTransfer nonCashTransaction) throws AuthException;
 
 }

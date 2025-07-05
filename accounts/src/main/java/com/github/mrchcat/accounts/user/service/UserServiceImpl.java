@@ -2,6 +2,7 @@ package com.github.mrchcat.accounts.user.service;
 
 import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
 import com.github.mrchcat.accounts.exceptions.UserNotUniqueProperties;
+import com.github.mrchcat.accounts.user.dto.BankUserDto;
 import com.github.mrchcat.accounts.user.dto.CreateNewClientDto;
 import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.model.BankUser;
@@ -112,6 +113,11 @@ public class UserServiceImpl implements UserService {
         if (!propertyUniquenessCheckResult.isEmpty()) {
             throw new UserNotUniqueProperties(propertyUniquenessCheckResult);
         }
+    }
+
+    @Override
+    public List<BankUserDto> getAllActiveClients() {
+        return UserMapper.toDto(userRepository.findAllActive());
     }
 
     //    private void sendBankNotification(BankNotificationDto notification) {

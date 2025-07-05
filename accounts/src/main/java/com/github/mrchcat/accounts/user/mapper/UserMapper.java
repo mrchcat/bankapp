@@ -30,4 +30,22 @@ public class UserMapper {
                 .accounts(AccountMapper.toDto(accounts))
                 .build();
     }
+
+    public static BankUserDto toDto(BankUser bankUser) {
+        return BankUserDto.builder()
+                .id(bankUser.getId())
+                .username(bankUser.getUsername())
+                .fullName(bankUser.getFullName())
+                .birthDay(bankUser.getBirthDay())
+                .email(bankUser.getEmail())
+                .accounts(null)
+                .build();
+    }
+
+    public static List<BankUserDto> toDto(List<BankUser> bankUsers) {
+        return bankUsers.stream()
+                .map(UserMapper::toDto)
+                .toList();
+    }
+
 }

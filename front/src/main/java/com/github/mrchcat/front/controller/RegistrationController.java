@@ -28,11 +28,15 @@ public class RegistrationController {
         return "/signup";
     }
 
+    /**
+     * контроллер для регистрации нового пользователя
+     */
     @PostMapping("/registration")
     String registerNewClient(@ModelAttribute @Valid NewClientRegisterDto newClientRegisterDto,
                              BindingResult bindingResult,
                              Model model) {
         List<String> errors = new ArrayList<>();
+
         model.addAttribute("errors", errors);
         model.addAttribute("isNewClientRegistered", false);
 

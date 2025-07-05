@@ -6,6 +6,8 @@ import com.github.mrchcat.front.dto.CashTransactionRequestDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
+import com.github.mrchcat.front.dto.NonCashTransfer;
+import com.github.mrchcat.front.dto.NonCashTransferRequest;
 import com.github.mrchcat.front.dto.UserDetailsDto;
 import com.github.mrchcat.front.mapper.FrontMapper;
 import com.github.mrchcat.front.model.CashAction;
@@ -13,6 +15,7 @@ import com.github.mrchcat.front.security.OAuthHeaderGetter;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,6 +23,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+
+import javax.naming.ServiceUnavailableException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +37,10 @@ public class FrontServiceImpl implements FrontService {
 
     private final String CASH_SERVICE = "bankCash";
     private final String CASH_PROCESS_API = "/cash";
+
+    private final String TRANSFER_SERVICE = "bankTransfer";
+    private final String TRANSFER_PROCESS_API = "/transfer";
+
 
     private final UserDetailsPasswordService userDetailsPasswordService;
     private final UserDetailsService userDetailsService;
@@ -75,7 +85,7 @@ public class FrontServiceImpl implements FrontService {
         if (bankUserDto == null) {
             throw new UsernameNotFoundException("сервис accounts вернул пустой ответ");
         }
-        return FrontMapper.toFrontDto(bankUserDto);
+        return FrontMapper.toFrontBankUserDto(bankUserDto);
     }
 
     @Override
@@ -97,11 +107,41 @@ public class FrontServiceImpl implements FrontService {
 
     @Override
     public void processCashOperation(String username, CashTransactionDto cashOperationDto, CashAction action) throws AuthException {
-        CashTransactionRequestDto requestDto = FrontMapper.torequestDto(username, cashOperationDto, action);
+        CashTransactionRequestDto requestDto = FrontMapper.toRequestDto(username, cashOperationDto, action);
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         restClientBuilder.build()
                 .post()
                 .uri("http://" + CASH_SERVICE + CASH_PROCESS_API)
+                .header(oAuthHeader.name(), oAuthHeader.value())
+                .body(requestDto)
+                .retrieve()
+                .body(String.class);
+    }
+
+    @Override
+    public List<FrontBankUserDto> getAllClientsWithActiveAccounts() throws AuthException, ServiceUnavailableException {
+        var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
+        List<BankUserDto> response = restClientBuilder.build()
+                .get()
+                .uri("http://" + ACCOUNT_SERVICE + ACCOUNTS_GET_CLIENT_API)
+                .header(oAuthHeader.name(), oAuthHeader.value())
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<BankUserDto>>() {
+                });
+        if (response == null) {
+            throw new ServiceUnavailableException("сервис аккаунтов не доступен");
+        }
+        System.out.println("получили "+response);
+        return FrontMapper.toFrontBankUserDto(response);
+    }
+
+    @Override
+    public void processNonCashOperation(NonCashTransfer nonCashTransfer) throws AuthException {
+        NonCashTransferRequest requestDto = FrontMapper.toRequestDto(nonCashTransfer);
+        var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
+        restClientBuilder.build()
+                .post()
+                .uri("http://" + TRANSFER_SERVICE + TRANSFER_PROCESS_API)
                 .header(oAuthHeader.name(), oAuthHeader.value())
                 .body(requestDto)
                 .retrieve()

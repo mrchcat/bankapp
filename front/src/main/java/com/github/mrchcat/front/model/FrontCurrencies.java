@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 public class FrontCurrencies {
-    private static final List<BankCurrency> frontCurrencies = new ArrayList<>();
+    private static final List<BankFrontCurrency> frontCurrencies = new ArrayList<>();
     private static final Map<String, Boolean> accountsMap = new HashMap<>();
 
     static {
-        frontCurrencies.addAll(Arrays.asList(BankCurrency.values()));
+        frontCurrencies.addAll(Arrays.asList(BankFrontCurrency.values()));
     }
 
-    public static List<BankCurrency> getCurrencyList() {
+    public static List<BankFrontCurrency> getCurrencyList() {
         return frontCurrencies;
     }
 
@@ -25,14 +25,14 @@ public class FrontCurrencies {
     }
 
 
-    public enum BankCurrency {
+    public enum BankFrontCurrency {
         RUB("рубли"),
         USD("доллары"),
         CNY("юани");
 
         public final String title;
 
-        BankCurrency(String title) {
+        BankFrontCurrency(String title) {
             this.title = title;
         }
 

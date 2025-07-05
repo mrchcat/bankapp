@@ -6,7 +6,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Builder
-public record FrontBankUserDto(String fullName,
+public record FrontBankUserDto(String username,
+                               String fullName,
                                LocalDate birthDay,
                                String email,
                                List<FrontAccountDto> accounts) {

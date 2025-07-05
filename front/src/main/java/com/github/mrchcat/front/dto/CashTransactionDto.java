@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 public record CashTransactionDto(
-//        @NotNull(message = "ошибка: не указана валюта")
+        @NotNull(message = "ошибка: не указана валюта")
         BankCurrency accountCurrency,
 
         @Positive(message = "ошибка: сумма должна быть положительным числом")

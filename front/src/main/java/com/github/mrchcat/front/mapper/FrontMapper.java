@@ -10,6 +10,8 @@ import com.github.mrchcat.front.dto.EditUserAccountRequestDto;
 import com.github.mrchcat.front.dto.FrontAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
+import com.github.mrchcat.front.dto.NonCashTransfer;
+import com.github.mrchcat.front.dto.NonCashTransferRequest;
 import com.github.mrchcat.front.dto.UserDetailsDto;
 import com.github.mrchcat.front.model.BankCurrency;
 import com.github.mrchcat.front.model.CashAction;
@@ -18,6 +20,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,18 +53,25 @@ public class FrontMapper {
                 .build();
     }
 
-    public static FrontBankUserDto toFrontDto(BankUserDto dto) {
+    public static FrontBankUserDto toFrontBankUserDto(BankUserDto dto) {
         return FrontBankUserDto.builder()
+                .username(dto.username())
                 .fullName(dto.fullName())
                 .birthDay(dto.birthDay())
                 .email(dto.email())
-                .accounts(toFrontDto(dto.accounts()))
+                .accounts((dto.accounts() == null) ? null : FrontMapper.toFrontAccountDto(dto.accounts()))
                 .build();
     }
 
-    public static List<FrontAccountDto> toFrontDto(List<AccountDto> dtos) {
+    public static List<FrontBankUserDto> toFrontBankUserDto(List<BankUserDto> list) {
+        return list.stream()
+                .map(FrontMapper::toFrontBankUserDto)
+                .toList();
+    }
+
+    public static List<FrontAccountDto> toFrontAccountDto(List<AccountDto> dtos) {
         List<FrontAccountDto> frontAccountDtos = new ArrayList<>();
-        for (FrontCurrencies.BankCurrency currency : FrontCurrencies.getCurrencyList()) {
+        for (FrontCurrencies.BankFrontCurrency currency : FrontCurrencies.getCurrencyList()) {
             String frontCurrencyStringCode = currency.name();
             AccountDto desiredAccountDto = findFirstByCurrencyCode(frontCurrencyStringCode, dtos);
             FrontAccountDto frontAccountDto = FrontAccountDto.builder()
@@ -102,12 +112,23 @@ public class FrontMapper {
                 .build();
     }
 
-    public static CashTransactionRequestDto torequestDto(String username, CashTransactionDto cashOperationDto, CashAction operationType) {
+    public static CashTransactionRequestDto toRequestDto(String username, CashTransactionDto cashOperationDto, CashAction operationType) {
         return CashTransactionRequestDto.builder()
                 .username(username)
                 .value(cashOperationDto.value())
                 .currency(cashOperationDto.accountCurrency())
                 .action(operationType)
+                .build();
+    }
+
+    public static NonCashTransferRequest toRequestDto(NonCashTransfer dto) {
+        return NonCashTransferRequest.builder()
+                .direction(dto.direction())
+                .fromCurrency(dto.fromCurrency())
+                .toCurrency(dto.toCurrency())
+                .amount(dto.amount())
+                .fromUsername(dto.fromUsername())
+                .toUsername(dto.toUsername())
                 .build();
     }
 

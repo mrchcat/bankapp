@@ -4,11 +4,12 @@ import com.github.mrchcat.front.dto.CashTransactionDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
+import com.github.mrchcat.front.dto.NonCashTransfer;
 import com.github.mrchcat.front.dto.PasswordUpdateDto;
 import com.github.mrchcat.front.model.CashAction;
-import com.github.mrchcat.front.model.FrontCurrencies;
 import com.github.mrchcat.front.model.UserRole;
 import com.github.mrchcat.front.service.FrontService;
+import jakarta.security.auth.message.AuthException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -31,6 +32,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.naming.ServiceUnavailableException;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -62,7 +64,7 @@ public class MainController {
      * основная страница
      */
     @GetMapping(path = {"/main", "/"})
-    String getMain(Model model, Principal principal) {
+    String getMain(Model model, Principal principal) throws AuthException, ServiceUnavailableException {
         String username = principal.getName();
         model.addAttribute("login", username);
 
@@ -71,6 +73,10 @@ public class MainController {
         model.addAttribute("birthDate", clientDetailsAndAccounts.birthDay());
         model.addAttribute("email", clientDetailsAndAccounts.email());
         model.addAttribute("accounts", clientDetailsAndAccounts.accounts());
+
+        var clientsWithAccounts = frontService.getAllClientsWithActiveAccounts();
+        System.out.println("отправляем " + clientsWithAccounts);
+        model.addAttribute("clientsWithAccounts", clientsWithAccounts);
 
         return "/main";
     }
@@ -170,7 +176,7 @@ public class MainController {
                              @RequestParam("action") @NotNull CashAction action,
                              BindingResult bindingResult,
                              RedirectAttributes redirectAttributes) {
-        System.out.println("получили " +cashOperationDto);
+        System.out.println("получили " + cashOperationDto);
         RedirectView redirectView = new RedirectView();
         redirectView.setContextRelative(true);
         redirectView.setUrl("/main");
@@ -189,12 +195,56 @@ public class MainController {
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode().equals(HttpStatus.FORBIDDEN)) {
                 var details = ex.getResponseBodyAs(ProblemDetail.class);
-                if(details!=null&&details.getDetail()!=null){
+                if (details != null && details.getDetail() != null) {
                     cashErrors.add(details.getDetail());
                 }
             }
         } catch (Exception ex) {
             cashErrors.add(ex.getMessage());
+        }
+        return redirectView;
+    }
+
+
+    /**
+     * контроллер для перевода денег
+     */
+    @PostMapping(path = "/user/{username}/transfer")
+    RedirectView depositCash(@PathVariable @NotNull @NotBlank String username,
+                             @ModelAttribute @Valid NonCashTransfer nonCashTransaction,
+                             BindingResult bindingResult,
+                             RedirectAttributes redirectAttributes) throws AuthException, ServiceUnavailableException {
+        System.out.println("проверка " + nonCashTransaction);
+        RedirectView redirectView = new RedirectView();
+        redirectView.setContextRelative(true);
+        redirectView.setUrl("/main");
+        List<String> transferErrors = new ArrayList<>();
+        switch (nonCashTransaction.direction()) {
+            case YOURSELF -> redirectAttributes.addFlashAttribute("transferYourselfErrors", transferErrors);
+            case OTHER -> redirectAttributes.addFlashAttribute("transferOtherErrors", transferErrors);
+        }
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors()
+                    .stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .forEach(transferErrors::add);
+            return redirectView;
+        }
+        try {
+            frontService.processNonCashOperation(nonCashTransaction);
+            switch (nonCashTransaction.direction()) {
+                case YOURSELF -> redirectAttributes.addFlashAttribute("isTransferYourselfSucceed", true);
+                case OTHER -> redirectAttributes.addFlashAttribute("isTransferOtherSucceed", true);
+            }
+        } catch (HttpClientErrorException ex) {
+            if (ex.getStatusCode().equals(HttpStatus.FORBIDDEN)) {
+                var details = ex.getResponseBodyAs(ProblemDetail.class);
+                if (details != null && details.getDetail() != null) {
+                    transferErrors.add(details.getDetail());
+                }
+            }
+        } catch (Exception ex) {
+            transferErrors.add(ex.getMessage());
         }
         return redirectView;
     }

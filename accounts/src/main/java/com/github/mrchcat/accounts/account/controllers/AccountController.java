@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.w3c.dom.ls.LSOutput;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -74,5 +77,13 @@ public class AccountController {
         return accountService.processCashTransaction(cashTransactionDto);
     }
 
+    /**
+     * получить список пользователей с активными аккаунтами
+     */
+    @GetMapping("/account")
+    List<BankUserDto> getAllActiveClientsAccountsAndPersonalData() {
+        System.out.println("зашли в getAllActiveClientsAccountsAndPersonalData");
+        return userService.getAllActiveClients();
+    }
 
 }
