@@ -4,7 +4,7 @@ application:
 
 spring:
   application:
-    name: bank_transfer
+    name: bankTransfer
 
   security:
     oauth2:
