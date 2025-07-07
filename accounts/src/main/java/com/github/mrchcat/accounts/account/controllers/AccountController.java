@@ -3,6 +3,7 @@ package com.github.mrchcat.accounts.account.controllers;
 import com.github.mrchcat.accounts.account.dto.CashTransactionDto;
 import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
 import com.github.mrchcat.accounts.account.dto.TransactionConfirmation;
+import com.github.mrchcat.accounts.account.dto.TransferTransactionDto;
 import com.github.mrchcat.accounts.account.model.BankCurrency;
 import com.github.mrchcat.accounts.account.service.AccountService;
 import com.github.mrchcat.accounts.user.dto.BankUserDto;
@@ -43,6 +44,15 @@ public class AccountController {
     }
 
     /**
+     * получить список пользователей с активными аккаунтами
+     */
+    @GetMapping("/account")
+    List<BankUserDto> getAllActiveClientsAccountsAndPersonalData() {
+        System.out.println("зашли в getAllActiveClientsAccountsAndPersonalData");
+        return userService.getAllActiveClients();
+    }
+
+    /**
      * корректировка информации о клиенте банка по запросу фронта
      */
     @PatchMapping("/account/{username}")
@@ -78,12 +88,12 @@ public class AccountController {
     }
 
     /**
-     * получить список пользователей с активными аккаунтами
+     * выполнение транзакции от сервиса переводов
      */
-    @GetMapping("/account")
-    List<BankUserDto> getAllActiveClientsAccountsAndPersonalData() {
-        System.out.println("зашли в getAllActiveClientsAccountsAndPersonalData");
-        return userService.getAllActiveClients();
+    @PostMapping("/account/transfer")
+    TransactionConfirmation processNonCashTransaction(@RequestBody @Valid TransferTransactionDto transferTransactionDto) {
+        System.out.println("контроллер /account/transfer" + transferTransactionDto);
+        return accountService.processNonCashTransaction(transferTransactionDto);
     }
 
 }

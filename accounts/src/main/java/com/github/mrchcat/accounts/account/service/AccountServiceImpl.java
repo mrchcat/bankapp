@@ -3,6 +3,7 @@ package com.github.mrchcat.accounts.account.service;
 import com.github.mrchcat.accounts.account.dto.CashTransactionDto;
 import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
 import com.github.mrchcat.accounts.account.dto.TransactionConfirmation;
+import com.github.mrchcat.accounts.account.dto.TransferTransactionDto;
 import com.github.mrchcat.accounts.account.model.Account;
 import com.github.mrchcat.accounts.account.model.BankCurrency;
 import com.github.mrchcat.accounts.account.model.TransactionStatus;
@@ -106,6 +107,7 @@ public class AccountServiceImpl implements AccountService {
         return switch (cashTransactionDto.action()) {
             case DEPOSIT -> processCashDeposit(cashTransactionDto);
             case WITHDRAWAL -> processCashWithdrawal(cashTransactionDto);
+            case TRANSFER -> throw new UnsupportedOperationException();
         };
     }
 
@@ -145,6 +147,7 @@ public class AccountServiceImpl implements AccountService {
                     logService.isCorrectStep(transactionId, cashDepositStatusChain.get(cashTransactionDto.status()));
             case WITHDRAWAL ->
                     logService.isCorrectStep(transactionId, cashWithdrawStatusChain.get(cashTransactionDto.status()));
+            case TRANSFER -> throw new UnsupportedOperationException();
         };
         if (!isCorrectOrder) {
             System.out.println("validateCashTransaction некорректная последовательность");
@@ -212,4 +215,33 @@ public class AccountServiceImpl implements AccountService {
         }
         return new TransactionConfirmation(cashTransactionDto.transactionId(), cashTransactionDto.status());
     }
+
+    @Override
+    @Transactional
+    public TransactionConfirmation processNonCashTransaction(TransferTransactionDto transactionDto) {
+        System.out.println("получили transferTransactionDto=" + transactionDto);
+        // отклоняем операцию, если аккаунт не активен или не существует
+        UUID fromAccount = transactionDto.fromAccount();
+        if (!accountRepository.isExistActive(fromAccount)) {
+            throw new NoSuchElementException(fromAccount.toString());
+        }
+        UUID toAccountId = transactionDto.toAccount();
+        if (toAccountId != fromAccount && !accountRepository.isExistActive(toAccountId)) {
+            throw new NoSuchElementException(toAccountId.toString());
+        }
+        // отклоняем операции, которые уже ранее были обработаны
+        UUID transactionId = transactionDto.transactionId();
+        TransactionStatus status = transactionDto.status();
+        if (logService.existByTransaction(transactionId, status)) {
+            System.out.println("validateCashTransaction транзакция есть в логах");
+            throw new TransactionWasCompletedAlready(transactionId.toString());
+        }
+        // проводим операцию
+
+        // логируем
+        logService.saveTransactionLogRecord(LogMapper.toNonCashLogRecord(transactionDto, TransactionStatus.STARTED));
+        return new TransactionConfirmation(transactionDto.transactionId(), transactionDto.status());
+    }
+
+
 }

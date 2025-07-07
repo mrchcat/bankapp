@@ -1,10 +1,16 @@
 server.port: 8085
 
-application:
-
 spring:
   application:
     name: bankTransfer
+  datasource:
+    url: jdbc:postgresql://localhost:5432/transferapp
+    username: postgres
+    password: Inushing1980
+  sql.init:
+    mode: always
+    schema-locations: classpath:schema.sql
+
 
   security:
     oauth2:
@@ -25,8 +31,6 @@ spring:
   cloud:
     consul:
       discovery:
-        hostname: localhost
-        port: 8500
         prefer-ip-address: true
         health-check-url: http://host.docker.internal:${server.port}/actuator/health
 

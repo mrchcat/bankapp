@@ -104,4 +104,10 @@ public class AccountRepositoryImpl implements AccountRepository {
         System.out.println("зашли в getBalance getBalance" +balance);
         return Optional.ofNullable(balance);
     }
+
+    @Override
+    public void transfer(UUID fromAccountId, UUID toAccountId, BigDecimal amount) {
+        Stri
+
+    }
 }

@@ -1,5 +1,6 @@
 package com.github.mrchcat.transfer.config;
 
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -18,8 +19,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**").permitAll()
-                        .anyRequest().hasAuthority("SCOPE_cash")
+                                .requestMatchers("/actuator/**").permitAll()
+                                .anyRequest().permitAll()
+//                        .anyRequest().hasAuthority("SCOPE_cash")
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2ResourceServer(oauth2 ->
@@ -28,9 +30,10 @@ public class SecurityConfig {
                 .build();
     }
 
+    @LoadBalanced
     @Bean
-    public RestClient restClient(RestClient.Builder builder, OAuth2AuthorizedClientManager authorizedClientManager) {
-        OAuth2ClientHttpRequestInterceptor requestInterceptor = new OAuth2ClientHttpRequestInterceptor(authorizedClientManager);
-        return builder.requestInterceptor(requestInterceptor).build();
+    RestClient.Builder restClientBuilder() {
+        return RestClient.builder();
     }
+
 }

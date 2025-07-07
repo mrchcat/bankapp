@@ -25,4 +25,6 @@ public interface AccountRepository {
     Boolean isExistActive(UUID accountId);
 
     Optional<BigDecimal> getBalance(UUID accountId);
+
+    void transfer(UUID fromAccountId, UUID toAccountId, BigDecimal amount);
 }
