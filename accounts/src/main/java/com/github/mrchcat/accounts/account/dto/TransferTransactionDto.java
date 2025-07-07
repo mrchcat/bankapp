@@ -9,9 +9,9 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record TransferTransactionDto(
-        @NotNull
+        @NotNull(message = "проблема transactionId")
         UUID transactionId,
-        @NotNull
+        @NotNull(message = "проблема fromAccount")
         UUID fromAccount,
         @NotNull
         UUID toAccount,

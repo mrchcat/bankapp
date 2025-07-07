@@ -93,6 +93,8 @@ public class AccountController {
     @PostMapping("/account/transfer")
     TransactionConfirmation processNonCashTransaction(@RequestBody @Valid TransferTransactionDto transferTransactionDto) {
         System.out.println("контроллер /account/transfer" + transferTransactionDto);
+        TransactionConfirmation confirmation=accountService.processNonCashTransaction(transferTransactionDto);
+        System.out.println("возвращаем "+confirmation);
         return accountService.processNonCashTransaction(transferTransactionDto);
     }
 

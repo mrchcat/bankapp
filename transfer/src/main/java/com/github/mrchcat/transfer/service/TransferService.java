@@ -9,5 +9,5 @@ import java.sql.SQLException;
 
 public interface TransferService {
 
-    TransferTransaction processTransfer(NonCashTransferDto transaction) throws AuthException, ServiceUnavailableException, SQLException;
+    void processTransfer(NonCashTransferDto transaction) throws AuthException, ServiceUnavailableException, SQLException;
 }

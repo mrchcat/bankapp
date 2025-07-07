@@ -44,11 +44,11 @@ public class TransferServiceImpl implements TransferService {
     private final TransferRepository transferRepository;
 
     @Override
-    public TransferTransaction processTransfer(NonCashTransferDto transaction) throws AuthException, ServiceUnavailableException, SQLException {
-        UUID fromAccount = getFromAccountAndValidate(transaction);
+    public void processTransfer(NonCashTransferDto transaction) throws AuthException, ServiceUnavailableException, SQLException {
+        UUID fromAccount = getFromAccountAndValidate(transaction.fromUsername(), transaction.amount(), transaction.fromCurrency());
         UUID toAccount = switch (transaction.direction()) {
-            case YOURSELF -> fromAccount;
-            case OTHER -> getToAccountAndValidate(transaction);
+            case YOURSELF -> getToAccountAndValidate(transaction.fromUsername(), transaction.toCurrency());
+            case OTHER -> getToAccountAndValidate(transaction.toUsername(), transaction.toCurrency());
         };
         BigDecimal fromAmount = transaction.amount();
         BigDecimal toAmount;
@@ -69,14 +69,13 @@ public class TransferServiceImpl implements TransferService {
                 .status(TransactionStatus.STARTED)
                 .build();
         TransferTransaction newTransaction = transferRepository.createNewTransaction(transferTransaction);
-        var confirmation = sendTransaction(transferTransaction);
-        if (validateTransaction(confirmation, newTransaction.getTransactionId(), newTransaction.getStatus())) {
-            transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.SUCCESS);
-        } else {
-            transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.ERROR);
-            throw new AccountServiceException("ошибка: операция внесения денег не подтверждена");
-        }
-        return newTransaction;
+        var confirmation = sendTransaction(newTransaction);
+//        if (validateTransaction(confirmation, newTransaction.getTransactionId(), newTransaction.getStatus())) {
+//            transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.SUCCESS);
+//        } else {
+//            transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.ERROR);
+//            throw new AccountServiceException("ошибка: операция внесения денег не подтверждена");
+//        }
     }
 
     private BigDecimal getExchangeRate(BankCurrency from, BankCurrency to) {
@@ -94,6 +93,7 @@ public class TransferServiceImpl implements TransferService {
     }
 
     private TransactionConfirmation sendTransaction(TransferTransaction transferTransaction) throws AuthException, ServiceUnavailableException {
+        System.out.println("отправляем " + TransferMapper.toRequestDto(transferTransaction));
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         String requestUrl = "http://" + ACCOUNT_SERVICE + ACCOUNTS_SEND_TRANSFER_TRANSACTION_API;
         System.out.println("запросили=" + requestUrl);
@@ -110,8 +110,8 @@ public class TransferServiceImpl implements TransferService {
         return confirmation;
     }
 
-    private UUID getToAccountAndValidate(NonCashTransferDto transaction) throws AuthException {
-        BankUserDto receiver = getClient(transaction.toUsername(), transaction.fromCurrency());
+    private UUID getToAccountAndValidate(String username, BankCurrency currency) throws AuthException {
+        BankUserDto receiver = getClient(username, currency);
         List<AccountDto> accounts = receiver.accounts();
         if (accounts == null || accounts.isEmpty()) {
             throw new AccountServiceException("сервис не вернул список аккаунтов");
@@ -120,8 +120,8 @@ public class TransferServiceImpl implements TransferService {
     }
 
 
-    private UUID getFromAccountAndValidate(NonCashTransferDto transaction) throws AuthException {
-        BankUserDto sender = getClient(transaction.fromUsername(), transaction.fromCurrency());
+    private UUID getFromAccountAndValidate(String username, BigDecimal fromAmount, BankCurrency currency) throws AuthException {
+        BankUserDto sender = getClient(username, currency);
         List<AccountDto> accounts = sender.accounts();
         if (accounts == null) {
             throw new AccountServiceException("сервис не вернул список аккаунтов");
@@ -130,7 +130,7 @@ public class TransferServiceImpl implements TransferService {
             throw new NotEnoughMoney("");
         }
         return accounts.stream()
-                .filter(accountDto -> accountDto.balance().compareTo(transaction.amount()) >= 0)
+                .filter(accountDto -> accountDto.balance().compareTo(fromAmount) >= 0)
                 .findFirst()
                 .map(AccountDto::id)
                 .orElseThrow(() -> new NotEnoughMoney(""));

@@ -21,10 +21,10 @@ public class TransferController {
     private final TransferService transferService;
 
     @PostMapping("/transfer")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-    TransferTransaction processTransfer(@RequestBody @Valid NonCashTransferDto nonCashTransferDto) throws AuthException, SQLException, ServiceUnavailableException {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void processTransfer(@RequestBody @Valid NonCashTransferDto nonCashTransferDto) throws AuthException, SQLException, ServiceUnavailableException {
         System.out.println("получили " + nonCashTransferDto);
-        return transferService.processTransfer(nonCashTransferDto);
+        transferService.processTransfer(nonCashTransferDto);
     }
 
 }

@@ -18,3 +18,7 @@ INSERT INTO accounts(number,balance,currency_string_code_iso4217,user_id,updated
 VALUES ('номер3',0,'CNY',(SELECT id FROM users WHERE username='anna'),now())
 ON CONFLICT DO NOTHING;
 
+INSERT INTO accounts(number,balance,currency_string_code_iso4217,user_id,updated_at)
+VALUES ('номер4',100,'RUB',(SELECT id FROM users WHERE username='boris'),now())
+ON CONFLICT DO NOTHING;
+

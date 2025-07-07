@@ -16,6 +16,8 @@ public interface AccountRepository {
 
     List<Account> findAllAccountsByUser(UUID userId);
 
+    Optional<Account> findActiveAccountById(UUID accountId);
+
     void setAccountActivation(UUID accountId, boolean isActive);
 
     void createNewAccount(Account account);
@@ -26,5 +28,4 @@ public interface AccountRepository {
 
     Optional<BigDecimal> getBalance(UUID accountId);
 
-    void transfer(UUID fromAccountId, UUID toAccountId, BigDecimal amount);
 }

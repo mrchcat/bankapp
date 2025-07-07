@@ -101,13 +101,17 @@ public class AccountRepositoryImpl implements AccountRepository {
                 WHERE id=? AND is_active=true
                 """;
         BigDecimal balance = jdbc.queryForObject(query, BigDecimal.class, accountId);
-        System.out.println("зашли в getBalance getBalance" +balance);
+        System.out.println("зашли в getBalance getBalance" + balance);
         return Optional.ofNullable(balance);
     }
 
     @Override
-    public void transfer(UUID fromAccountId, UUID toAccountId, BigDecimal amount) {
-        Stri
-
+    public Optional<Account> findActiveAccountById(UUID accountId) {
+        String query = """
+                SELECT *
+                FROM accounts
+                WHERE id=? AND is_active=true
+                """;
+        return Optional.ofNullable(jdbc.queryForObject(query, accountRowMapper, accountId));
     }
 }

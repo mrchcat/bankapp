@@ -58,7 +58,7 @@ public class TransferRepositoryImpl implements TransferRepository {
     public void changeTransactionStatus(long id, TransactionStatus status) {
         String query = """
                 UPDATE transfers(status)
-                SET status=CAST(? AS TRANSFER_STATUS)
+                SET status=CAST(? AS transaction_status)
                 WHERE is=?
                 """;
         jdbc.update(query, status.name(), id);

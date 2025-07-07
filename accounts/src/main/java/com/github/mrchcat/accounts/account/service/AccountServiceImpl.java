@@ -220,6 +220,14 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public TransactionConfirmation processNonCashTransaction(TransferTransactionDto transactionDto) {
         System.out.println("получили transferTransactionDto=" + transactionDto);
+        // отклоняем операции, которые уже ранее были обработаны
+        UUID transactionId = transactionDto.transactionId();
+        TransactionStatus status = transactionDto.status();
+        if (logService.existByTransaction(transactionId, status)) {
+            System.out.println("validateCashTransaction транзакция есть в логах");
+            throw new TransactionWasCompletedAlready(transactionId.toString());
+        }
+        logService.saveTransactionLogRecord(LogMapper.toNonCashLogRecord(transactionDto, TransactionStatus.STARTED));
         // отклоняем операцию, если аккаунт не активен или не существует
         UUID fromAccount = transactionDto.fromAccount();
         if (!accountRepository.isExistActive(fromAccount)) {
@@ -229,17 +237,18 @@ public class AccountServiceImpl implements AccountService {
         if (toAccountId != fromAccount && !accountRepository.isExistActive(toAccountId)) {
             throw new NoSuchElementException(toAccountId.toString());
         }
-        // отклоняем операции, которые уже ранее были обработаны
-        UUID transactionId = transactionDto.transactionId();
-        TransactionStatus status = transactionDto.status();
-        if (logService.existByTransaction(transactionId, status)) {
-            System.out.println("validateCashTransaction транзакция есть в логах");
-            throw new TransactionWasCompletedAlready(transactionId.toString());
+        // отклоняем операции, если баланс недостаточен
+        Account account = accountRepository.findActiveAccountById(fromAccount)
+                .orElseThrow(() -> new NoSuchElementException(fromAccount.toString()));
+        if (account.getBalance().compareTo(transactionDto.fromAmount()) < 0) {
+            throw new NotEnoughMoney(fromAccount.toString());
         }
-        // проводим операцию
 
+        // проводим операцию
+        accountRepository.changeBalance(fromAccount, transactionDto.fromAmount().negate());
+        accountRepository.changeBalance(toAccountId, transactionDto.toAmount());
         // логируем
-        logService.saveTransactionLogRecord(LogMapper.toNonCashLogRecord(transactionDto, TransactionStatus.STARTED));
+        logService.saveTransactionLogRecord(LogMapper.toNonCashLogRecord(transactionDto, TransactionStatus.SUCCESS));
         return new TransactionConfirmation(transactionDto.transactionId(), transactionDto.status());
     }
 
