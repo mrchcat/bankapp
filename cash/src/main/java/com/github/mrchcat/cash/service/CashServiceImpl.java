@@ -47,19 +47,18 @@ public class CashServiceImpl implements CashService {
 
 
     @Override
-    public void processCashOperation(CashTransactionDto cashOperationDto) throws AuthException, ServiceUnavailableException {
-        BankUserDto client = getClient(cashOperationDto.username(), cashOperationDto.currency());
-        var blockerResponse = checkCashTransaction(cashOperationDto);
+    public void processCashOperation(CashTransactionDto cashTransactionDto) throws AuthException, ServiceUnavailableException {
+        BankUserDto client = getClient(cashTransactionDto.username(), cashTransactionDto.currency());
+        var blockerResponse = checkCashTransaction(cashTransactionDto);
         if (!blockerResponse.isConfirmed()) {
             throw new BlockerException(blockerResponse.reason());
         }
-        switch (cashOperationDto.action()) {
-            case DEPOSIT -> deposit(client, cashOperationDto);
-            case WITHDRAWAL -> withdrawal(client, cashOperationDto);
-            default -> throw new UnsupportedOperationException("некорректный тип акции:" + cashOperationDto.action());
+        switch (cashTransactionDto.action()) {
+            case DEPOSIT -> deposit(client, cashTransactionDto);
+            case WITHDRAWAL -> withdrawal(client, cashTransactionDto);
+            default -> throw new UnsupportedOperationException("некорректный тип акции:" + cashTransactionDto.action());
         }
     }
-
     private BlockerResponseDto checkCashTransaction(CashTransactionDto cashTransactionDto) throws AuthException, ServiceUnavailableException {
         System.out.println("отправляем в блокер " + cashTransactionDto);
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
@@ -75,6 +74,7 @@ public class CashServiceImpl implements CashService {
         }
         return blockerResponse;
     }
+
 
     private void deposit(BankUserDto client, CashTransactionDto cashOperationDto) throws AuthException, ServiceUnavailableException {
         AccountDto processedAccount = client.accounts().get(0);

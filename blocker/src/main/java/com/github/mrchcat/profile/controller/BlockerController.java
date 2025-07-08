@@ -2,6 +2,7 @@ package com.github.mrchcat.profile.controller;
 
 import com.github.mrchcat.profile.dto.CashTransactionDto;
 import com.github.mrchcat.profile.dto.BlockerResponseDto;
+import com.github.mrchcat.profile.dto.NonCashTransferDto;
 import com.github.mrchcat.profile.service.BlockerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,12 @@ public class BlockerController {
     BlockerResponseDto checkCashTransaction(@RequestBody @Valid CashTransactionDto cashTransactionDto) {
         System.out.println("зашли " + cashTransactionDto);
         return blockerService.checkCashTransaction(cashTransactionDto);
+    }
+
+    @PostMapping("/blocker/noncash")
+    BlockerResponseDto checkCashTransaction(@RequestBody @Valid NonCashTransferDto nonCashTransferDto) {
+        System.out.println("зашли " + nonCashTransferDto);
+        return blockerService.checkNonCashTransaction(nonCashTransferDto);
     }
 
 }

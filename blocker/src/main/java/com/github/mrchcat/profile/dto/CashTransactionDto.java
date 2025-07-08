@@ -1,6 +1,8 @@
 package com.github.mrchcat.profile.dto;
 
 
+import com.github.mrchcat.profile.model.BankCurrency;
+import com.github.mrchcat.profile.model.CashAction;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

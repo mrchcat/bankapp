@@ -2,9 +2,11 @@ package com.github.mrchcat.transfer.service;
 
 import com.github.mrchcat.transfer.dto.AccountDto;
 import com.github.mrchcat.transfer.dto.BankUserDto;
+import com.github.mrchcat.transfer.dto.BlockerResponseDto;
 import com.github.mrchcat.transfer.dto.NonCashTransferDto;
 import com.github.mrchcat.transfer.dto.TransactionConfirmation;
 import com.github.mrchcat.transfer.exception.AccountServiceException;
+import com.github.mrchcat.transfer.exception.BlockerException;
 import com.github.mrchcat.transfer.exception.NotEnoughMoney;
 import com.github.mrchcat.transfer.mapper.TransferMapper;
 import com.github.mrchcat.transfer.model.BankCurrency;
@@ -50,6 +52,10 @@ public class TransferServiceImpl implements TransferService {
             case YOURSELF -> getToAccountAndValidate(transaction.fromUsername(), transaction.toCurrency());
             case OTHER -> getToAccountAndValidate(transaction.toUsername(), transaction.toCurrency());
         };
+        var blockerResponse = checkCashTransaction(transaction);
+        if (!blockerResponse.isConfirmed()) {
+            throw new BlockerException(blockerResponse.reason());
+        }
         BigDecimal fromAmount = transaction.amount();
         BigDecimal toAmount;
         BigDecimal exchangeRate;
@@ -70,12 +76,17 @@ public class TransferServiceImpl implements TransferService {
                 .build();
         TransferTransaction newTransaction = transferRepository.createNewTransaction(transferTransaction);
         var confirmation = sendTransaction(newTransaction);
-//        if (validateTransaction(confirmation, newTransaction.getTransactionId(), newTransaction.getStatus())) {
-//            transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.SUCCESS);
-//        } else {
-//            transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.ERROR);
-//            throw new AccountServiceException("ошибка: операция внесения денег не подтверждена");
-//        }
+        try {
+            if (validateTransaction(confirmation, newTransaction.getTransactionId(), newTransaction.getStatus())) {
+                transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.SUCCESS);
+            } else {
+                transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.ERROR);
+                throw new AccountServiceException("ошибка: операция внесения денег не подтверждена");
+            }
+        } catch (Exception e) {
+            transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.ERROR);
+            throw e;
+        }
     }
 
     private BigDecimal getExchangeRate(BankCurrency from, BankCurrency to) {
@@ -165,6 +176,22 @@ public class TransferServiceImpl implements TransferService {
             }
         }
         return null;
+    }
+
+    private BlockerResponseDto checkCashTransaction(NonCashTransferDto transaction) throws AuthException, ServiceUnavailableException {
+        System.out.println("отправляем в блокер " + transaction);
+        var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
+        var blockerResponse = restClientBuilder.build()
+                .post()
+                .uri("http://" + BLOCKER_SERVICE + BLOCKER_ASK_PERMISSION)
+                .header(oAuthHeader.name(), oAuthHeader.value())
+                .body(transaction)
+                .retrieve()
+                .body(BlockerResponseDto.class);
+        if (blockerResponse == null) {
+            throw new ServiceUnavailableException("сервис подтверждения не доступен");
+        }
+        return blockerResponse;
     }
 
 }

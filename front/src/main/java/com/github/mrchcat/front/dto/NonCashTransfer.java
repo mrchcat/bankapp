@@ -36,6 +36,10 @@ public record NonCashTransfer(
         if (direction.equals(TransferDirection.YOURSELF)) {
             return fromCurrency.equals(toCurrency);
         }
+        if (direction.equals(TransferDirection.OTHER)&&fromUsername.equals(toUsername)) {
+            return fromCurrency.equals(toCurrency);
+        }
+
         return false;
     }
 
