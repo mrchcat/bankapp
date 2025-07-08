@@ -3,10 +3,12 @@ package com.github.mrchcat.transfer.service;
 import com.github.mrchcat.transfer.dto.AccountDto;
 import com.github.mrchcat.transfer.dto.BankUserDto;
 import com.github.mrchcat.transfer.dto.BlockerResponseDto;
+import com.github.mrchcat.transfer.dto.CurrencyExchangeRateDto;
 import com.github.mrchcat.transfer.dto.NonCashTransferDto;
 import com.github.mrchcat.transfer.dto.TransactionConfirmation;
 import com.github.mrchcat.transfer.exception.AccountServiceException;
 import com.github.mrchcat.transfer.exception.BlockerException;
+import com.github.mrchcat.transfer.exception.ExchangeServiceException;
 import com.github.mrchcat.transfer.exception.NotEnoughMoney;
 import com.github.mrchcat.transfer.mapper.TransferMapper;
 import com.github.mrchcat.transfer.model.BankCurrency;
@@ -35,10 +37,13 @@ import java.util.UUID;
 public class TransferServiceImpl implements TransferService {
     private final String ACCOUNT_SERVICE = "bankAccounts";
     private final String BLOCKER_SERVICE = "bankBlocker";
+    private final String EXCHANGE_SERVICE = "bankExchange";
+
 
     private final String ACCOUNTS_GET_CLIENT_API = "/account";
     private final String ACCOUNTS_SEND_TRANSFER_TRANSACTION_API = "/account/transfer";
     private final String BLOCKER_ASK_PERMISSION = "/blocker/noncash";
+    private final String EXCHANGE_GET_EXCHANGE_RATE = "/exchange";
 
 
     private final RestClient.Builder restClientBuilder;
@@ -89,11 +94,33 @@ public class TransferServiceImpl implements TransferService {
         }
     }
 
-    private BigDecimal getExchangeRate(BankCurrency from, BankCurrency to) {
+    private BigDecimal getExchangeRate(BankCurrency from, BankCurrency to) throws AuthException {
         if (from.equals(to)) {
             return BigDecimal.ONE;
         }
-        return BigDecimal.TEN;
+        var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
+        String requestUrl = "http://"
+                + EXCHANGE_SERVICE + EXCHANGE_GET_EXCHANGE_RATE + "/" + from.name() + "?exchangeCurrency=" + to.name();
+        System.out.println("запросили=" + requestUrl);
+        try {
+            var exchangeRate = restClientBuilder.build()
+                    .get()
+                    .uri(requestUrl)
+                    .header(oAuthHeader.name(), oAuthHeader.value())
+                    .retrieve()
+                    .body(CurrencyExchangeRateDto.class);
+            if (exchangeRate == null) {
+                throw new ExchangeServiceException("");
+            }
+            BigDecimal rate = exchangeRate.amount();
+            if (!exchangeRate.baseCurrency().equals(from) || !exchangeRate.exchangeCurrency().equals(to) ||
+                    rate.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new ExchangeServiceException("");
+            }
+            return rate;
+        } catch (Exception ex) {
+            throw new ExchangeServiceException("");
+        }
     }
 
     private boolean validateTransaction(TransactionConfirmation confirmation, UUID transactionId, TransactionStatus status) {

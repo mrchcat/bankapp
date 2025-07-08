@@ -2,11 +2,10 @@ package com.github.mrchcat.cash.service;
 
 import com.github.mrchcat.cash.dto.AccountDto;
 import com.github.mrchcat.cash.dto.BankUserDto;
+import com.github.mrchcat.cash.dto.BlockerResponseDto;
 import com.github.mrchcat.cash.dto.CashTransactionDto;
 import com.github.mrchcat.cash.dto.CashTransactionRequestDto;
 import com.github.mrchcat.cash.dto.TransactionConfirmation;
-import com.github.mrchcat.cash.dto.BlockerResponseDto;
-import com.github.mrchcat.cash.exceptions.AccountServiceException;
 import com.github.mrchcat.cash.exceptions.BlockerException;
 import com.github.mrchcat.cash.exceptions.NotEnoughMoney;
 import com.github.mrchcat.cash.exceptions.RejectedByClient;
@@ -23,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 

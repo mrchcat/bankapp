@@ -13,14 +13,12 @@ import com.github.mrchcat.front.dto.NewClientRegisterDto;
 import com.github.mrchcat.front.dto.NonCashTransfer;
 import com.github.mrchcat.front.dto.NonCashTransferRequest;
 import com.github.mrchcat.front.dto.UserDetailsDto;
-import com.github.mrchcat.front.model.BankCurrency;
 import com.github.mrchcat.front.model.CashAction;
 import com.github.mrchcat.front.model.FrontCurrencies;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

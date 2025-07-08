@@ -4,12 +4,8 @@ import com.github.mrchcat.accounts.account.model.TransactionStatus;
 import com.github.mrchcat.accounts.log.model.TransactionLogRecord;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Repository;
-import org.w3c.dom.ls.LSOutput;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 

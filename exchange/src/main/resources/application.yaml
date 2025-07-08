@@ -1,6 +1,16 @@
-server.port: 8085
+server.port: 8086
 
 spring:
+  application:
+    name: bankExchange
+  datasource:
+    url: jdbc:postgresql://localhost:5432/exchange
+    username: postgres
+    password: Inushing1980
+  sql.init:
+    mode: ALWAYS
+    schema-locations: classpath:schema.sql
+
   security:
     oauth2:
       resourceserver:
@@ -9,8 +19,6 @@ spring:
   cloud:
     consul:
       discovery:
-        hostname: localhost
-        port: 8500
         prefer-ip-address: true
         health-check-url: http://host.docker.internal:${server.port}/actuator/health
 

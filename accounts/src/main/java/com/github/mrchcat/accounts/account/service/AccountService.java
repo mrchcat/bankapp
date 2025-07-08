@@ -7,8 +7,6 @@ import com.github.mrchcat.accounts.account.dto.TransferTransactionDto;
 import com.github.mrchcat.accounts.account.model.BankCurrency;
 import com.github.mrchcat.accounts.user.dto.BankUserDto;
 
-import java.util.List;
-
 public interface AccountService {
 
     BankUserDto getClient(String username);

@@ -7,8 +7,6 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import static org.zalando.logbook.core.Conditions.header;
-
 @ControllerAdvice
 public class GlobalExceptionHandler {
 

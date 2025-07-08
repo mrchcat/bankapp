@@ -4,7 +4,6 @@ import com.github.mrchcat.transfer.model.TransactionStatus;
 import com.github.mrchcat.transfer.model.TransferTransaction;
 
 import java.sql.SQLException;
-import java.util.UUID;
 
 public interface TransferRepository {
 

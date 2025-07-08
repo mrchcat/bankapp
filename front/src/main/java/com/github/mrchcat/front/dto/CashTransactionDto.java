@@ -1,7 +1,6 @@
 package com.github.mrchcat.front.dto;
 
 import com.github.mrchcat.front.model.BankCurrency;
-import com.github.mrchcat.front.model.FrontCurrencies;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 

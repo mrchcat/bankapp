@@ -1,0 +1,36 @@
+package com.github.mrchcat.exchange.controller;
+
+import com.github.mrchcat.exchange.dto.CurrencyExchangeRateDto;
+import com.github.mrchcat.exchange.dto.CurrencyExchangeRatesDto;
+import com.github.mrchcat.exchange.model.BankCurrency;
+import com.github.mrchcat.exchange.service.ExchangeService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+public class ExchangeController {
+    private final ExchangeService exchangeService;
+
+    @GetMapping("/exchange/{baseCurrency}")
+    CurrencyExchangeRateDto getExchangeRate(@PathVariable("baseCurrency") BankCurrency baseCurrency,
+                                            @RequestParam("exchangeCurrency") BankCurrency exchangeCurrency) {
+        System.out.println("получили " + baseCurrency + "  " + exchangeCurrency);
+        return exchangeService.getExchangeRate(baseCurrency, exchangeCurrency);
+    }
+
+    @PostMapping("/exchange")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void getAllRates(@RequestBody @Valid CurrencyExchangeRatesDto rates) {
+        System.out.println("получили " + rates);
+        exchangeService.saveRates(rates);
+    }
+}

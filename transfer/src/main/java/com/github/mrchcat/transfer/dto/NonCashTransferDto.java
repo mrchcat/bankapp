@@ -3,7 +3,6 @@ package com.github.mrchcat.transfer.dto;
 import com.github.mrchcat.transfer.model.BankCurrency;
 import com.github.mrchcat.transfer.model.TransferDirection;
 import jakarta.validation.constraints.AssertFalse;
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
