@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class ExchangeController {
     private final ExchangeService exchangeService;
 
-    @GetMapping("/exchange/{baseCurrency}")
-    CurrencyExchangeRateDto getExchangeRate(@PathVariable("baseCurrency") BankCurrency baseCurrency,
-                                            @RequestParam("exchangeCurrency") BankCurrency exchangeCurrency) {
-        System.out.println("получили " + baseCurrency + "  " + exchangeCurrency);
-        return exchangeService.getExchangeRate(baseCurrency, exchangeCurrency);
+    @GetMapping("/exchange/{fromCurrency}")
+    CurrencyExchangeRateDto getExchangeRate(@PathVariable("fromCurrency") BankCurrency fromCurrency,
+                                            @RequestParam("toCurrency") BankCurrency toCurrency) {
+        System.out.println("получили " + fromCurrency + "  " + toCurrency);
+        return exchangeService.getExchangeRate(fromCurrency, toCurrency);
     }
 
     @PostMapping("/exchange")

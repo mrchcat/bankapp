@@ -17,32 +17,41 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @RequiredArgsConstructor
 public class ExchangeServiceImpl implements ExchangeService {
-    private final ConcurrentHashMap<BankCurrency, BigDecimal> exchangeRates = new ConcurrentHashMap<>();
-    private final BankCurrency baseCurrencyByDefault = BankCurrency.RUB;
+    private static final ConcurrentHashMap<BankCurrency, BigDecimal> exchangeRates = new ConcurrentHashMap<>();
+    private static final BankCurrency baseCurrencyByDefault = BankCurrency.RUB;
     private final ExchangeRepository exchangeRepository;
 
+    static {
+        exchangeRates.put(baseCurrencyByDefault, BigDecimal.ONE);
+    }
+
     @Override
-    public CurrencyExchangeRateDto getExchangeRate(BankCurrency baseCurrency, BankCurrency exchangeCurrency) {
+    public CurrencyExchangeRateDto getExchangeRate(BankCurrency fromCurrency, BankCurrency toCurrency) {
         var dto = CurrencyExchangeRateDto.builder()
-                .baseCurrency(baseCurrency)
-                .exchangeCurrency(exchangeCurrency)
+                .from(fromCurrency)
+                .to(toCurrency)
                 .build();
-        if (baseCurrency.equals(exchangeCurrency)) {
+        //если валюты совпадают
+        if (fromCurrency.equals(toCurrency)) {
             dto.setRate(BigDecimal.ONE);
             return dto;
         }
-        if (!exchangeRates.containsKey(exchangeCurrency)) {
-            throw new NoSuchElementException(exchangeCurrency.name());
+        //если меняем на основную валюту
+        if (!exchangeRates.containsKey(fromCurrency)) {
+            throw new NoSuchElementException(fromCurrency.name());
         }
-        BigDecimal exchangeCurrencyRateToDefault = exchangeRates.get(exchangeCurrency);
-        if (baseCurrency.equals(baseCurrencyByDefault)) {
-            dto.setRate(exchangeCurrencyRateToDefault);
+        if (toCurrency.equals(baseCurrencyByDefault)) {
+            dto.setRate(exchangeRates.get(fromCurrency));
             return dto;
         }
-        if (!exchangeRates.containsKey(baseCurrency)) {
-            throw new NoSuchElementException(baseCurrency.name());
+//        если обе валюты не основные
+        if (!exchangeRates.containsKey(toCurrency)) {
+            throw new NoSuchElementException(toCurrency.name());
         }
-        dto.setRate(exchangeRates.get(baseCurrency).divide(exchangeCurrencyRateToDefault, RoundingMode.CEILING));
+        BigDecimal fromCurrencyInDefault=exchangeRates.get(fromCurrency);
+        BigDecimal toCurrencyInDefault=exchangeRates.get(toCurrency);
+        BigDecimal rate=fromCurrencyInDefault.divide(toCurrencyInDefault, 5, RoundingMode.CEILING);
+        dto.setRate(rate);
         return dto;
     }
 

@@ -27,7 +27,6 @@ import org.springframework.web.client.RestClient;
 
 import javax.naming.ServiceUnavailableException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
@@ -69,7 +68,7 @@ public class TransferServiceImpl implements TransferService {
             exchangeRate = BigDecimal.ONE;
         } else {
             exchangeRate = getExchangeRate(transaction.fromCurrency(), transaction.toCurrency());
-            toAmount = fromAmount.divide(exchangeRate, 2, RoundingMode.CEILING);
+            toAmount = fromAmount.multiply(exchangeRate);
         }
         TransferTransaction transferTransaction = TransferTransaction.builder()
                 .fromAccount(fromAccount)
@@ -94,13 +93,13 @@ public class TransferServiceImpl implements TransferService {
         }
     }
 
-    private BigDecimal getExchangeRate(BankCurrency from, BankCurrency to) throws AuthException {
-        if (from.equals(to)) {
+    private BigDecimal getExchangeRate(BankCurrency fromCurrency, BankCurrency toCurrency) throws AuthException {
+        if (fromCurrency.equals(toCurrency)) {
             return BigDecimal.ONE;
         }
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         String requestUrl = "http://"
-                + EXCHANGE_SERVICE + EXCHANGE_GET_EXCHANGE_RATE + "/" + from.name() + "?exchangeCurrency=" + to.name();
+                + EXCHANGE_SERVICE + EXCHANGE_GET_EXCHANGE_RATE + "/" + fromCurrency.name() + "?toCurrency=" + toCurrency.name();
         System.out.println("запросили=" + requestUrl);
         try {
             var exchangeRate = restClientBuilder.build()
@@ -112,12 +111,7 @@ public class TransferServiceImpl implements TransferService {
             if (exchangeRate == null) {
                 throw new ExchangeServiceException("");
             }
-            BigDecimal rate = exchangeRate.amount();
-            if (!exchangeRate.baseCurrency().equals(from) || !exchangeRate.exchangeCurrency().equals(to) ||
-                    rate.compareTo(BigDecimal.ZERO) <= 0) {
-                throw new ExchangeServiceException("");
-            }
-            return rate;
+            return exchangeRate.rate();
         } catch (Exception ex) {
             throw new ExchangeServiceException("");
         }

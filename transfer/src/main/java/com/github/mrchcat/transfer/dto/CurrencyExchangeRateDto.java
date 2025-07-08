@@ -2,16 +2,16 @@ package com.github.mrchcat.transfer.dto;
 
 
 import com.github.mrchcat.transfer.model.BankCurrency;
-import lombok.Builder;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
-@Builder
 public record CurrencyExchangeRateDto(
-        BankCurrency baseCurrency,
-        BankCurrency exchangeCurrency,
-        BigDecimal amount,
-        LocalDateTime time
+        @NotNull
+        BankCurrency from,
+        @NotNull
+        BankCurrency to,
+        @NotNull
+        BigDecimal rate
 ) {
 }

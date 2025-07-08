@@ -76,19 +76,19 @@ public class SecurityConfig {
     RestClient.Builder restClientBuilder() {
         return RestClient.builder();
     }
-
-    String CLIENT_REGISTRATION_ID = "bank_front";
-
-    HttpHeaders authHeaders(OAuth2AuthorizedClientManager authorizedClientManager) {
-        String token = authorizedClientManager.authorize(OAuth2AuthorizeRequest
-                        .withClientRegistrationId(CLIENT_REGISTRATION_ID)
-                        .principal("system")
-                        .build())
-                .getAccessToken()
-                .getTokenValue();
-        return new HttpHeaders(MultiValueMap
-                .fromSingleValue(Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token)));
-
-    }
+//
+//    String CLIENT_REGISTRATION_ID = "bank_front";
+//
+//    HttpHeaders authHeaders(OAuth2AuthorizedClientManager authorizedClientManager) {
+//        String token = authorizedClientManager.authorize(OAuth2AuthorizeRequest
+//                        .withClientRegistrationId(CLIENT_REGISTRATION_ID)
+//                        .principal("system")
+//                        .build())
+//                .getAccessToken()
+//                .getTokenValue();
+//        return new HttpHeaders(MultiValueMap
+//                .fromSingleValue(Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token)));
+//
+//    }
 
 }
