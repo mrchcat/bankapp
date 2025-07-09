@@ -1,6 +1,7 @@
 package com.github.mrchcat.transfer.service;
 
 import com.github.mrchcat.transfer.dto.AccountDto;
+import com.github.mrchcat.transfer.dto.BankNotificationDtoRequest;
 import com.github.mrchcat.transfer.dto.BankUserDto;
 import com.github.mrchcat.transfer.dto.BlockerResponseDto;
 import com.github.mrchcat.transfer.dto.CurrencyExchangeRateDto;
@@ -13,6 +14,7 @@ import com.github.mrchcat.transfer.exception.NotEnoughMoney;
 import com.github.mrchcat.transfer.mapper.TransferMapper;
 import com.github.mrchcat.transfer.model.BankCurrency;
 import com.github.mrchcat.transfer.model.TransactionStatus;
+import com.github.mrchcat.transfer.model.TransferDirection;
 import com.github.mrchcat.transfer.model.TransferTransaction;
 import com.github.mrchcat.transfer.repository.TransferRepository;
 import com.github.mrchcat.transfer.security.OAuthHeaderGetter;
@@ -44,15 +46,24 @@ public class TransferServiceImpl implements TransferService {
     private final String BLOCKER_ASK_PERMISSION = "/blocker/noncash";
     private final String EXCHANGE_GET_EXCHANGE_RATE = "/exchange";
 
+    private final String NOTIFICATION_SERVICE = "bankNotifications";
+    private final String NOTIFICATION_SEND_NOTIFICATION = "/notification";
+
+    private final String TRANSFER_SERVICE = "bankTransfer";
 
     private final RestClient.Builder restClientBuilder;
     private final OAuthHeaderGetter oAuthHeaderGetter;
     private final TransferRepository transferRepository;
 
+    BankUserDto senderClient;
+    BankUserDto receiverClient;
+    AccountDto senderAccount;
+    AccountDto receiverAccount;
+
     @Override
     public void processTransfer(NonCashTransferDto transaction) throws AuthException, ServiceUnavailableException, SQLException {
-        UUID fromAccount = getFromAccountAndValidate(transaction.fromUsername(), transaction.amount(), transaction.fromCurrency());
-        UUID toAccount = switch (transaction.direction()) {
+        UUID fromAccountId = getFromAccountAndValidate(transaction.fromUsername(), transaction.amount(), transaction.fromCurrency());
+        UUID toAccountId = switch (transaction.direction()) {
             case YOURSELF -> getToAccountAndValidate(transaction.fromUsername(), transaction.toCurrency());
             case OTHER -> getToAccountAndValidate(transaction.toUsername(), transaction.toCurrency());
         };
@@ -71,8 +82,8 @@ public class TransferServiceImpl implements TransferService {
             toAmount = fromAmount.multiply(exchangeRate);
         }
         TransferTransaction transferTransaction = TransferTransaction.builder()
-                .fromAccount(fromAccount)
-                .toAccount(toAccount)
+                .fromAccount(fromAccountId)
+                .toAccount(toAccountId)
                 .fromAmount(fromAmount)
                 .toAmount(toAmount)
                 .exchangeRate(exchangeRate)
@@ -83,8 +94,22 @@ public class TransferServiceImpl implements TransferService {
         try {
             if (validateTransaction(confirmation, newTransaction.getTransactionId(), newTransaction.getStatus())) {
                 transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.SUCCESS);
+                String messageToSender = String.format("Со счета %s списаны средства в размере %s %s",
+                        fromAccountId, newTransaction.getFromAmount(), senderAccount.currencyStringCode());
+                sendNotification(senderClient, messageToSender);
+                if (transaction.direction().equals(TransferDirection.OTHER)) {
+                    String messageToReceiver = String.format("На счет %s зачислены средства в размере %s %s",
+                            toAccountId, newTransaction.getToAmount(), receiverAccount.currencyStringCode());
+                    sendNotification(receiverClient, messageToReceiver);
+                }
             } else {
                 transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.ERROR);
+                String messageToSender = String.format("Ошибка при попытке списания средств со счета %s", fromAccountId);
+                sendNotification(senderClient, messageToSender);
+                if (transaction.direction().equals(TransferDirection.OTHER)) {
+                    String messageToReceiver = String.format("Ошибка при попытке зачисления средств на счет %s", toAccountId);
+                    sendNotification(receiverClient, messageToReceiver);
+                }
                 throw new AccountServiceException("ошибка: операция внесения денег не подтверждена");
             }
         } catch (Exception e) {
@@ -144,16 +169,20 @@ public class TransferServiceImpl implements TransferService {
 
     private UUID getToAccountAndValidate(String username, BankCurrency currency) throws AuthException {
         BankUserDto receiver = getClient(username, currency);
+        receiverClient = receiver;
         List<AccountDto> accounts = receiver.accounts();
         if (accounts == null || accounts.isEmpty()) {
             throw new AccountServiceException("сервис не вернул список аккаунтов");
         }
-        return accounts.get(0).id();
+        AccountDto toAccount = accounts.get(0);
+        receiverAccount = toAccount;
+        return toAccount.id();
     }
 
 
     private UUID getFromAccountAndValidate(String username, BigDecimal fromAmount, BankCurrency currency) throws AuthException {
         BankUserDto sender = getClient(username, currency);
+        senderClient = sender;
         List<AccountDto> accounts = sender.accounts();
         if (accounts == null) {
             throw new AccountServiceException("сервис не вернул список аккаунтов");
@@ -161,11 +190,12 @@ public class TransferServiceImpl implements TransferService {
         if (accounts.isEmpty()) {
             throw new NotEnoughMoney("");
         }
-        return accounts.stream()
+        AccountDto fromAccountDto = accounts.stream()
                 .filter(accountDto -> accountDto.balance().compareTo(fromAmount) >= 0)
                 .findFirst()
-                .map(AccountDto::id)
                 .orElseThrow(() -> new NotEnoughMoney(""));
+        senderAccount = fromAccountDto;
+        return fromAccountDto.id();
     }
 
 
@@ -213,6 +243,30 @@ public class TransferServiceImpl implements TransferService {
             throw new ServiceUnavailableException("сервис подтверждения не доступен");
         }
         return blockerResponse;
+    }
+
+    private void sendNotification(BankUserDto client, String message) throws AuthException {
+        try {
+            var notification = BankNotificationDtoRequest.builder()
+                    .service(TRANSFER_SERVICE)
+                    .username(client.username())
+                    .fullName(client.fullName())
+                    .email(client.email())
+                    .message(message)
+                    .build();
+            var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
+            String requestUrl = "http://" + NOTIFICATION_SERVICE + NOTIFICATION_SEND_NOTIFICATION;
+            System.out.println("запросили=" + requestUrl);
+            restClientBuilder.build()
+                    .post()
+                    .uri(requestUrl)
+                    .header(oAuthHeader.name(), oAuthHeader.value())
+                    .body(notification)
+                    .retrieve()
+                    .toBodilessEntity();
+
+        } catch (Exception ignore) {
+        }
     }
 
 }

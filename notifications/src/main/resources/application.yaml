@@ -1,8 +1,15 @@
-server.port: 8082
+server.port: 8089
 
 spring:
   application:
-    name: bank-notifications
+    name: bankNotifications
+  datasource:
+    url: jdbc:postgresql://localhost:5432/notification
+    username: postgres
+    password: Inushing1980
+  sql.init:
+    mode: ALWAYS
+    schema-locations: classpath:schema.sql
   security:
     oauth2:
       resourceserver:

@@ -14,13 +14,17 @@ import com.github.mrchcat.accounts.exceptions.NotEnoughMoney;
 import com.github.mrchcat.accounts.exceptions.TransactionWasCompletedAlready;
 import com.github.mrchcat.accounts.log.mapper.LogMapper;
 import com.github.mrchcat.accounts.log.service.LogService;
+import com.github.mrchcat.accounts.security.OAuthHeaderGetter;
+import com.github.mrchcat.accounts.user.dto.BankNotificationDtoRequest;
 import com.github.mrchcat.accounts.user.dto.BankUserDto;
 import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.model.BankUser;
 import com.github.mrchcat.accounts.user.service.UserService;
+import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -40,6 +44,14 @@ public class AccountServiceImpl implements AccountService {
     private final LogService logService;
     private final AccountBlockService accountBlockService;
 
+    private final String NOTIFICATION_SERVICE = "bankNotifications";
+    private final String NOTIFICATION_SEND_NOTIFICATION = "/notification";
+    private final String ACCOUNT_SERVICE = "bankAccounts";
+
+    private final RestClient.Builder restClientBuilder;
+    private final OAuthHeaderGetter oAuthHeaderGetter;
+
+
     @Override
     public BankUserDto getClient(String username, BankCurrency currency) {
         BankUser client = userService.getClient(username);
@@ -56,7 +68,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void editClientAccounts(String username, EditUserAccountDto editUserAccountDto) {
-        System.out.println();
         Map<String, Boolean> mapOfCurrenciesToUpdateAccounts = editUserAccountDto.accounts();
         if (mapOfCurrenciesToUpdateAccounts == null || mapOfCurrenciesToUpdateAccounts.isEmpty()) {
             return;
@@ -252,5 +263,26 @@ public class AccountServiceImpl implements AccountService {
         return new TransactionConfirmation(transactionDto.transactionId(), transactionDto.status());
     }
 
-
+    private void sendNotification(BankUser client, String message) throws AuthException {
+        try {
+            var notification = BankNotificationDtoRequest.builder()
+                    .service(ACCOUNT_SERVICE)
+                    .username(client.getUsername())
+                    .fullName(client.getFullName())
+                    .email(client.getEmail())
+                    .message(message)
+                    .build();
+            var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
+            String requestUrl = "http://" + NOTIFICATION_SERVICE + NOTIFICATION_SEND_NOTIFICATION;
+            System.out.println("запросили=" + requestUrl);
+            restClientBuilder.build()
+                    .post()
+                    .uri(requestUrl)
+                    .header(oAuthHeader.name(), oAuthHeader.value())
+                    .body(notification)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception ignore) {
+        }
+    }
 }

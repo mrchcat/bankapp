@@ -1,6 +1,7 @@
 package com.github.mrchcat.cash.service;
 
 import com.github.mrchcat.cash.dto.AccountDto;
+import com.github.mrchcat.cash.dto.BankNotificationDtoRequest;
 import com.github.mrchcat.cash.dto.BankUserDto;
 import com.github.mrchcat.cash.dto.BlockerResponseDto;
 import com.github.mrchcat.cash.dto.CashTransactionDto;
@@ -32,12 +33,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CashServiceImpl implements CashService {
     private final String ACCOUNT_SERVICE = "bankAccounts";
-    private final String BLOCKER_SERVICE = "bankBlocker";
-
     private final String ACCOUNTS_GET_CLIENT_API = "/account";
     private final String ACCOUNTS_SEND_TRANSACTION_API = "/account/cash";
 
+    private final String BLOCKER_SERVICE = "bankBlocker";
     private final String BLOCKER_ASK_PERMISSION = "/blocker/cash";
+
+    private final String NOTIFICATION_SERVICE = "bankNotifications";
+    private final String NOTIFICATION_SEND_NOTIFICATION = "/notification";
+
+    private final String CASH_SERVICE = "bankCash";
 
     private final RestClient.Builder restClientBuilder;
     private final OAuthHeaderGetter oAuthHeaderGetter;
@@ -57,6 +62,7 @@ public class CashServiceImpl implements CashService {
             default -> throw new UnsupportedOperationException("некорректный тип акции:" + cashTransactionDto.action());
         }
     }
+
     private BlockerResponseDto checkCashTransaction(CashTransactionDto cashTransactionDto) throws AuthException, ServiceUnavailableException {
         System.out.println("отправляем в блокер " + cashTransactionDto);
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
@@ -95,11 +101,20 @@ public class CashServiceImpl implements CashService {
             var confirmation = sendTransactionToAccountService(CashMapper.toRequestDto(newTransaction, TransactionStatus.CASH_RECEIVED));
             if (validateTransaction(confirmation, newTransaction.getTransactionId(), TransactionStatus.CASH_RECEIVED)) {
                 cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.SUCCESS);
+                String message = "приняты наличные в сумме " + newTransaction.getAmount() + " "
+                        + newTransaction.getCurrencyStringCodeIso4217();
+                sendNotification(client, message);
             } else {
+                String message = "ошибка в процессе внесения наличных денег в сумме" + newTransaction.getAmount() + " "
+                        + newTransaction.getCurrencyStringCodeIso4217();
+                sendNotification(client, message);
                 cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.ERROR);
                 throw new RuntimeException("ошибка: операция внесения денег не подтверждена");
             }
         } else {
+            String message = "деньги не были востребованы в банкомате в сумме" + newTransaction.getAmount() + " "
+                    + newTransaction.getCurrencyStringCodeIso4217();
+            sendNotification(client, message);
             //        если не получили
             cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.CANCEL);
             throw new RejectedByClient("");
@@ -204,10 +219,17 @@ public class CashServiceImpl implements CashService {
             if (validateTransaction(confirmation, newTransaction.getTransactionId(), newTransaction.getStatus())) {
                 cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.SUCCESS);
             }
+            String message = "выданы наличные в сумме" + newTransaction.getAmount() + " "
+                    + newTransaction.getCurrencyStringCodeIso4217();
+            sendNotification(client, message);
+
 //          если не забрали
         } else {
             cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.CANCEL);
             sendTransactionToAccountService(CashMapper.toRequestDto(newTransaction, TransactionStatus.CANCEL));
+            String message = "деньги не были востребованы в банкомате в сумме" + newTransaction.getAmount() + " "
+                    + newTransaction.getCurrencyStringCodeIso4217();
+            sendNotification(client, message);
             throw new RejectedByClient("");
         }
     }
@@ -221,4 +243,27 @@ public class CashServiceImpl implements CashService {
         System.out.println("возвращаем деньги обратно клиенту");
     }
 
+    private void sendNotification(BankUserDto client, String message) throws AuthException {
+        try {
+            var notification = BankNotificationDtoRequest.builder()
+                    .service(CASH_SERVICE)
+                    .username(client.username())
+                    .fullName(client.fullName())
+                    .email(client.email())
+                    .message(message)
+                    .build();
+            var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
+            String requestUrl = "http://" + NOTIFICATION_SERVICE + NOTIFICATION_SEND_NOTIFICATION;
+            System.out.println("запросили=" + requestUrl);
+            restClientBuilder.build()
+                    .post()
+                    .uri(requestUrl)
+                    .header(oAuthHeader.name(), oAuthHeader.value())
+                    .body(notification)
+                    .retrieve()
+                    .toBodilessEntity();
+
+        } catch (Exception ignore) {
+        }
+    }
 }

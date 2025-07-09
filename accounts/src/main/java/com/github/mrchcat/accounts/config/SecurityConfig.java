@@ -1,5 +1,6 @@
 package com.github.mrchcat.accounts.config;
 
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -29,17 +30,10 @@ public class SecurityConfig {
                 .build();
     }
 
+    @LoadBalanced
     @Bean
-    public RestClient restClient(RestClient.Builder builder, OAuth2AuthorizedClientManager authorizedClientManager) {
-        OAuth2ClientHttpRequestInterceptor requestInterceptor = new OAuth2ClientHttpRequestInterceptor(authorizedClientManager);
-        return builder.requestInterceptor(requestInterceptor).build();
+    RestClient.Builder restClientBuilder() {
+        return RestClient.builder();
     }
 
-//    @Bean
-//    public RestClient.Builder restClientBuilder(RestClientBuilderConfigurer configurer,
-//                                                OAuth2AuthorizedClientManager authorizedClientManager) {
-//        var requestInterceptor = new OAuth2ClientHttpRequestInterceptor(authorizedClientManager);
-//        return configurer.configure(RestClient.builder())
-//                .requestInterceptor(requestInterceptor);
-//    }
 }

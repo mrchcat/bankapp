@@ -15,8 +15,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**").permitAll()
-                        .anyRequest().hasAuthority("SCOPE_notifications")
+                                .requestMatchers("/actuator/**").permitAll()
+                                .anyRequest().permitAll()
+//                        .anyRequest().hasAuthority("SCOPE_notifications")
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2ResourceServer(oauth2 ->

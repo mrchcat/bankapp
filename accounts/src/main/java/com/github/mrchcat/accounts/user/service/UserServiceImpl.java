@@ -2,16 +2,20 @@ package com.github.mrchcat.accounts.user.service;
 
 import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
 import com.github.mrchcat.accounts.exceptions.UserNotUniqueProperties;
+import com.github.mrchcat.accounts.security.OAuthHeaderGetter;
+import com.github.mrchcat.accounts.user.dto.BankNotificationDtoRequest;
 import com.github.mrchcat.accounts.user.dto.BankUserDto;
 import com.github.mrchcat.accounts.user.dto.CreateNewClientDto;
 import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.model.BankUser;
 import com.github.mrchcat.accounts.user.model.UserRole;
 import com.github.mrchcat.accounts.user.repository.UserRepository;
+import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,13 +25,14 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+    private final String NOTIFICATION_SERVICE = "bankNotifications";
+    private final String NOTIFICATION_SEND_NOTIFICATION = "/notification";
+    private final String ACCOUNT_SERVICE = "bankAccounts";
+
+    private final RestClient.Builder restClientBuilder;
+    private final OAuthHeaderGetter oAuthHeaderGetter;
     private final UserRepository userRepository;
-//    //    private final RestClient.Builder restClientBuilder;
-//    private final RestClient restClient;
-//    //    private String ACCOUNT_SERVICE = "bank_notifications";
-//    private String ACCOUNT_SERVICE = "localhost:8082";
-//    private final String NOTIFICATION_POST_MESSAGE = "/notification";
-//    private final String CLIENT_REGISTRATION_ID = "bank_accounts";
+
 
     @Override
     public UserDetails getUserDetails(String username) {
@@ -47,7 +52,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetails registerNewClient(CreateNewClientDto upDto) {
+    public UserDetails registerNewClient(CreateNewClientDto upDto) throws AuthException {
         validateIfClientPropertiesExistAlready(upDto);
         BankUser newClient = BankUser.builder()
                 .fullName(upDto.fullName())
@@ -61,6 +66,8 @@ public class UserServiceImpl implements UserService {
                 .updatedAt(LocalDateTime.now())
                 .build();
         userRepository.save(newClient);
+        String message = "Зарегистрирован новый клиент ФИО: " + newClient.getFullName();
+        sendNotification(newClient, message);
         return getUserDetails(upDto.username());
     }
 
@@ -71,7 +78,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void editClientData(String username, EditUserAccountDto dto) {
+    public void editClientData(String username, EditUserAccountDto dto) throws AuthException {
         BankUser client = getClient(username);
         boolean hasNewProperties = false;
         String newEmail = dto.email();
@@ -91,6 +98,8 @@ public class UserServiceImpl implements UserService {
         if (hasNewProperties) {
             client.setUpdatedAt(LocalDateTime.now());
             userRepository.save(client);
+            String message = "Клиент с username " + client.getUsername() + " обновил свои данные";
+            sendNotification(client, message);
         }
     }
 
@@ -120,19 +129,28 @@ public class UserServiceImpl implements UserService {
         return UserMapper.toDto(userRepository.findAllActive());
     }
 
-    //    private void sendBankNotification(BankNotificationDto notification) {
-//        try {
-//            System.out.println("пытаемся отправить");
-//            var responce = restClient
-//                    .post()
-//                    .uri("http://localhost:8082" + NOTIFICATION_POST_MESSAGE)
-//                    .attributes(clientRegistrationId(CLIENT_REGISTRATION_ID))
-//                    .body(notification)
-//                    .retrieve()
-//                    .body(UUID.class);
-//            System.out.println("вернулся ответ=" + responce);
-//        } catch (HttpClientErrorException ex) {
-//            System.out.println("ошибка=" + ex.getMessage());
-//        }
-//    }
+
+    private void sendNotification(BankUser client, String message) throws AuthException {
+        try {
+            var notification = BankNotificationDtoRequest.builder()
+                    .service(ACCOUNT_SERVICE)
+                    .username(client.getUsername())
+                    .fullName(client.getFullName())
+                    .email(client.getEmail())
+                    .message(message)
+                    .build();
+            var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
+            String requestUrl = "http://" + NOTIFICATION_SERVICE + NOTIFICATION_SEND_NOTIFICATION;
+            System.out.println("запросили=" + requestUrl);
+            restClientBuilder.build()
+                    .post()
+                    .uri(requestUrl)
+                    .header(oAuthHeader.name(), oAuthHeader.value())
+                    .body(notification)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception ignore) {
+        }
+    }
+
 }

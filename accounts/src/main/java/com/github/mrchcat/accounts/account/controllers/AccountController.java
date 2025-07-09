@@ -8,6 +8,7 @@ import com.github.mrchcat.accounts.account.model.BankCurrency;
 import com.github.mrchcat.accounts.account.service.AccountService;
 import com.github.mrchcat.accounts.user.dto.BankUserDto;
 import com.github.mrchcat.accounts.user.service.UserService;
+import jakarta.security.auth.message.AuthException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -56,7 +57,7 @@ public class AccountController {
      */
     @PatchMapping("/account/{username}")
     BankUserDto editClientAccountsAndPersonalData(@PathVariable @NotNull @NotBlank String username,
-                                                  @RequestBody @Valid EditUserAccountDto editUserAccountDto) {
+                                                  @RequestBody @Valid EditUserAccountDto editUserAccountDto) throws AuthException {
         if (!validateIfAllPropertiesEmpty(editUserAccountDto)) {
             userService.editClientData(username, editUserAccountDto);
         }
