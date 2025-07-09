@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -53,6 +55,11 @@ public class ExchangeServiceImpl implements ExchangeService {
         BigDecimal rate=fromCurrencyInDefault.divide(toCurrencyInDefault, 5, RoundingMode.CEILING);
         dto.setRate(rate);
         return dto;
+    }
+
+    @Override
+    public Map<BankCurrency, BigDecimal> getAllRates() {
+        return exchangeRates;
     }
 
     @Override

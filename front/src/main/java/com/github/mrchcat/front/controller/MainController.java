@@ -6,6 +6,7 @@ import com.github.mrchcat.front.dto.FrontAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NonCashTransfer;
 import com.github.mrchcat.front.dto.PasswordUpdateDto;
+import com.github.mrchcat.front.model.BankCurrency;
 import com.github.mrchcat.front.model.CashAction;
 import com.github.mrchcat.front.model.UserRole;
 import com.github.mrchcat.front.service.FrontService;
@@ -38,6 +39,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 //TODO добавить проверку, что username действительно соответствует авторизированнному пользователю
 
@@ -77,6 +79,8 @@ public class MainController {
         var clientsWithAccounts = frontService.getAllClientsWithActiveAccounts();
         System.out.println("отправляем " + clientsWithAccounts);
         model.addAttribute("clientsWithAccounts", clientsWithAccounts);
+
+        model.addAttribute("ratesLink", "http://localhost:8080/front/rates");
 
         return "/main";
     }
@@ -248,6 +252,4 @@ public class MainController {
         }
         return redirectView;
     }
-
-
 }

@@ -5,12 +5,16 @@ import com.github.mrchcat.front.dto.CashTransactionDto;
 import com.github.mrchcat.front.dto.CashTransactionRequestDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
+import com.github.mrchcat.front.dto.FrontRate;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
 import com.github.mrchcat.front.dto.NonCashTransfer;
 import com.github.mrchcat.front.dto.NonCashTransferRequest;
 import com.github.mrchcat.front.dto.UserDetailsDto;
+import com.github.mrchcat.front.exception.ExchangeServiceException;
 import com.github.mrchcat.front.mapper.FrontMapper;
+import com.github.mrchcat.front.model.BankCurrency;
 import com.github.mrchcat.front.model.CashAction;
+import com.github.mrchcat.front.model.FrontCurrencies;
 import com.github.mrchcat.front.security.OAuthHeaderGetter;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +29,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import javax.naming.ServiceUnavailableException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +50,8 @@ public class FrontServiceImpl implements FrontService {
     private final String TRANSFER_SERVICE = "bankTransfer";
     private final String TRANSFER_PROCESS_API = "/transfer";
 
+    private final String EXCHANGE_SERVICE = "bankExchange";
+    private final String EXCHANGE_GET_ALL_RATES = "/exchange";
 
     private final UserDetailsPasswordService userDetailsPasswordService;
     private final UserDetailsService userDetailsService;
@@ -131,7 +142,7 @@ public class FrontServiceImpl implements FrontService {
         if (response == null) {
             throw new ServiceUnavailableException("сервис аккаунтов не доступен");
         }
-        System.out.println("получили "+response);
+        System.out.println("получили " + response);
         return FrontMapper.toFrontBankUserDto(response);
     }
 
@@ -146,5 +157,41 @@ public class FrontServiceImpl implements FrontService {
                 .body(requestDto)
                 .retrieve()
                 .body(String.class);
+    }
+
+    @Override
+    public List<FrontRate> getAllRates() throws AuthException {
+        Map<BankCurrency, BigDecimal> rateMap = getAllRatesFromExchange();
+        List<FrontRate> frontRates = new ArrayList<>();
+        for (FrontCurrencies.BankFrontCurrency frontCurrency : FrontCurrencies.getCurrencyList()) {
+            BankCurrency currency = BankCurrency.valueOf(frontCurrency.name());
+            if (rateMap.containsKey(currency)) {
+//                frontRates.add(new FrontRate(frontCurrency.name(), frontCurrency.title, rateMap.get(currency)));
+            }
+        }
+        return frontRates;
+    }
+
+
+    private Map<BankCurrency, BigDecimal> getAllRatesFromExchange() throws AuthException {
+        var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
+        String requestUrl = "http://" + EXCHANGE_SERVICE + EXCHANGE_GET_ALL_RATES;
+        System.out.println("запросили=" + requestUrl);
+        try {
+            Map<BankCurrency, BigDecimal> rates = restClientBuilder.build()
+                    .get()
+                    .uri(requestUrl)
+                    .header(oAuthHeader.name(), oAuthHeader.value())
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<>() {
+                    });
+            if (rates == null) {
+                throw new ExchangeServiceException("");
+            }
+            return rates;
+        } catch (Exception ex) {
+            throw new ExchangeServiceException("");
+        }
+
     }
 }
