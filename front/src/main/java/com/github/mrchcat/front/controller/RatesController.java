@@ -25,10 +25,6 @@ public class RatesController {
      */
     @GetMapping("/front/rates")
     List<FrontRate> getAllRates() throws AuthException {
-        List<FrontRate> list = new ArrayList<>();
-        list.add(new FrontRate("USD", "доллар", BigDecimal.ONE, BigDecimal.TEN));
-        list.add(new FrontRate("CNY", "юани", BigDecimal.TEN,BigDecimal.ZERO));
-        return list;
-        //        return frontService.getAllRates();
+        return frontService.getAllRates();
     }
 }

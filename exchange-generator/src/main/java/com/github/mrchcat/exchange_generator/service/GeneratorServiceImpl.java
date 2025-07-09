@@ -2,6 +2,7 @@ package com.github.mrchcat.exchange_generator.service;
 
 import com.github.mrchcat.exchange_generator.dto.CurrencyExchangeRatesDto;
 import com.github.mrchcat.exchange_generator.model.BankCurrency;
+import com.github.mrchcat.exchange_generator.model.CurrencyRate;
 import com.github.mrchcat.exchange_generator.security.OAuthHeaderGetter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -9,7 +10,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -24,22 +28,29 @@ public class GeneratorServiceImpl implements GeneratorService {
     private final OAuthHeaderGetter oAuthHeaderGetter;
 
     @Override
-    @Scheduled(fixedDelay = 5000L)
+    @Scheduled(fixedDelay = 1000L)
     public void sendNewRates() {
-        var currencyMap = getRates();
-        var rates = CurrencyExchangeRatesDto.builder()
-                .baseCurrency(BankCurrency.RUB)
-                .exchangeRates(currencyMap)
-                .time(LocalDateTime.now())
-                .build();
-        send(rates);
+        send(new CurrencyExchangeRatesDto(BankCurrency.RUB, getRates()));
     }
 
-    private Map<BankCurrency, BigDecimal> getRates() {
-        BigDecimal randomUsd = BigDecimal.valueOf(Math.random() + 1);
-        BigDecimal randomCNY = BigDecimal.valueOf(Math.random() + 1);
-        return Map.of(BankCurrency.USD, AVERAGE_USD.multiply(randomUsd),
-                BankCurrency.CNY, AVERAGE_CNY.multiply(randomCNY));
+    private List<CurrencyRate> getRates() {
+        BigDecimal randomBuyUsd = BigDecimal.valueOf(1 + Math.random() / 10);
+        BigDecimal randomSellUsd = BigDecimal.valueOf(1 - Math.random() / 10);
+        BigDecimal randomBuyCNY = BigDecimal.valueOf(1 + Math.random() / 10);
+        BigDecimal randomSellCNY = BigDecimal.valueOf(1 - Math.random() / 10);
+        var USDrate = CurrencyRate.builder()
+                .currency(BankCurrency.USD)
+                .buyRate(AVERAGE_USD.multiply(randomBuyUsd).setScale(2, RoundingMode.HALF_UP))
+                .sellRate(AVERAGE_USD.multiply(randomSellUsd).setScale(2, RoundingMode.HALF_UP))
+                .time(LocalDateTime.now())
+                .build();
+        var CNYrate = CurrencyRate.builder()
+                .currency(BankCurrency.CNY)
+                .buyRate(AVERAGE_CNY.multiply(randomBuyCNY).setScale(2, RoundingMode.HALF_UP))
+                .sellRate(AVERAGE_CNY.multiply(randomSellCNY).setScale(2, RoundingMode.HALF_UP))
+                .time(LocalDateTime.now())
+                .build();
+        return List.of(USDrate, CNYrate);
     }
 
     private void send(CurrencyExchangeRatesDto rates) {

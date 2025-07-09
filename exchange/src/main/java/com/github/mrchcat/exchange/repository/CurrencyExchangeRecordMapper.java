@@ -16,6 +16,8 @@ public class CurrencyExchangeRecordMapper implements RowMapper<CurrencyExchangeR
                 .id(rs.getLong("id"))
                 .baseCurrency(BankCurrency.valueOf(rs.getString("base")))
                 .exchangeCurrency(BankCurrency.valueOf(rs.getString("exchange")))
+                .buyRate(rs.getBigDecimal("buy_rate"))
+                .sellRate(rs.getBigDecimal("sell_rate"))
                 .time(rs.getTimestamp("time").toLocalDateTime())
                 .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                 .build();

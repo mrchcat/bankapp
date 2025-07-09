@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.naming.ServiceUnavailableException;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,4 +37,6 @@ public interface FrontService {
     void processNonCashOperation(NonCashTransfer nonCashTransaction) throws AuthException;
 
     List<FrontRate> getAllRates() throws AuthException;
+
+    URI getFrontExchangeUri();
 }

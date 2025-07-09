@@ -2,7 +2,7 @@ server.port: 8080
 
 spring:
   application:
-    name: bank_front
+    name: bankFront
   security:
     oauth2:
         client:

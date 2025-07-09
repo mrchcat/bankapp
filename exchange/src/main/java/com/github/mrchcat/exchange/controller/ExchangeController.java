@@ -2,6 +2,7 @@ package com.github.mrchcat.exchange.controller;
 
 import com.github.mrchcat.exchange.dto.CurrencyExchangeRateDto;
 import com.github.mrchcat.exchange.dto.CurrencyExchangeRatesDto;
+import com.github.mrchcat.exchange.dto.CurrencyRate;
 import com.github.mrchcat.exchange.model.BankCurrency;
 import com.github.mrchcat.exchange.service.ExchangeService;
 import jakarta.validation.Valid;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 @RestController
@@ -32,7 +35,7 @@ public class ExchangeController {
     }
 
     @GetMapping("/exchange")
-    Map<BankCurrency, BigDecimal> getAllRates() {
+    Collection<CurrencyRate> getAllRates() {
         return exchangeService.getAllRates();
     }
 

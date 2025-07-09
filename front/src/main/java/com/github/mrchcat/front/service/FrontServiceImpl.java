@@ -3,6 +3,7 @@ package com.github.mrchcat.front.service;
 import com.github.mrchcat.front.dto.BankUserDto;
 import com.github.mrchcat.front.dto.CashTransactionDto;
 import com.github.mrchcat.front.dto.CashTransactionRequestDto;
+import com.github.mrchcat.front.dto.CurrencyRate;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.FrontRate;
@@ -19,6 +20,7 @@ import com.github.mrchcat.front.security.OAuthHeaderGetter;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
@@ -30,7 +32,9 @@ import org.springframework.web.client.RestClient;
 
 import javax.naming.ServiceUnavailableException;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,11 +57,16 @@ public class FrontServiceImpl implements FrontService {
     private final String EXCHANGE_SERVICE = "bankExchange";
     private final String EXCHANGE_GET_ALL_RATES = "/exchange";
 
+    private final String FRONT_SERVICE = "bankFront";
+    private final String FRONT_GET_ALL_RATES = "/front/rates";
+
+
     private final UserDetailsPasswordService userDetailsPasswordService;
     private final UserDetailsService userDetailsService;
     private final RestClient.Builder restClientBuilder;
     private final OAuthHeaderGetter oAuthHeaderGetter;
     private final PasswordEncoder encoder;
+    private final DiscoveryClient discoveryClient;
 
     @Override
     public UserDetails editClientPassword(String username, String password) {
@@ -161,24 +170,35 @@ public class FrontServiceImpl implements FrontService {
 
     @Override
     public List<FrontRate> getAllRates() throws AuthException {
-        Map<BankCurrency, BigDecimal> rateMap = getAllRatesFromExchange();
+        Collection<CurrencyRate> rateList = getAllRatesFromExchange();
+        Map<BankCurrency, CurrencyRate> rateMap = new HashMap<>();
+        rateList.forEach(cr -> rateMap.put(cr.currency(), cr));
         List<FrontRate> frontRates = new ArrayList<>();
         for (FrontCurrencies.BankFrontCurrency frontCurrency : FrontCurrencies.getCurrencyList()) {
+            if (frontCurrency.name().equals("RUB")) {
+                continue;
+            }
             BankCurrency currency = BankCurrency.valueOf(frontCurrency.name());
             if (rateMap.containsKey(currency)) {
-//                frontRates.add(new FrontRate(frontCurrency.name(), frontCurrency.title, rateMap.get(currency)));
+                CurrencyRate currencyRate = rateMap.get(currency);
+                var frontRate = FrontRate.builder()
+                        .currencyCode(frontCurrency.name())
+                        .title(frontCurrency.title)
+                        .buyRate(currencyRate.buyRate())
+                        .sellRate(currencyRate.sellRate())
+                        .build();
+                frontRates.add(frontRate);
             }
         }
         return frontRates;
     }
 
-
-    private Map<BankCurrency, BigDecimal> getAllRatesFromExchange() throws AuthException {
+    private Collection<CurrencyRate> getAllRatesFromExchange() throws AuthException {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         String requestUrl = "http://" + EXCHANGE_SERVICE + EXCHANGE_GET_ALL_RATES;
         System.out.println("запросили=" + requestUrl);
         try {
-            Map<BankCurrency, BigDecimal> rates = restClientBuilder.build()
+            Collection<CurrencyRate> rates = restClientBuilder.build()
                     .get()
                     .uri(requestUrl)
                     .header(oAuthHeader.name(), oAuthHeader.value())
@@ -192,6 +212,11 @@ public class FrontServiceImpl implements FrontService {
         } catch (Exception ex) {
             throw new ExchangeServiceException("");
         }
+    }
 
+    @Override
+    public URI getFrontExchangeUri() {
+        URI frontUri = discoveryClient.getInstances(FRONT_SERVICE).get(0).getUri();
+        return frontUri.resolve(FRONT_GET_ALL_RATES);
     }
 }

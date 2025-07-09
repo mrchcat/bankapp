@@ -14,7 +14,8 @@ public class CurrencyExchangeRecord {
     long id;
     BankCurrency baseCurrency;
     BankCurrency exchangeCurrency;
-    BigDecimal rate;
+    BigDecimal buyRate;
+    BigDecimal sellRate;
     LocalDateTime time;
     LocalDateTime createdAt;
 }
