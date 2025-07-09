@@ -108,7 +108,6 @@ public class FrontServiceImpl implements FrontService {
 
     @Override
     public BankUserDto editUserAccount(String username, EditUserAccountDto editUserAccountDto) throws AuthException {
-        System.out.println("должны отправить " + FrontMapper.toRequestDto(editUserAccountDto));
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         var response = restClientBuilder.build()
                 .patch()
@@ -149,7 +148,6 @@ public class FrontServiceImpl implements FrontService {
         if (response == null) {
             throw new ServiceUnavailableException("сервис аккаунтов не доступен");
         }
-        System.out.println("получили " + response);
         return FrontMapper.toFrontBankUserDto(response);
     }
 
@@ -194,7 +192,6 @@ public class FrontServiceImpl implements FrontService {
     private Collection<CurrencyRate> getAllRatesFromExchange() throws AuthException {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         String requestUrl = "http://" + EXCHANGE_SERVICE + EXCHANGE_GET_ALL_RATES;
-        System.out.println("запросили=" + requestUrl);
         try {
             Collection<CurrencyRate> rates = restClientBuilder.build()
                     .get()

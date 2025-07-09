@@ -21,7 +21,6 @@ public class CashController {
     @PostMapping("/cash")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void processOperation(@RequestBody @Valid CashTransactionDto cashTransactionDto) throws AuthException, ServiceUnavailableException {
-        System.out.println("получен запрос " + cashTransactionDto);
         cashService.processCashOperation(cashTransactionDto);
     }
 }

@@ -125,7 +125,6 @@ public class TransferServiceImpl implements TransferService {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         String requestUrl = "http://"
                 + EXCHANGE_SERVICE + EXCHANGE_GET_EXCHANGE_RATE + "/" + fromCurrency.name() + "?toCurrency=" + toCurrency.name();
-        System.out.println("запросили=" + requestUrl);
         try {
             var exchangeRate = restClientBuilder.build()
                     .get()
@@ -150,10 +149,8 @@ public class TransferServiceImpl implements TransferService {
     }
 
     private TransactionConfirmation sendTransaction(TransferTransaction transferTransaction) throws AuthException, ServiceUnavailableException {
-        System.out.println("отправляем " + TransferMapper.toRequestDto(transferTransaction));
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         String requestUrl = "http://" + ACCOUNT_SERVICE + ACCOUNTS_SEND_TRANSFER_TRANSACTION_API;
-        System.out.println("запросили=" + requestUrl);
         var confirmation = restClientBuilder.build()
                 .post()
                 .uri(requestUrl)
@@ -202,7 +199,6 @@ public class TransferServiceImpl implements TransferService {
     private BankUserDto getClient(String username, BankCurrency currency) throws AuthException {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         String requestUrl = "http://" + ACCOUNT_SERVICE + ACCOUNTS_GET_CLIENT_API + "/" + username + "?currency=" + currency.name();
-        System.out.println("запросили=" + requestUrl);
         try {
             var client = restClientBuilder.build()
                     .get()
@@ -230,7 +226,6 @@ public class TransferServiceImpl implements TransferService {
     }
 
     private BlockerResponseDto checkCashTransaction(NonCashTransferDto transaction) throws AuthException, ServiceUnavailableException {
-        System.out.println("отправляем в блокер " + transaction);
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         var blockerResponse = restClientBuilder.build()
                 .post()
@@ -256,7 +251,6 @@ public class TransferServiceImpl implements TransferService {
                     .build();
             var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
             String requestUrl = "http://" + NOTIFICATION_SERVICE + NOTIFICATION_SEND_NOTIFICATION;
-            System.out.println("запросили=" + requestUrl);
             restClientBuilder.build()
                     .post()
                     .uri(requestUrl)

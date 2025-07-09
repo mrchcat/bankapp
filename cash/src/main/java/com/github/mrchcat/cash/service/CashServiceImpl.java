@@ -64,7 +64,6 @@ public class CashServiceImpl implements CashService {
     }
 
     private BlockerResponseDto checkCashTransaction(CashTransactionDto cashTransactionDto) throws AuthException, ServiceUnavailableException {
-        System.out.println("отправляем в блокер " + cashTransactionDto);
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         var blockerResponse = restClientBuilder.build()
                 .post()
@@ -129,9 +128,7 @@ public class CashServiceImpl implements CashService {
     }
 
     private TransactionConfirmation sendTransactionToAccountService(CashTransactionRequestDto cashTransactionRequestDto) throws AuthException, ServiceUnavailableException {
-        System.out.println("на отправку " + cashTransactionRequestDto);
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
-        System.out.println("запросили=" + "http://" + ACCOUNT_SERVICE + ACCOUNTS_SEND_TRANSACTION_API);
         var confirmation = restClientBuilder.build()
                 .post()
                 .uri("http://" + ACCOUNT_SERVICE + ACCOUNTS_SEND_TRANSACTION_API)
@@ -148,7 +145,6 @@ public class CashServiceImpl implements CashService {
     private BankUserDto getClient(String username, BankCurrency currency) throws AuthException {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         String requestUrl = "http://" + ACCOUNT_SERVICE + ACCOUNTS_GET_CLIENT_API + "/" + username + "?currency=" + currency.name();
-        System.out.println("запросили=" + requestUrl);
         try {
             var client = restClientBuilder.build()
                     .get()
@@ -235,12 +231,11 @@ public class CashServiceImpl implements CashService {
     }
 
     private boolean isATMConfirmMoneyTransfer(UUID transactionId) {
-        System.out.println("проверяем, что клиент физически забрал деньги из банкомата");
         return true;
     }
 
     private void giveMoneyBackFromATM(UUID transactionId) {
-        System.out.println("возвращаем деньги обратно клиенту");
+//        возвращаем деньги обратно клиенту
     }
 
     private void sendNotification(BankUserDto client, String message) {
@@ -254,7 +249,6 @@ public class CashServiceImpl implements CashService {
                     .build();
             var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
             String requestUrl = "http://" + NOTIFICATION_SERVICE + NOTIFICATION_SEND_NOTIFICATION;
-            System.out.println("запросили=" + requestUrl);
             restClientBuilder.build()
                     .post()
                     .uri(requestUrl)

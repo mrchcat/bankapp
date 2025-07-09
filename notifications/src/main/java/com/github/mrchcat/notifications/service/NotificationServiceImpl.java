@@ -35,7 +35,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private void sendByEmail(BankNotification notification) {
-        System.out.println("отправляем по почте " + notification);
+//        отправляем по почте
     }
 
 }

@@ -22,7 +22,6 @@ public class TransferController {
     @PostMapping("/transfer")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void processTransfer(@RequestBody @Valid NonCashTransferDto nonCashTransferDto) throws AuthException, SQLException, ServiceUnavailableException {
-        System.out.println("получили " + nonCashTransferDto);
         transferService.processTransfer(nonCashTransferDto);
     }
 

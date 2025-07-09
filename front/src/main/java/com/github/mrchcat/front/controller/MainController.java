@@ -73,12 +73,10 @@ public class MainController {
         model.addAttribute("accounts", clientDetailsAndAccounts.accounts());
 
         var clientsWithAccounts = frontService.getAllClientsWithActiveAccounts();
-        System.out.println("отправляем " + clientsWithAccounts);
         model.addAttribute("clientsWithAccounts", clientsWithAccounts);
 
         model.addAttribute("ratesLink", "http://localhost:8080/front/rates");
 //        model.addAttribute("ratesLink", frontService.getFrontExchangeUri());
-
         return "/main";
     }
 
@@ -177,7 +175,6 @@ public class MainController {
                              @RequestParam("action") @NotNull CashAction action,
                              BindingResult bindingResult,
                              RedirectAttributes redirectAttributes) {
-        System.out.println("получили " + cashOperationDto);
         RedirectView redirectView = new RedirectView();
         redirectView.setContextRelative(true);
         redirectView.setUrl("/main");
@@ -215,7 +212,6 @@ public class MainController {
                              @ModelAttribute @Valid NonCashTransfer nonCashTransaction,
                              BindingResult bindingResult,
                              RedirectAttributes redirectAttributes) {
-        System.out.println("проверка " + nonCashTransaction);
         RedirectView redirectView = new RedirectView();
         redirectView.setContextRelative(true);
         redirectView.setUrl("/main");

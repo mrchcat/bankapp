@@ -48,7 +48,6 @@ public class AccountController {
      */
     @GetMapping("/account")
     List<BankUserDto> getAllActiveClientsAccountsAndPersonalData() {
-        System.out.println("зашли в getAllActiveClientsAccountsAndPersonalData");
         return userService.getAllActiveClients();
     }
 
@@ -79,7 +78,6 @@ public class AccountController {
      */
     @PostMapping("/account/cash")
     TransactionConfirmation processCashTransaction(@RequestBody @Valid CashTransactionDto cashTransactionDto) {
-        System.out.println("контроллер /account/cash" + cashTransactionDto);
         return accountService.processCashTransaction(cashTransactionDto);
     }
 

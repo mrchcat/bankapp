@@ -22,13 +22,11 @@ public class OAuthHeaderGetter {
                     .withClientRegistrationId(CLIENT_REGISTRATION_ID)
                     .principal("system")
                     .build());
-            System.out.println("токен=" + token);
             if (token == null) {
                 throw new AuthException("OAuth token is absent");
             }
             return new OAuthHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token.getAccessToken().getTokenValue());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
     }

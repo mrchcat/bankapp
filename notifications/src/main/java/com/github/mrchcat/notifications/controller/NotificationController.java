@@ -18,7 +18,6 @@ public class NotificationController {
     @PostMapping("/notification")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void getNotification(@RequestBody @Valid BankNotificationDto dto) {
-        System.out.println("получили");
         notificationService.save(dto);
     }
 

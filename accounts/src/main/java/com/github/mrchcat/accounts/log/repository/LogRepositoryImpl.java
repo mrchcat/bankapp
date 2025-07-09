@@ -45,7 +45,6 @@ public class LogRepositoryImpl implements LogRepository {
 
     @Override
     public boolean isCorrectStep(UUID transactionId, List<TransactionStatus> statuses) {
-        System.out.println("зашли в isCorrectStep");
         String query = """
                 SELECT status
                 FROM log

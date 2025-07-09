@@ -66,7 +66,6 @@ public class CredentialsService implements UserDetailsService, UserDetailsPasswo
             if (response == null) {
                 throw new UsernameNotFoundException("сервис accounts вернул пустой ответ");
             }
-            System.out.println("Получили обновленный= " + FrontMapper.toUserDetails(response));
             return FrontMapper.toUserDetails(response);
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode().equals(HttpStatus.NOT_FOUND)) {

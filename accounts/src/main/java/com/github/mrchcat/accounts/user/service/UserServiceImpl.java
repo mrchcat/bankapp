@@ -141,7 +141,6 @@ public class UserServiceImpl implements UserService {
                     .build();
             var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
             String requestUrl = "http://" + NOTIFICATION_SERVICE + NOTIFICATION_SEND_NOTIFICATION;
-            System.out.println("запросили=" + requestUrl);
             restClientBuilder.build()
                     .post()
                     .uri(requestUrl)

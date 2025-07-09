@@ -101,7 +101,6 @@ public class AccountRepositoryImpl implements AccountRepository {
                 WHERE id=? AND is_active=true
                 """;
         BigDecimal balance = jdbc.queryForObject(query, BigDecimal.class, accountId);
-        System.out.println("зашли в getBalance getBalance" + balance);
         return Optional.ofNullable(balance);
     }
 

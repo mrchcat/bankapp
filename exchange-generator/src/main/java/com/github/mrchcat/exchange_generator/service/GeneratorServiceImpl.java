@@ -53,7 +53,6 @@ public class GeneratorServiceImpl implements GeneratorService {
 
     private void send(CurrencyExchangeRatesDto rates) {
         try {
-            System.out.println("отправляем " + rates);
             var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
             String url = "http://" + EXCHANGE_SERVICE + EXCHANGE_SEND_RATES;
             var response = restClientBuilder.build()

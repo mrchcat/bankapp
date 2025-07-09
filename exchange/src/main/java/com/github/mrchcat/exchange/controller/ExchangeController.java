@@ -26,7 +26,6 @@ public class ExchangeController {
     @GetMapping("/exchange/{fromCurrency}")
     CurrencyExchangeRateDto getExchangeRate(@PathVariable("fromCurrency") BankCurrency fromCurrency,
                                             @RequestParam("toCurrency") BankCurrency toCurrency) {
-        System.out.println("получили " + fromCurrency + "  " + toCurrency);
         return exchangeService.getExchangeRate(fromCurrency, toCurrency);
     }
 
@@ -38,7 +37,6 @@ public class ExchangeController {
     @PostMapping("/exchange")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void getAllRates(@RequestBody @Valid CurrencyExchangeRatesDto rates) {
-        System.out.println("получили " + rates);
         exchangeService.saveRates(rates);
     }
 }

@@ -17,13 +17,11 @@ public class BlockerController {
 
     @PostMapping("/blocker/cash")
     BlockerResponseDto checkCashTransaction(@RequestBody @Valid CashTransactionDto cashTransactionDto) {
-        System.out.println("зашли " + cashTransactionDto);
         return blockerService.checkCashTransaction(cashTransactionDto);
     }
 
     @PostMapping("/blocker/noncash")
     BlockerResponseDto checkCashTransaction(@RequestBody @Valid NonCashTransferDto nonCashTransferDto) {
-        System.out.println("зашли " + nonCashTransferDto);
         return blockerService.checkNonCashTransaction(nonCashTransferDto);
     }
 

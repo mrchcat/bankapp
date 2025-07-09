@@ -17,7 +17,6 @@
         <module>exchange</module>
         <module>exchange-generator</module>
         <module>notifications</module>
-        <module>service-dto</module>
     </modules>
 
     <parent>
