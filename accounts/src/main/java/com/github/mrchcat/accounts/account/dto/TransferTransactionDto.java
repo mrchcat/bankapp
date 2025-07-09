@@ -21,8 +21,8 @@ public record TransferTransactionDto(
         @NotNull
         TransactionStatus status) {
 
-        @AssertFalse
-        boolean isAccountsEqual(){
-                return fromAccount.equals(toAccount);
-        }
+    @AssertFalse
+    boolean isAccountsEqual() {
+        return fromAccount.equals(toAccount);
+    }
 }

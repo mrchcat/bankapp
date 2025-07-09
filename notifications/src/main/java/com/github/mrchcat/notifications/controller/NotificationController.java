@@ -1,6 +1,5 @@
 package com.github.mrchcat.notifications.controller;
 
-import com.github.mrchcat.notifications.domain.BankNotification;
 import com.github.mrchcat.notifications.dto.BankNotificationDto;
 import com.github.mrchcat.notifications.service.NotificationService;
 import jakarta.validation.Valid;
@@ -10,8 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor

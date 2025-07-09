@@ -8,10 +8,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.client.RestClient;
 
@@ -38,8 +36,8 @@ public class SecurityConfig {
 
     @Bean
     AuthorizedClientServiceOAuth2AuthorizedClientManager getManager(ClientRegistrationRepository clientRegistrationRepository,
-                                                                    OAuth2AuthorizedClientService authorizedClientService){
-        return new AuthorizedClientServiceOAuth2AuthorizedClientManager(clientRegistrationRepository,authorizedClientService);
+                                                                    OAuth2AuthorizedClientService authorizedClientService) {
+        return new AuthorizedClientServiceOAuth2AuthorizedClientManager(clientRegistrationRepository, authorizedClientService);
     }
 
 }

@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,16 +13,16 @@ import org.springframework.stereotype.Component;
 public class OAuthHeaderGetter {
     private final AuthorizedClientServiceOAuth2AuthorizedClientManager manager;
 
-    String CLIENT_REGISTRATION_ID = "bank_exchange_generator";
+    private final String CLIENT_REGISTRATION_ID = "bank_exchange_generator";
 
-    public OAuthHeader getOAuthHeader() throws AuthException {
+    public OAuthHeader getOAuthHeader() {
 
-        try{
+        try {
             var token = manager.authorize(OAuth2AuthorizeRequest
                     .withClientRegistrationId(CLIENT_REGISTRATION_ID)
                     .principal("system")
                     .build());
-            System.out.println("токен="+token);
+            System.out.println("токен=" + token);
             if (token == null) {
                 throw new AuthException("OAuth token is absent");
             }

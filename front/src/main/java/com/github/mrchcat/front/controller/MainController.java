@@ -6,7 +6,6 @@ import com.github.mrchcat.front.dto.FrontAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NonCashTransfer;
 import com.github.mrchcat.front.dto.PasswordUpdateDto;
-import com.github.mrchcat.front.model.BankCurrency;
 import com.github.mrchcat.front.model.CashAction;
 import com.github.mrchcat.front.model.UserRole;
 import com.github.mrchcat.front.service.FrontService;
@@ -39,9 +38,6 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-
-//TODO добавить проверку, что username действительно соответствует авторизированнному пользователю
 
 @Controller
 @RequiredArgsConstructor
@@ -218,7 +214,7 @@ public class MainController {
     RedirectView depositCash(@PathVariable @NotNull @NotBlank String username,
                              @ModelAttribute @Valid NonCashTransfer nonCashTransaction,
                              BindingResult bindingResult,
-                             RedirectAttributes redirectAttributes) throws AuthException, ServiceUnavailableException {
+                             RedirectAttributes redirectAttributes) {
         System.out.println("проверка " + nonCashTransaction);
         RedirectView redirectView = new RedirectView();
         redirectView.setContextRelative(true);

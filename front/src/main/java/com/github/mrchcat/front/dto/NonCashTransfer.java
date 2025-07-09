@@ -31,11 +31,10 @@ public record NonCashTransfer(
 ) {
     @AssertFalse(message = "ошибка: счета совпадают")
     boolean isSameAccountsForTransferToYourself() {
-        System.out.println("проверка "+fromCurrency.equals(toCurrency));
         if (direction.equals(TransferDirection.YOURSELF)) {
             return fromCurrency.equals(toCurrency);
         }
-        if (direction.equals(TransferDirection.OTHER)&&fromUsername.equals(toUsername)) {
+        if (direction.equals(TransferDirection.OTHER) && fromUsername.equals(toUsername)) {
             return fromCurrency.equals(toCurrency);
         }
 

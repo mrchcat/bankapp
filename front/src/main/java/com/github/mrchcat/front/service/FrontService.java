@@ -7,18 +7,13 @@ import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.FrontRate;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
 import com.github.mrchcat.front.dto.NonCashTransfer;
-import com.github.mrchcat.front.model.BankCurrency;
 import com.github.mrchcat.front.model.CashAction;
-import com.github.mrchcat.front.model.FrontCurrencies;
 import jakarta.security.auth.message.AuthException;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.naming.ServiceUnavailableException;
-import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public interface FrontService {
 

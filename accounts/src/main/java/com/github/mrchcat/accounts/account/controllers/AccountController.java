@@ -62,20 +62,16 @@ public class AccountController {
             userService.editClientData(username, editUserAccountDto);
         }
         accountService.editClientAccounts(username, editUserAccountDto);
-        var client = accountService.getClient(username);
-        return client;
+        return accountService.getClient(username);
     }
 
-    private final boolean validateIfAllPropertiesEmpty(EditUserAccountDto editUserAccountDto) {
+    private boolean validateIfAllPropertiesEmpty(EditUserAccountDto editUserAccountDto) {
         String email = editUserAccountDto.email();
         if (email != null && !email.isBlank()) {
             return false;
         }
         String fullName = editUserAccountDto.fullName();
-        if (fullName != null && !fullName.isBlank()) {
-            return false;
-        }
-        return true;
+        return fullName == null || fullName.isBlank();
     }
 
     /**
@@ -92,9 +88,6 @@ public class AccountController {
      */
     @PostMapping("/account/transfer")
     TransactionConfirmation processNonCashTransaction(@RequestBody @Valid TransferTransactionDto transferTransactionDto) {
-//        System.out.println("контроллер /account/transfer" + transferTransactionDto);
-//        TransactionConfirmation confirmation=accountService.processNonCashTransaction(transferTransactionDto);
-//        System.out.println("возвращаем "+confirmation);
         return accountService.processNonCashTransaction(transferTransactionDto);
     }
 

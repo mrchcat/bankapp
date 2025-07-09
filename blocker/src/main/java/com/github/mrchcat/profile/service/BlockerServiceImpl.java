@@ -11,7 +11,7 @@ import java.util.List;
 public class BlockerServiceImpl implements BlockerService {
     private final double CONFIRM_PROBABILITY = 0.999;
 
-    List<String> rejectReasons = List.of("такова воля богов",
+    private final List<String> rejectReasons = List.of("такова воля богов",
             "подозрительная операция",
             "нарушение закона об отмывании средств");
 

@@ -12,12 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,6 +23,7 @@ public class ExchangeServiceImpl implements ExchangeService {
 
     private static final ConcurrentHashMap<BankCurrency, CurrencyRate> exchangeRates = new ConcurrentHashMap<>();
     private static final BankCurrency baseCurrencyByDefault = BankCurrency.RUB;
+
     static {
         exchangeRates.put(baseCurrencyByDefault,
                 new CurrencyRate(baseCurrencyByDefault, BigDecimal.ONE, BigDecimal.ONE, null));

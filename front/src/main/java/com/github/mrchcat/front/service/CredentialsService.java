@@ -19,9 +19,9 @@ import org.springframework.web.client.RestClient;
 @Service
 @RequiredArgsConstructor
 public class CredentialsService implements UserDetailsService, UserDetailsPasswordService {
-    String ACCOUNT_SERVICE = "bankAccounts";
-    String ACCOUNTS_GET_USER_DETAILS_API = "/credentials";
-    String ACCOUNTS_UPDATE_USER_PASSWORD_API = "/credentials";
+    private final String ACCOUNT_SERVICE = "bankAccounts";
+    private final String ACCOUNTS_GET_USER_DETAILS_API = "/credentials";
+    private final String ACCOUNTS_UPDATE_USER_PASSWORD_API = "/credentials";
 
     private final RestClient.Builder restClientBuilder;
     private final OAuthHeaderGetter oAuthHeaderGetter;
@@ -40,9 +40,6 @@ public class CredentialsService implements UserDetailsService, UserDetailsPasswo
             if (response == null) {
                 throw new UsernameNotFoundException("сервис accounts вернул пустой ответ");
             }
-//            System.out.println("получили response" + response);
-//            System.out.println("получили UserDetails=" + FrontMapper.toUserDetails(response));
-//            System.out.println("получили size=" + FrontMapper.toUserDetails(response).getAuthorities().size());
             return FrontMapper.toUserDetails(response);
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode().equals(HttpStatus.NOT_FOUND)) {

@@ -31,14 +31,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import javax.naming.ServiceUnavailableException;
-import java.math.BigDecimal;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -146,7 +144,7 @@ public class FrontServiceImpl implements FrontService {
                 .uri("http://" + ACCOUNT_SERVICE + ACCOUNTS_GET_CLIENT_API)
                 .header(oAuthHeader.name(), oAuthHeader.value())
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<BankUserDto>>() {
+                .body(new ParameterizedTypeReference<>() {
                 });
         if (response == null) {
             throw new ServiceUnavailableException("сервис аккаунтов не доступен");

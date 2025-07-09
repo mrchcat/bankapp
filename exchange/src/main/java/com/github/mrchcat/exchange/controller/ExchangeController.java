@@ -6,7 +6,6 @@ import com.github.mrchcat.exchange.dto.CurrencyRate;
 import com.github.mrchcat.exchange.model.BankCurrency;
 import com.github.mrchcat.exchange.service.ExchangeService;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor

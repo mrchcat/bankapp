@@ -245,7 +245,7 @@ public class TransferServiceImpl implements TransferService {
         return blockerResponse;
     }
 
-    private void sendNotification(BankUserDto client, String message) throws AuthException {
+    private void sendNotification(BankUserDto client, String message) {
         try {
             var notification = BankNotificationDtoRequest.builder()
                     .service(TRANSFER_SERVICE)

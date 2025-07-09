@@ -12,8 +12,7 @@ import org.springframework.stereotype.Component;
 public class OAuthHeaderGetter {
     private final OAuth2AuthorizedClientManager authorizedClientManager;
 
-    //    @Value("${spring.security.oauth2.registration}")
-    String CLIENT_REGISTRATION_ID = "bank_front";
+    private final String CLIENT_REGISTRATION_ID = "bank_front";
 
 
     public OAuthHeader getOAuthHeader() throws AuthException {

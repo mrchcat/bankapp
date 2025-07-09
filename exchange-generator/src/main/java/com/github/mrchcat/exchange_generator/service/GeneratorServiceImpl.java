@@ -11,10 +11,8 @@ import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -65,9 +63,7 @@ public class GeneratorServiceImpl implements GeneratorService {
                     .body(rates)
                     .retrieve()
                     .toBodilessEntity();
-            System.out.println("получили response=" + response);
         } catch (Exception ignore) {
-            System.out.println("ошибка " + ignore.getMessage());
         }
     }
 

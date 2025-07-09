@@ -122,8 +122,8 @@ public class AccountServiceImpl implements AccountService {
         };
     }
 
-    private final static Map<TransactionStatus, List<TransactionStatus>> cashDepositStatusChain = new HashMap<>();
-    private final static Map<TransactionStatus, List<TransactionStatus>> cashWithdrawStatusChain = new HashMap<>();
+    private static final Map<TransactionStatus, List<TransactionStatus>> cashDepositStatusChain = new HashMap<>();
+    private static final Map<TransactionStatus, List<TransactionStatus>> cashWithdrawStatusChain = new HashMap<>();
 
     static {
         cashDepositStatusChain.put(TransactionStatus.CASH_RECEIVED, Collections.emptyList());
@@ -263,7 +263,7 @@ public class AccountServiceImpl implements AccountService {
         return new TransactionConfirmation(transactionDto.transactionId(), transactionDto.status());
     }
 
-    private void sendNotification(BankUser client, String message) throws AuthException {
+    private void sendNotification(BankUser client, String message) {
         try {
             var notification = BankNotificationDtoRequest.builder()
                     .service(ACCOUNT_SERVICE)

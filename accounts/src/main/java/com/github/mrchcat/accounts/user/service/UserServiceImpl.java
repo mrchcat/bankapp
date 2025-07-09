@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private void sendNotification(BankUser client, String message) throws AuthException {
+    private void sendNotification(BankUser client, String message) {
         try {
             var notification = BankNotificationDtoRequest.builder()
                     .service(ACCOUNT_SERVICE)

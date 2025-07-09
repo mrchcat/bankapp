@@ -5,10 +5,7 @@ import com.github.mrchcat.exchange.dto.CurrencyExchangeRatesDto;
 import com.github.mrchcat.exchange.dto.CurrencyRate;
 import com.github.mrchcat.exchange.model.BankCurrency;
 
-import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 public interface ExchangeService {
 

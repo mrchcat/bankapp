@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class OAuthHeaderGetter {
     private final OAuth2AuthorizedClientManager authorizedClientManager;
 
-    String CLIENT_REGISTRATION_ID = "bank_cash";
+    private final String CLIENT_REGISTRATION_ID = "bank_cash";
 
     public OAuthHeader getOAuthHeader() throws AuthException {
 

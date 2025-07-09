@@ -51,8 +51,8 @@ public class LogRepositoryImpl implements LogRepository {
                 FROM log
                 WHERE transaction_id=?
                 """;
-        List<TransactionStatus> existingStatuses = jdbc.queryForList(query, TransactionStatus.class,transactionId);
-        if(statuses.isEmpty()&&existingStatuses.isEmpty()){
+        List<TransactionStatus> existingStatuses = jdbc.queryForList(query, TransactionStatus.class, transactionId);
+        if (statuses.isEmpty() && existingStatuses.isEmpty()) {
             return true;
         }
         for (TransactionStatus s : statuses) {

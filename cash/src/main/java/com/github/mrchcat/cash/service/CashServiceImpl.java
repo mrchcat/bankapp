@@ -243,7 +243,7 @@ public class CashServiceImpl implements CashService {
         System.out.println("возвращаем деньги обратно клиенту");
     }
 
-    private void sendNotification(BankUserDto client, String message) throws AuthException {
+    private void sendNotification(BankUserDto client, String message) {
         try {
             var notification = BankNotificationDtoRequest.builder()
                     .service(CASH_SERVICE)
