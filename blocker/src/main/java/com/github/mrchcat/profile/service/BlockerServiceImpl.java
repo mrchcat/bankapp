@@ -11,9 +11,13 @@ import java.util.List;
 public class BlockerServiceImpl implements BlockerService {
     private final double CONFIRM_PROBABILITY = 0.5;
 
-    private final List<String> rejectReasons = List.of("такова воля богов",
+    private final List<String> rejectReasons = List.of(
+            "сомнительные источники поступлений",
             "подозрительная операция",
-            "нарушение закона об отмывании средств");
+            "нарушение закона об отмывании средств",
+            "ограничения на лимит перевода",
+            "ограничения на определённые виды деятельности"
+    );
 
     @Override
     public BlockerResponseDto checkCashTransaction(CashTransactionDto cashTransactionDto) {

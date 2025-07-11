@@ -4,11 +4,13 @@ import com.github.mrchcat.notifications.Repository.NotificationRepository;
 import com.github.mrchcat.notifications.domain.BankNotification;
 import com.github.mrchcat.notifications.dto.BankNotificationDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
 
@@ -35,7 +37,8 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private void sendByEmail(BankNotification notification) {
-//        отправляем по почте
+        log.info(notification.toString());
+        //        отправляем по почте
     }
 
 }

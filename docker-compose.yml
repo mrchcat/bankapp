@@ -37,24 +37,69 @@ services:
     ports:
       - "8500:8500"
     command: "agent -dev -node=myNode -client=0.0.0.0 -log-level=INFO"
-#     consul kv import @consul/tmp/key_value.json
+    #     consul kv import @consul/tmp/key_value.json
     networks:
       - backend
 
-  bank_front:
-    build: front/.
-    image: bank_front
-    container_name: bank_front
+  bank_notifications_db:
+    image: postgres:17.5
+    container_name: notifications-postgres
     ports:
-      - "8080:8080"
+      - "5462:5432"
     environment:
-      - SPRING_CLOUD_CONSUL_HOST=bank-consul
+      - POSTGRES_DB=notificationsdb
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=12345
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+    networks:
+      - backend
+
+  bank_notifications:
+    build: notifications/.
+    image: notifications
+    container_name: bank_notifications
+    ports:
+      - "8089:8089"
+    environment:
+      - SPRING_APPLICATION_NAME=bankNotifications
+
+      - SPRING_CLOUD_CONSUL_HOST=http://bank-consul
       - SPRING_CLOUD_CONSUL_PORT=8500
-      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER-URI=http://bank-keycloak:8080/realms/master
+
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://bank_notifications_db:5432/notificationsdb
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=12345
     depends_on:
       bank-keycloak:
+        condition: service_healthy
+      bank-consul:
         condition: service_started
+      bank_notifications_db:
+        condition: service_started
+    networks:
+      - backend
 
+  bank_accounts_db:
+    image: postgres:17.5
+    container_name: accounts-postgres
+    ports:
+      - "5442:5432"
+    environment:
+      - POSTGRES_DB=accountsdb
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=12345
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
     networks:
       - backend
 
@@ -65,16 +110,250 @@ services:
     ports:
       - "8081:8081"
     environment:
+      - SPRING_APPLICATION_NAME=bankAccounts
+
       - SPRING_CLOUD_CONSUL_HOST=bank-consul
       - SPRING_CLOUD_CONSUL_PORT=8500
-      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER-URI=http://bank-keycloak:8080/realms/master
+
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://bank_accounts_db:5432/accountsdb
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=12345
     depends_on:
       bank-keycloak:
+        condition: service_healthy
+      bank-consul:
         condition: service_started
-
+      bank_accounts_db:
+        condition: service_healthy
+      bank_notifications:
+        condition: service_started
     networks:
       - backend
 
+  bank_exchange_generator:
+    build: exchange-generator/.
+    image: exchange_generator
+    container_name: bank_exchange_generator
+    ports:
+      - "8087:8087"
+    environment:
+      - SPRING_APPLICATION_NAME=bankExchangeGenerator
+
+      - SPRING_CLOUD_CONSUL_HOST=http://bank-consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+    depends_on:
+      bank-keycloak:
+        condition: service_healthy
+      bank-consul:
+        condition: service_started
+    networks:
+      - backend
+
+  bank_exchange_db:
+    image: postgres:17.5
+    container_name: exchange-postgres
+    ports:
+      - "5452:5432"
+    environment:
+      - POSTGRES_DB=exchangedb
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=12345
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+    networks:
+      - backend
+
+  bank_exchange:
+    build: exchange/.
+    image: exchange
+    container_name: bank_exchange
+    ports:
+      - "8086:8086"
+    environment:
+      - SPRING_APPLICATION_NAME=bankExchange
+
+      - SPRING_CLOUD_CONSUL_HOST=http://bank-consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://bank_exchange_db:5432/exchangedb
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=12345
+    depends_on:
+      bank-keycloak:
+        condition: service_healthy
+      bank-consul:
+        condition: service_started
+      bank_exchange_db:
+        condition: service_healthy
+      bank_exchange_generator:
+        condition: service_started
+    networks:
+      - backend
+
+  bank_blocker:
+    build: blocker/.
+    image: blocker
+    container_name: bank_blocker
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_APPLICATION_NAME=bankBlocker
+
+      - SPRING_CLOUD_CONSUL_HOST=http://bank-consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+    depends_on:
+      bank-keycloak:
+        condition: service_healthy
+      bank-consul:
+        condition: service_started
+    networks:
+      - backend
+
+  bank_cash_db:
+    image: postgres:17.5
+    container_name: cash-postgres
+    ports:
+      - "5472:5432"
+    environment:
+      - POSTGRES_DB=cashdb
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=12345
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+    networks:
+      - backend
+
+  bank_cash:
+    build: cash/.
+    image: cash
+    container_name: bank_cash
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_APPLICATION_NAME=bankCash
+
+      - SPRING_CLOUD_CONSUL_HOST=http://bank-consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://bank_cash_db:5432/cashdb
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=12345
+    depends_on:
+      bank-keycloak:
+        condition: service_healthy
+      bank-consul:
+        condition: service_started
+      bank_cash_db:
+        condition: service_healthy
+      bank_blocker:
+        condition: service_started
+      bank_notifications:
+        condition: service_started
+      bank_accounts:
+        condition: service_started
+    networks:
+      - backend
+
+  bank_transfer_db:
+    image: postgres:17.5
+    container_name: transfer-postgres
+    ports:
+      - "5482:5432"
+    environment:
+      - POSTGRES_DB=transferdb
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=12345
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+    networks:
+      - backend
+
+  bank_transfer:
+    build: transfer/.
+    image: transfer
+    container_name: bank_transfer
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_APPLICATION_NAME=bankTransfer
+
+      - SPRING_CLOUD_CONSUL_HOST=http://bank-consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://bank_transfer_db:5432/transferdb
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=12345
+    depends_on:
+      bank-keycloak:
+        condition: service_healthy
+      bank-consul:
+        condition: service_started
+      bank_transfer_db:
+        condition: service_healthy
+      bank_blocker:
+        condition: service_started
+      bank_notifications:
+        condition: service_started
+      bank_accounts:
+        condition: service_started
+    networks:
+      - backend
+
+  bank_front:
+    build: front/.
+    image: bank_front
+    container_name: bank_front
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_APPLICATION_NAME=bankFront
+
+      - SPRING_CLOUD_CONSUL_HOST=http://bank-consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER-URI=http://bank-keycloak:8080/realms/bankapp
+    depends_on:
+      bank-keycloak:
+        condition: service_healthy
+      bank-consul:
+        condition: service_started
+      bank_accounts:
+        condition: service_started
+      bank_cash:
+        condition: service_started
+      bank_transfer:
+        condition: service_started
+      bank_exchange:
+        condition: service_started
+    networks:
+      - backend
 
 networks:
   backend:

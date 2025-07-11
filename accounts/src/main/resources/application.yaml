@@ -8,7 +8,7 @@ spring:
     username: postgres
     password: Inushing1980
   sql.init:
-    mode: always
+    mode: ALWAYS
     schema-locations: classpath:database/schema.sql
     data-locations: classpath:database/data.sql
   security:

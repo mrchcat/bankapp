@@ -32,10 +32,12 @@ public class GeneratorServiceImpl implements GeneratorService {
     }
 
     private List<CurrencyRate> getRates() {
-        BigDecimal randomBuyUsd = BigDecimal.valueOf(1 + Math.random() / 10);
-        BigDecimal randomSellUsd = BigDecimal.valueOf(1 - Math.random() / 10);
-        BigDecimal randomBuyCNY = BigDecimal.valueOf(1 + Math.random() / 10);
-        BigDecimal randomSellCNY = BigDecimal.valueOf(1 - Math.random() / 10);
+        BigDecimal randomBuyUsd = BigDecimal.valueOf(1 - Math.random() / 10);
+        BigDecimal randomSellUsd = BigDecimal.valueOf(1 + Math.random() / 10);
+
+        BigDecimal randomBuyCNY = BigDecimal.valueOf(1 - Math.random() / 10);
+        BigDecimal randomSellCNY = BigDecimal.valueOf(1 + Math.random() / 10);
+
         var USDrate = CurrencyRate.builder()
                 .currency(BankCurrency.USD)
                 .buyRate(AVERAGE_USD.multiply(randomBuyUsd).setScale(2, RoundingMode.HALF_UP))

@@ -25,7 +25,7 @@ public class RegistrationController {
 
     @GetMapping("/registration")
     String registerNewClient(Model model) {
-        return "/signup";
+        return "signup";
     }
 
     /**
@@ -45,7 +45,7 @@ public class RegistrationController {
                     .stream()
                     .map(ObjectError::getDefaultMessage)
                     .forEach(errors::add);
-            return "/signup";
+            return "signup";
         }
         try {
             UserDetails newUserDetails = frontService.registerNewClient(newClientRegisterDto);
@@ -58,6 +58,6 @@ public class RegistrationController {
         } catch (Exception ex) {
             errors.add(ex.getMessage());
         }
-        return "/signup";
+        return "signup";
     }
 }

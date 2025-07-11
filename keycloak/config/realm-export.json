@@ -69,18 +69,18 @@
         "attributes": {}
       },
       {
-        "id": "cf940eaa-1e81-4597-b73c-5babd97a6900",
-        "name": "uma_authorization",
-        "description": "${role_uma_authorization}",
+        "id": "330bdbe2-67a9-42fb-8c5b-c2034ee563d9",
+        "name": "offline_access",
+        "description": "${role_offline-access}",
         "composite": false,
         "clientRole": false,
         "containerId": "417c67ad-0311-4b3a-8372-1c5be1677eb2",
         "attributes": {}
       },
       {
-        "id": "0a143b02-d4e8-4b33-87da-cfc019eeefd4",
-        "name": "offline_access",
-        "description": "${role_offline-access}",
+        "id": "cf940eaa-1e81-4597-b73c-5babd97a6900",
+        "name": "uma_authorization",
+        "description": "${role_uma_authorization}",
         "composite": false,
         "clientRole": false,
         "containerId": "417c67ad-0311-4b3a-8372-1c5be1677eb2",
@@ -311,10 +311,10 @@
         }
       ],
       "bank_transfer": [],
-      "bank_exchange-generator": [],
       "security-admin-console": [],
       "bank_cash": [],
       "admin-cli": [],
+      "bank_exchange_generator": [],
       "account-console": [],
       "bank_accounts": [],
       "broker": [
@@ -506,12 +506,12 @@
     },
     {
       "id": "d1b2682b-6f61-443e-8e9d-8d27bbb566ae",
-      "username": "service-account-bank_exchange-generator",
+      "username": "service-account-bank_exchange_generator",
       "emailVerified": false,
       "createdTimestamp": 1750792581096,
       "enabled": true,
       "totp": false,
-      "serviceAccountClientId": "bank_exchange-generator",
+      "serviceAccountClientId": "bank_exchange_generator",
       "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": [
@@ -556,6 +556,14 @@
       ],
       "notBefore": 0,
       "groups": []
+    }
+  ],
+  "scopeMappings": [
+    {
+      "clientScope": "offline_access",
+      "roles": [
+        "offline_access"
+      ]
     }
   ],
   "clientScopeMappings": {
@@ -671,7 +679,8 @@
       "protocol": "openid-connect",
       "attributes": {
         "realm_client": "false",
-        "client.use.lightweight.access.token.enabled": "true"
+        "client.use.lightweight.access.token.enabled": "true",
+        "post.logout.redirect.uris": "+"
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
@@ -715,6 +724,7 @@
         "backchannel.logout.session.required": "true",
         "standard.token.exchange.enabled": "false",
         "frontchannel.logout.session.required": "true",
+        "post.logout.redirect.uris": "+",
         "oauth2.device.authorization.grant.enabled": "false",
         "display.on.consent.screen": "false",
         "backchannel.logout.revoke.offline.tokens": "false"
@@ -763,6 +773,7 @@
         "backchannel.logout.session.required": "true",
         "standard.token.exchange.enabled": "false",
         "frontchannel.logout.session.required": "true",
+        "post.logout.redirect.uris": "+",
         "oauth2.device.authorization.grant.enabled": "false",
         "display.on.consent.screen": "false",
         "backchannel.logout.revoke.offline.tokens": "false"
@@ -779,8 +790,8 @@
     },
     {
       "id": "023d96a5-1a5c-4e24-b0dd-785df69ff0ff",
-      "clientId": "bank_exchange-generator",
-      "name": "bank_exchange-generator",
+      "clientId": "bank_exchange_generator",
+      "name": "bank_exchange_generator",
       "description": "Генератор курсов валют",
       "rootUrl": "",
       "adminUrl": "",
@@ -813,6 +824,7 @@
         "backchannel.logout.session.required": "true",
         "standard.token.exchange.enabled": "false",
         "frontchannel.logout.session.required": "true",
+        "post.logout.redirect.uris": "+",
         "oauth2.device.authorization.grant.enabled": "false",
         "display.on.consent.screen": "false",
         "backchannel.logout.revoke.offline.tokens": "false"
@@ -861,6 +873,7 @@
         "client.introspection.response.allow.jwt.claim.enabled": "false",
         "standard.token.exchange.enabled": "false",
         "frontchannel.logout.session.required": "true",
+        "post.logout.redirect.uris": "+",
         "oauth2.device.authorization.grant.enabled": "false",
         "use.jwks.url": "false",
         "backchannel.logout.revoke.offline.tokens": "false",
@@ -884,6 +897,7 @@
       "nodeReRegistrationTimeout": -1,
       "defaultClientScopes": [
         "transfer",
+        "exchange",
         "accounts",
         "cash"
       ],
@@ -925,6 +939,7 @@
         "backchannel.logout.session.required": "true",
         "standard.token.exchange.enabled": "false",
         "frontchannel.logout.session.required": "true",
+        "post.logout.redirect.uris": "+",
         "oauth2.device.authorization.grant.enabled": "false",
         "display.on.consent.screen": "false",
         "backchannel.logout.revoke.offline.tokens": "false"
@@ -935,6 +950,7 @@
       "defaultClientScopes": [
         "blocker",
         "exchange",
+        "accounts",
         "notifications"
       ],
       "optionalClientScopes": []
@@ -960,7 +976,8 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
-        "realm_client": "true"
+        "realm_client": "true",
+        "post.logout.redirect.uris": "+"
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
@@ -989,7 +1006,8 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
-        "realm_client": "true"
+        "realm_client": "true",
+        "post.logout.redirect.uris": "+"
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
@@ -1080,6 +1098,16 @@
       }
     },
     {
+      "id": "cf932c58-9ca0-4ae6-a0dc-f83e578eb754",
+      "name": "offline_access",
+      "description": "OpenID Connect built-in scope: offline_access",
+      "protocol": "openid-connect",
+      "attributes": {
+        "consent.screen.text": "${offlineAccessScopeConsentText}",
+        "display.on.consent.screen": "true"
+      }
+    },
+    {
       "id": "b321d340-86e9-4e0f-8fc2-01aef02f833c",
       "name": "notifications",
       "description": "Доступ к сервису bank_notifications",
@@ -1132,7 +1160,9 @@
     "notifications",
     "cash"
   ],
-  "defaultOptionalClientScopes": [],
+  "defaultOptionalClientScopes": [
+    "offline_access"
+  ],
   "browserSecurityHeaders": {
     "contentSecurityPolicyReportOnly": "",
     "xContentTypeOptions": "nosniff",
@@ -1201,14 +1231,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-user-property-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "oidc-full-name-mapper",
             "oidc-address-mapper",
             "saml-user-attribute-mapper",
+            "oidc-full-name-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
             "oidc-usermodel-property-mapper",
-            "saml-role-list-mapper"
+            "saml-role-list-mapper",
+            "saml-user-property-mapper",
+            "oidc-usermodel-attribute-mapper"
           ]
         }
       },
@@ -1248,14 +1278,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
+            "oidc-full-name-mapper",
+            "saml-role-list-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "oidc-usermodel-property-mapper",
             "saml-user-property-mapper",
             "oidc-sha256-pairwise-sub-mapper",
-            "oidc-address-mapper",
-            "oidc-usermodel-property-mapper",
-            "saml-role-list-mapper",
             "saml-user-attribute-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "oidc-full-name-mapper"
+            "oidc-address-mapper"
           ]
         }
       }
@@ -2050,8 +2080,12 @@
     "cibaExpiresIn": "120",
     "cibaAuthRequestedUserHint": "login_hint",
     "oauth2DeviceCodeLifespan": "600",
+    "clientOfflineSessionMaxLifespan": "0",
     "oauth2DevicePollingInterval": "5",
+    "clientSessionIdleTimeout": "0",
     "parRequestUriLifespan": "60",
+    "clientSessionMaxLifespan": "0",
+    "clientOfflineSessionIdleTimeout": "0",
     "cibaInterval": "5",
     "realmReusableOtpCode": "false"
   },

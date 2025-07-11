@@ -77,7 +77,7 @@ public class MainController {
 
         model.addAttribute("ratesLink", "http://localhost:8080/front/rates");
 //        model.addAttribute("ratesLink", frontService.getFrontExchangeUri());
-        return "/main";
+        return "main";
     }
 
     /**
