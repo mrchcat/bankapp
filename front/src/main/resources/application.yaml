@@ -20,8 +20,8 @@ spring:
     consul:
       discovery:
         prefer-ip-address: true
-        health-check-path: /actuator/health
-        healthCheckInterval: 15s
+#        health-check-path: /actuator/health
+#        healthCheckInterval: 15s
 
 management.endpoints.web.exposure.include: info, health,refresh
 

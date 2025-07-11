@@ -97,6 +97,10 @@ public class TransferServiceImpl implements TransferService {
                 String messageToSender = String.format("Со счета %s списаны средства в размере %s %s",
                         fromAccountId, newTransaction.getFromAmount(), senderAccount.currencyStringCode());
                 sendNotification(senderClient, messageToSender);
+                String message2ToSender = String.format("На счет %s начислены средства в размере %s %s",
+                        toAccountId, newTransaction.getToAmount(), senderAccount.currencyStringCode());
+                sendNotification(senderClient, message2ToSender);
+
                 if (transaction.direction().equals(TransferDirection.OTHER)) {
                     String messageToReceiver = String.format("На счет %s зачислены средства в размере %s %s",
                             toAccountId, newTransaction.getToAmount(), receiverAccount.currencyStringCode());

@@ -18,8 +18,8 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/actuator/**").permitAll()
-//                                .anyRequest().hasAuthority("SCOPE_accounts")
-                                .anyRequest().permitAll()
+                                .anyRequest().hasAuthority("SCOPE_accounts")
+//                                .anyRequest().permitAll()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2ResourceServer(oauth2 ->
