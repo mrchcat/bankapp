@@ -1,9 +1,9 @@
 package com.github.mrchcat.transfer.service;
 
-import com.github.mrchcat.notifications.dto.BankNotificationDto;
 import com.github.mrchcat.shared.enums.BankCurrency;
 import com.github.mrchcat.shared.enums.TransactionStatus;
 import com.github.mrchcat.shared.enums.TransferDirection;
+import com.github.mrchcat.shared.notification.BankNotificationDto;
 import com.github.mrchcat.transfer.dto.AccountDto;
 import com.github.mrchcat.transfer.dto.BankUserDto;
 import com.github.mrchcat.transfer.dto.BlockerResponseDto;

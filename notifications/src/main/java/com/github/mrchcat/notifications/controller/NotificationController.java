@@ -1,7 +1,7 @@
 package com.github.mrchcat.notifications.controller;
 
-import com.github.mrchcat.notifications.dto.BankNotificationDto;
 import com.github.mrchcat.notifications.service.NotificationService;
+import com.github.mrchcat.shared.notification.BankNotificationDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

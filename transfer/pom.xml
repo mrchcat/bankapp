@@ -21,19 +21,6 @@
         <!--modules-->
         <dependency>
             <groupId>com.github.mrchcat</groupId>
-            <artifactId>notifications</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.mrchcat</groupId>
-            <artifactId>blocker</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <!--modules-->
-        <dependency>
-            <groupId>com.github.mrchcat</groupId>
             <artifactId>shared-model-dto</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>

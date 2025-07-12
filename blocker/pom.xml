@@ -18,6 +18,7 @@
     </properties>
 
     <dependencies>
+        <!--modules-->
         <dependency>
             <groupId>com.github.mrchcat</groupId>
             <artifactId>shared-model-dto</artifactId>

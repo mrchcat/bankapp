@@ -1,4 +1,4 @@
-package com.github.mrchcat.notifications.dto;
+package com.github.mrchcat.shared.notification;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -2,7 +2,7 @@ package com.github.mrchcat.notifications.service;
 
 import com.github.mrchcat.notifications.Repository.NotificationRepository;
 import com.github.mrchcat.notifications.domain.BankNotification;
-import com.github.mrchcat.notifications.dto.BankNotificationDto;
+import com.github.mrchcat.shared.notification.BankNotificationDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
