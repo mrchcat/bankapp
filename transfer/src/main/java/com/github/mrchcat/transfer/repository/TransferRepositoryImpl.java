@@ -1,6 +1,6 @@
 package com.github.mrchcat.transfer.repository;
 
-import com.github.mrchcat.transfer.model.TransactionStatus;
+import com.github.mrchcat.shared.enums.TransactionStatus;
 import com.github.mrchcat.transfer.model.TransferTransaction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;

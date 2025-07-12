@@ -1,7 +1,7 @@
 package com.github.mrchcat.front.dto;
 
-import com.github.mrchcat.front.model.TransferDirection;
 import com.github.mrchcat.shared.enums.BankCurrency;
+import com.github.mrchcat.shared.enums.TransferDirection;
 import lombok.Builder;
 
 import java.math.BigDecimal;

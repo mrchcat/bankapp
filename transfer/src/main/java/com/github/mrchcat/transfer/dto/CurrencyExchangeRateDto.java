@@ -1,7 +1,8 @@
 package com.github.mrchcat.transfer.dto;
 
 
-import com.github.mrchcat.transfer.model.BankCurrency;
+
+import com.github.mrchcat.shared.enums.BankCurrency;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;

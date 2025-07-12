@@ -1,7 +1,7 @@
 package com.github.mrchcat.exchange.repository;
 
-import com.github.mrchcat.exchange.model.BankCurrency;
 import com.github.mrchcat.exchange.model.CurrencyExchangeRecord;
+import com.github.mrchcat.shared.enums.BankCurrency;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 

@@ -4,9 +4,9 @@ import com.github.mrchcat.exchange.dto.CurrencyExchangeRateDto;
 import com.github.mrchcat.exchange.dto.CurrencyExchangeRatesDto;
 import com.github.mrchcat.exchange.dto.CurrencyRate;
 import com.github.mrchcat.exchange.exceptions.ExchangeGeneratorServiceException;
-import com.github.mrchcat.exchange.model.BankCurrency;
 import com.github.mrchcat.exchange.model.CurrencyExchangeRecord;
 import com.github.mrchcat.exchange.repository.ExchangeRepository;
+import com.github.mrchcat.shared.enums.BankCurrency;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

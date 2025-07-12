@@ -1,7 +1,7 @@
 package com.github.mrchcat.cash.dto;
 
-import com.github.mrchcat.cash.model.TransactionStatus;
 import com.github.mrchcat.shared.enums.CashAction;
+import com.github.mrchcat.shared.enums.TransactionStatus;
 import lombok.Builder;
 
 import java.math.BigDecimal;

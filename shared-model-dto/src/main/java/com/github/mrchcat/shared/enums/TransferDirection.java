@@ -1,4 +1,4 @@
-package com.github.mrchcat.front.model;
+package com.github.mrchcat.shared.enums;
 
 public enum TransferDirection {
     YOURSELF, OTHER

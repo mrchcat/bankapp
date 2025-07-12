@@ -1,7 +1,7 @@
 package com.github.mrchcat.cash.repository;
 
 import com.github.mrchcat.cash.model.CashTransaction;
-import com.github.mrchcat.cash.model.TransactionStatus;
+import com.github.mrchcat.shared.enums.TransactionStatus;
 import com.sun.jdi.InternalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;

@@ -31,6 +31,13 @@
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <!--modules-->
+        <dependency>
+            <groupId>com.github.mrchcat</groupId>
+            <artifactId>shared-model-dto</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
         <!--database-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

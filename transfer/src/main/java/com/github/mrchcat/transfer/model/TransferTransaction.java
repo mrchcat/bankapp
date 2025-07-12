@@ -1,5 +1,6 @@
 package com.github.mrchcat.transfer.model;
 
+import com.github.mrchcat.shared.enums.TransactionStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

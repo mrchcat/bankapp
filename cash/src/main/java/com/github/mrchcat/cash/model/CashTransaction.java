@@ -2,6 +2,7 @@ package com.github.mrchcat.cash.model;
 
 import com.github.mrchcat.shared.enums.BankCurrency;
 import com.github.mrchcat.shared.enums.CashAction;
+import com.github.mrchcat.shared.enums.TransactionStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;

@@ -1,6 +1,6 @@
 package com.github.mrchcat.cash.dto;
 
-import com.github.mrchcat.cash.model.TransactionStatus;
+import com.github.mrchcat.shared.enums.TransactionStatus;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;

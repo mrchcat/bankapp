@@ -1,5 +1,6 @@
 package com.github.mrchcat.exchange_generator.model;
 
+import com.github.mrchcat.shared.enums.BankCurrency;
 import lombok.Builder;
 
 import java.math.BigDecimal;

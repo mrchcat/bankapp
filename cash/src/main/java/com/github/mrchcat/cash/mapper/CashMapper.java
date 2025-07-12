@@ -2,7 +2,7 @@ package com.github.mrchcat.cash.mapper;
 
 import com.github.mrchcat.cash.dto.CashTransactionRequestDto;
 import com.github.mrchcat.cash.model.CashTransaction;
-import com.github.mrchcat.cash.model.TransactionStatus;
+import com.github.mrchcat.shared.enums.TransactionStatus;
 
 public class CashMapper {
 

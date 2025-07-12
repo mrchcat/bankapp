@@ -1,8 +1,8 @@
 package com.github.mrchcat.profile.dto;
 
 
-import com.github.mrchcat.profile.model.TransferDirection;
 import com.github.mrchcat.shared.enums.BankCurrency;
+import com.github.mrchcat.shared.enums.TransferDirection;
 import jakarta.validation.constraints.AssertFalse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

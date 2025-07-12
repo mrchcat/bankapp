@@ -1,6 +1,9 @@
 package com.github.mrchcat.transfer.service;
 
 import com.github.mrchcat.notifications.dto.BankNotificationDto;
+import com.github.mrchcat.shared.enums.BankCurrency;
+import com.github.mrchcat.shared.enums.TransactionStatus;
+import com.github.mrchcat.shared.enums.TransferDirection;
 import com.github.mrchcat.transfer.dto.AccountDto;
 import com.github.mrchcat.transfer.dto.BankUserDto;
 import com.github.mrchcat.transfer.dto.BlockerResponseDto;
@@ -12,9 +15,6 @@ import com.github.mrchcat.transfer.exception.BlockerException;
 import com.github.mrchcat.transfer.exception.ExchangeServiceException;
 import com.github.mrchcat.transfer.exception.NotEnoughMoney;
 import com.github.mrchcat.transfer.mapper.TransferMapper;
-import com.github.mrchcat.transfer.model.BankCurrency;
-import com.github.mrchcat.transfer.model.TransactionStatus;
-import com.github.mrchcat.transfer.model.TransferDirection;
 import com.github.mrchcat.transfer.model.TransferTransaction;
 import com.github.mrchcat.transfer.repository.TransferRepository;
 import com.github.mrchcat.transfer.security.OAuthHeaderGetter;
@@ -32,6 +32,9 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+
+import static com.github.mrchcat.shared.enums.TransferDirection.OTHER;
+import static com.github.mrchcat.shared.enums.TransferDirection.YOURSELF;
 
 @Service
 @RequiredArgsConstructor
