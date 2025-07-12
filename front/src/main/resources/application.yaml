@@ -5,17 +5,17 @@ spring:
     name: bankFront
   security:
     oauth2:
-        client:
-          provider:
-            keycloak:
-              issuer-uri: http://localhost:8090/realms/bankapp
-          registration:
-            bank_front:
-              provider: keycloak
-              authorizationGrantType: client_credentials
-              client-id: bank_front
-              client-secret: wKWXOS1YJgNvFHt6jHL2mjgmHHvGu2r0
-              clientAuthenticationMethod: client_secret_post
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8090/realms/bankapp
+        registration:
+          bank_front:
+            provider: keycloak
+            authorizationGrantType: client_credentials
+            client-id: bank_front
+            client-secret: wKWXOS1YJgNvFHt6jHL2mjgmHHvGu2r0
+            clientAuthenticationMethod: client_secret_post
   cloud:
     consul:
       discovery:
@@ -30,3 +30,21 @@ logging:
   level:
     root: DEBUG
     org.zalando.logbook: DEBUG
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-type: TIME_BASED
+        slidingWindowSize: 100
+        permittedNumberOfCallsInHalfOpenState: 10
+        slowCallDurationThreshold: 4s
+        slowCallRateThreshold: 90
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        minimumNumberOfCalls: 10
+  retry:
+    configs:
+      default:
+        maxAttempts: 3
+        waitDuration: 100ms

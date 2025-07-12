@@ -21,10 +21,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/login", "/logout/**").permitAll()
-                        .requestMatchers("/registration","/signup").hasAuthority("MANAGER")
-                        .anyRequest().hasAnyAuthority("CLIENT", "MANAGER")
+                                .requestMatchers("/actuator/**").permitAll()
+                                .requestMatchers("/login", "/logout/**").permitAll()
+                                .requestMatchers("/error").permitAll()
+                                .requestMatchers("/registration", "/signup").hasAuthority("MANAGER")
+                                .anyRequest().hasAnyAuthority("CLIENT", "MANAGER")
+//                                .anyRequest().authenticated()
 //                                .anyRequest().permitAll()
                 )
                 .oauth2Client(Customizer.withDefaults())

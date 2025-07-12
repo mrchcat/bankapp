@@ -9,6 +9,7 @@ import com.github.mrchcat.front.dto.PasswordUpdateDto;
 import com.github.mrchcat.front.service.FrontService;
 import com.github.mrchcat.shared.enums.CashAction;
 import com.github.mrchcat.shared.enums.UserRole;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.security.auth.message.AuthException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -63,10 +64,14 @@ public class MainController {
      */
     @GetMapping(path = {"/main", "/"})
     String getMain(Model model, Principal principal) throws AuthException, ServiceUnavailableException {
+        if (principal == null) {
+            return "unavailable";
+        }
         String username = principal.getName();
         model.addAttribute("login", username);
 
         FrontBankUserDto clientDetailsAndAccounts = frontService.getClientDetailsAndAccounts(username);
+        System.out.println("получили фаллбек " + clientDetailsAndAccounts);
         model.addAttribute("fullName", clientDetailsAndAccounts.fullName());
         model.addAttribute("birthDate", clientDetailsAndAccounts.birthDay());
         model.addAttribute("email", clientDetailsAndAccounts.email());
@@ -155,20 +160,24 @@ public class MainController {
 
     private void validateCheckBoxes(String username, FrontEditUserAccountDto frontEditUserAccountDto, List<String> userAccountsErrors) {
         List<String> activeAccountsFromFront = (frontEditUserAccountDto.account() == null) ? Collections.emptyList() : frontEditUserAccountDto.account();
-        List<FrontAccountDto> existingAccounts = frontService.getClientDetailsAndAccounts(username).accounts();
-        List<String> notEmptyAccounts = frontService.getClientDetailsAndAccounts(username)
-                .accounts().stream()
-                .filter(account -> account.balance() != null)
-                .filter(account -> account.balance().compareTo(BigDecimal.ZERO) > 0)
-                .map(FrontAccountDto::currencyStringCode)
-                .filter(currencyStringCode -> !activeAccountsFromFront.contains(currencyStringCode))
-                .toList();
-        if (notEmptyAccounts.isEmpty()) {
-            return;
+        try {
+            List<FrontAccountDto> existingAccounts = frontService.getClientDetailsAndAccounts(username).accounts();
+            List<String> notEmptyAccounts = frontService.getClientDetailsAndAccounts(username)
+                    .accounts().stream()
+                    .filter(account -> account.balance() != null)
+                    .filter(account -> account.balance().compareTo(BigDecimal.ZERO) > 0)
+                    .map(FrontAccountDto::currencyStringCode)
+                    .filter(currencyStringCode -> !activeAccountsFromFront.contains(currencyStringCode))
+                    .toList();
+            if (notEmptyAccounts.isEmpty()) {
+                return;
+            }
+            String message = "Ошибка: невозможно удалить следующие аккаунты, т.к. они баланс не пуст: "
+                    + String.join(",", notEmptyAccounts);
+            userAccountsErrors.add(message);
+        } catch (Exception ex) {
+            userAccountsErrors.add(ex.getMessage());
         }
-        String message = "Ошибка: невозможно удалить следующие аккаунты, т.к. они баланс не пуст: "
-                + String.join(",", notEmptyAccounts);
-        userAccountsErrors.add(message);
     }
 
 

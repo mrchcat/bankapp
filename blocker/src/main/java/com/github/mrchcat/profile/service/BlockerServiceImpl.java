@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 public class BlockerServiceImpl implements BlockerService {
-    private final double CONFIRM_PROBABILITY = 0.99;
+    private final double CONFIRM_PROBABILITY = 0.90;
 
     private final List<String> rejectReasons = List.of(
             "сомнительные источники поступлений",

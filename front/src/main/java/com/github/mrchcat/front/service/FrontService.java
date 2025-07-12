@@ -21,7 +21,7 @@ public interface FrontService {
 
     UserDetails registerNewClient(NewClientRegisterDto newClientRegisterDto) throws AuthException;
 
-    FrontBankUserDto getClientDetailsAndAccounts(String username);
+    FrontBankUserDto getClientDetailsAndAccounts(String username) throws AuthException;
 
     List<FrontBankUserDto> getAllClientsWithActiveAccounts() throws AuthException, ServiceUnavailableException;
 
@@ -33,5 +33,4 @@ public interface FrontService {
 
     List<FrontRate> getAllRates() throws AuthException;
 
-    URI getFrontExchangeUri();
 }
