@@ -1,8 +1,8 @@
 package com.github.mrchcat.accounts.log.mapper;
 
-import com.github.mrchcat.accounts.account.dto.TransferTransactionDto;
 import com.github.mrchcat.accounts.log.model.TransactionLogRecord;
 import com.github.mrchcat.shared.accounts.AccountCashTransactionDto;
+import com.github.mrchcat.shared.accounts.AccountTransferTransactionDto;
 import com.github.mrchcat.shared.enums.CashAction;
 import com.github.mrchcat.shared.enums.TransactionStatus;
 
@@ -57,7 +57,7 @@ public class LogMapper {
         return record;
     }
 
-    public static TransactionLogRecord toNonCashLogRecord(TransferTransactionDto transaction) {
+    public static TransactionLogRecord toNonCashLogRecord(AccountTransferTransactionDto transaction) {
         return TransactionLogRecord.builder()
                 .transactionId(transaction.transactionId())
                 .action(CashAction.TRANSFER)
@@ -69,7 +69,7 @@ public class LogMapper {
                 .build();
     }
 
-    public static TransactionLogRecord toNonCashLogRecord(TransferTransactionDto transaction, TransactionStatus status) {
+    public static TransactionLogRecord toNonCashLogRecord(AccountTransferTransactionDto transaction, TransactionStatus status) {
         TransactionLogRecord record = toNonCashLogRecord(transaction);
         record.setStatus(status);
         return record;

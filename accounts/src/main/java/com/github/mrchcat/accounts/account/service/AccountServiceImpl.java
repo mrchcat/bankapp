@@ -1,7 +1,6 @@
 package com.github.mrchcat.accounts.account.service;
 
 import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
-import com.github.mrchcat.accounts.account.dto.TransferTransactionDto;
 import com.github.mrchcat.accounts.account.model.Account;
 import com.github.mrchcat.accounts.account.repository.AccountRepository;
 import com.github.mrchcat.accounts.blocks.model.AccountBlock;
@@ -15,6 +14,7 @@ import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.model.BankUser;
 import com.github.mrchcat.accounts.user.service.UserService;
 import com.github.mrchcat.shared.accounts.AccountCashTransactionDto;
+import com.github.mrchcat.shared.accounts.AccountTransferTransactionDto;
 import com.github.mrchcat.shared.accounts.BankUserDto;
 import com.github.mrchcat.shared.accounts.TransactionConfirmation;
 import com.github.mrchcat.shared.enums.BankCurrency;
@@ -215,7 +215,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public TransactionConfirmation processNonCashTransaction(TransferTransactionDto transactionDto) {
+    public TransactionConfirmation processNonCashTransaction(AccountTransferTransactionDto transactionDto) {
         // отклоняем операции, которые уже ранее были обработаны
         UUID transactionId = transactionDto.transactionId();
         TransactionStatus status = transactionDto.status();

@@ -1,10 +1,10 @@
 package com.github.mrchcat.accounts.account.controllers;
 
 import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
-import com.github.mrchcat.accounts.account.dto.TransferTransactionDto;
 import com.github.mrchcat.accounts.account.service.AccountService;
 import com.github.mrchcat.accounts.user.service.UserService;
 import com.github.mrchcat.shared.accounts.AccountCashTransactionDto;
+import com.github.mrchcat.shared.accounts.AccountTransferTransactionDto;
 import com.github.mrchcat.shared.accounts.BankUserDto;
 import com.github.mrchcat.shared.accounts.TransactionConfirmation;
 import com.github.mrchcat.shared.enums.BankCurrency;
@@ -85,8 +85,8 @@ public class AccountController {
      * выполнение транзакции от сервиса переводов
      */
     @PostMapping("/account/transfer")
-    TransactionConfirmation processNonCashTransaction(@RequestBody @Valid TransferTransactionDto transferTransactionDto) {
-        return accountService.processNonCashTransaction(transferTransactionDto);
+    TransactionConfirmation processNonCashTransaction(@RequestBody @Valid AccountTransferTransactionDto accountTransferTransactionDto) {
+        return accountService.processNonCashTransaction(accountTransferTransactionDto);
     }
 
 }
