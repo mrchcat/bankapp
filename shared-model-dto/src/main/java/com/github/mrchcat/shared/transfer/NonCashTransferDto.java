@@ -1,13 +1,16 @@
-package com.github.mrchcat.transfer.dto;
+package com.github.mrchcat.shared.transfer;
+
 
 import com.github.mrchcat.shared.enums.BankCurrency;
 import com.github.mrchcat.shared.enums.TransferDirection;
 import jakarta.validation.constraints.AssertFalse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 
+@Builder
 public record NonCashTransferDto(
         @NotNull
         TransferDirection direction,

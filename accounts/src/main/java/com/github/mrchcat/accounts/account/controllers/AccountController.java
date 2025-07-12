@@ -1,12 +1,12 @@
 package com.github.mrchcat.accounts.account.controllers;
 
-import com.github.mrchcat.accounts.account.dto.CashTransactionDto;
 import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
-import com.github.mrchcat.accounts.account.dto.TransactionConfirmation;
 import com.github.mrchcat.accounts.account.dto.TransferTransactionDto;
 import com.github.mrchcat.accounts.account.service.AccountService;
-import com.github.mrchcat.accounts.user.dto.BankUserDto;
 import com.github.mrchcat.accounts.user.service.UserService;
+import com.github.mrchcat.shared.accounts.AccountCashTransactionDto;
+import com.github.mrchcat.shared.accounts.BankUserDto;
+import com.github.mrchcat.shared.accounts.TransactionConfirmation;
 import com.github.mrchcat.shared.enums.BankCurrency;
 import jakarta.security.auth.message.AuthException;
 import jakarta.validation.Valid;
@@ -77,7 +77,7 @@ public class AccountController {
      * выполнение транзакции от сервиса выдачи денег
      */
     @PostMapping("/account/cash")
-    TransactionConfirmation processCashTransaction(@RequestBody @Valid CashTransactionDto cashTransactionDto) {
+    TransactionConfirmation processCashTransaction(@RequestBody @Valid AccountCashTransactionDto cashTransactionDto) {
         return accountService.processCashTransaction(cashTransactionDto);
     }
 

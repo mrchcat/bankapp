@@ -1,4 +1,4 @@
-package com.github.mrchcat.exchange.dto;
+package com.github.mrchcat.shared.exchange;
 
 import com.github.mrchcat.shared.enums.BankCurrency;
 import lombok.Builder;

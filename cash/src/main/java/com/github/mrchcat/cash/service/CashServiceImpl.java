@@ -1,10 +1,5 @@
 package com.github.mrchcat.cash.service;
 
-import com.github.mrchcat.cash.dto.AccountDto;
-import com.github.mrchcat.cash.dto.BankUserDto;
-import com.github.mrchcat.cash.dto.BlockerResponseDto;
-import com.github.mrchcat.cash.dto.CashTransactionRequestDto;
-import com.github.mrchcat.cash.dto.TransactionConfirmation;
 import com.github.mrchcat.cash.exceptions.BlockerException;
 import com.github.mrchcat.cash.exceptions.NotEnoughMoney;
 import com.github.mrchcat.cash.exceptions.RejectedByClient;
@@ -12,6 +7,11 @@ import com.github.mrchcat.cash.mapper.CashMapper;
 import com.github.mrchcat.cash.model.CashTransaction;
 import com.github.mrchcat.cash.repository.CashRepository;
 import com.github.mrchcat.cash.security.OAuthHeaderGetter;
+import com.github.mrchcat.shared.accounts.AccountCashTransactionDto;
+import com.github.mrchcat.shared.accounts.AccountDto;
+import com.github.mrchcat.shared.accounts.BankUserDto;
+import com.github.mrchcat.shared.accounts.TransactionConfirmation;
+import com.github.mrchcat.shared.blocker.BlockerResponseDto;
 import com.github.mrchcat.shared.cash.CashTransactionDto;
 import com.github.mrchcat.shared.enums.BankCurrency;
 import com.github.mrchcat.shared.enums.TransactionStatus;
@@ -130,7 +130,8 @@ public class CashServiceImpl implements CashService {
         return status.equals(confirmation.status());
     }
 
-    private TransactionConfirmation sendTransactionToAccountService(CashTransactionRequestDto cashTransactionRequestDto) throws AuthException, ServiceUnavailableException {
+    private TransactionConfirmation sendTransactionToAccountService(AccountCashTransactionDto cashTransactionRequestDto)
+            throws AuthException, ServiceUnavailableException {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         var confirmation = restClientBuilder.build()
                 .post()

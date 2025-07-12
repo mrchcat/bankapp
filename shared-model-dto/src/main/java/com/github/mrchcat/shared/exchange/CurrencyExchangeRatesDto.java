@@ -1,12 +1,15 @@
-package com.github.mrchcat.exchange_generator.dto;
+package com.github.mrchcat.shared.exchange;
 
-import com.github.mrchcat.exchange_generator.model.CurrencyRate;
+
 import com.github.mrchcat.shared.enums.BankCurrency;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
 public record CurrencyExchangeRatesDto(
+        @NotNull
         BankCurrency baseCurrency,
+        @NotNull
         List<CurrencyRate> exchangeRates
 ) {
 }

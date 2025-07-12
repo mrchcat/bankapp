@@ -1,6 +1,6 @@
 package com.github.mrchcat.transfer.controller;
 
-import com.github.mrchcat.transfer.dto.NonCashTransferDto;
+import com.github.mrchcat.shared.transfer.NonCashTransferDto;
 import com.github.mrchcat.transfer.service.TransferService;
 import jakarta.security.auth.message.AuthException;
 import jakarta.validation.Valid;

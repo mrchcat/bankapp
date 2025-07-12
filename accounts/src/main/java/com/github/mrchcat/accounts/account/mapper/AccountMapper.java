@@ -1,7 +1,7 @@
 package com.github.mrchcat.accounts.account.mapper;
 
-import com.github.mrchcat.accounts.account.dto.AccountDto;
 import com.github.mrchcat.accounts.account.model.Account;
+import com.github.mrchcat.shared.accounts.AccountDto;
 
 import java.util.List;
 

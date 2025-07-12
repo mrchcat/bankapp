@@ -1,4 +1,4 @@
-package com.github.mrchcat.accounts.account.dto;
+package com.github.mrchcat.shared.accounts;
 
 import com.github.mrchcat.shared.enums.CashAction;
 import com.github.mrchcat.shared.enums.TransactionStatus;
@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Builder
-public record CashTransactionDto(
+public record AccountCashTransactionDto(
         @NotNull
         UUID transactionId,
         @NotNull

@@ -1,14 +1,14 @@
 package com.github.mrchcat.accounts.log.mapper;
 
-import com.github.mrchcat.accounts.account.dto.CashTransactionDto;
 import com.github.mrchcat.accounts.account.dto.TransferTransactionDto;
 import com.github.mrchcat.accounts.log.model.TransactionLogRecord;
+import com.github.mrchcat.shared.accounts.AccountCashTransactionDto;
 import com.github.mrchcat.shared.enums.CashAction;
 import com.github.mrchcat.shared.enums.TransactionStatus;
 
 public class LogMapper {
 
-    public static TransactionLogRecord toCashLogRecord(CashTransactionDto cashTransactionDto) {
+    public static TransactionLogRecord toCashLogRecord(AccountCashTransactionDto cashTransactionDto) {
         return switch (cashTransactionDto.action()) {
             case DEPOSIT -> toCashDepositLogRecord(cashTransactionDto);
             case WITHDRAWAL -> toCashWithdrawalLogRecord(cashTransactionDto);
@@ -16,7 +16,7 @@ public class LogMapper {
         };
     }
 
-    public static TransactionLogRecord toCashLogRecord(CashTransactionDto cashTransactionDto, TransactionStatus status) {
+    public static TransactionLogRecord toCashLogRecord(AccountCashTransactionDto cashTransactionDto, TransactionStatus status) {
         return switch (cashTransactionDto.action()) {
             case DEPOSIT -> toCashDepositLogRecord(cashTransactionDto, status);
             case WITHDRAWAL -> toCashWithdrawalLogRecord(cashTransactionDto, status);
@@ -25,13 +25,13 @@ public class LogMapper {
     }
 
 
-    private static TransactionLogRecord toCashDepositLogRecord(CashTransactionDto cashTransactionDto, TransactionStatus status) {
+    private static TransactionLogRecord toCashDepositLogRecord(AccountCashTransactionDto cashTransactionDto, TransactionStatus status) {
         TransactionLogRecord record = toCashDepositLogRecord(cashTransactionDto);
         record.setStatus(status);
         return record;
     }
 
-    private static TransactionLogRecord toCashDepositLogRecord(CashTransactionDto cashTransactionDto) {
+    private static TransactionLogRecord toCashDepositLogRecord(AccountCashTransactionDto cashTransactionDto) {
         return TransactionLogRecord.builder()
                 .transactionId(cashTransactionDto.transactionId())
                 .action(cashTransactionDto.action())
@@ -41,7 +41,7 @@ public class LogMapper {
                 .build();
     }
 
-    private static TransactionLogRecord toCashWithdrawalLogRecord(CashTransactionDto cashTransactionDto) {
+    private static TransactionLogRecord toCashWithdrawalLogRecord(AccountCashTransactionDto cashTransactionDto) {
         return TransactionLogRecord.builder()
                 .transactionId(cashTransactionDto.transactionId())
                 .action(cashTransactionDto.action())
@@ -51,7 +51,7 @@ public class LogMapper {
                 .build();
     }
 
-    private static TransactionLogRecord toCashWithdrawalLogRecord(CashTransactionDto cashTransactionDto, TransactionStatus status) {
+    private static TransactionLogRecord toCashWithdrawalLogRecord(AccountCashTransactionDto cashTransactionDto, TransactionStatus status) {
         TransactionLogRecord record = toCashWithdrawalLogRecord(cashTransactionDto);
         record.setStatus(status);
         return record;

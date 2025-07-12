@@ -1,9 +1,9 @@
 package com.github.mrchcat.exchange_generator.service;
 
-import com.github.mrchcat.exchange_generator.dto.CurrencyExchangeRatesDto;
-import com.github.mrchcat.exchange_generator.model.CurrencyRate;
 import com.github.mrchcat.exchange_generator.security.OAuthHeaderGetter;
 import com.github.mrchcat.shared.enums.BankCurrency;
+import com.github.mrchcat.shared.exchange.CurrencyExchangeRatesDto;
+import com.github.mrchcat.shared.exchange.CurrencyRate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

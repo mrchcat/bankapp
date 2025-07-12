@@ -1,6 +1,6 @@
 package com.github.mrchcat.transfer.service;
 
-import com.github.mrchcat.transfer.dto.NonCashTransferDto;
+import com.github.mrchcat.shared.transfer.NonCashTransferDto;
 import jakarta.security.auth.message.AuthException;
 
 import javax.naming.ServiceUnavailableException;

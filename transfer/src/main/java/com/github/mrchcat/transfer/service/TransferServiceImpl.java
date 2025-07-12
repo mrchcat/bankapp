@@ -1,15 +1,15 @@
 package com.github.mrchcat.transfer.service;
 
+import com.github.mrchcat.shared.accounts.AccountDto;
+import com.github.mrchcat.shared.accounts.BankUserDto;
+import com.github.mrchcat.shared.accounts.TransactionConfirmation;
+import com.github.mrchcat.shared.blocker.BlockerResponseDto;
 import com.github.mrchcat.shared.enums.BankCurrency;
 import com.github.mrchcat.shared.enums.TransactionStatus;
 import com.github.mrchcat.shared.enums.TransferDirection;
+import com.github.mrchcat.shared.exchange.CurrencyExchangeRateDto;
 import com.github.mrchcat.shared.notification.BankNotificationDto;
-import com.github.mrchcat.transfer.dto.AccountDto;
-import com.github.mrchcat.transfer.dto.BankUserDto;
-import com.github.mrchcat.transfer.dto.BlockerResponseDto;
-import com.github.mrchcat.transfer.dto.CurrencyExchangeRateDto;
-import com.github.mrchcat.transfer.dto.NonCashTransferDto;
-import com.github.mrchcat.transfer.dto.TransactionConfirmation;
+import com.github.mrchcat.shared.transfer.NonCashTransferDto;
 import com.github.mrchcat.transfer.exception.AccountServiceException;
 import com.github.mrchcat.transfer.exception.BlockerException;
 import com.github.mrchcat.transfer.exception.ExchangeServiceException;
@@ -142,7 +142,7 @@ public class TransferServiceImpl implements TransferService {
             if (exchangeRate == null) {
                 throw new ExchangeServiceException("");
             }
-            return exchangeRate.rate();
+            return exchangeRate.getRate();
         } catch (Exception ex) {
             throw new ExchangeServiceException("");
         }

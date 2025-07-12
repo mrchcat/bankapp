@@ -1,8 +1,6 @@
 package com.github.mrchcat.accounts.account.service;
 
-import com.github.mrchcat.accounts.account.dto.CashTransactionDto;
 import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
-import com.github.mrchcat.accounts.account.dto.TransactionConfirmation;
 import com.github.mrchcat.accounts.account.dto.TransferTransactionDto;
 import com.github.mrchcat.accounts.account.model.Account;
 import com.github.mrchcat.accounts.account.repository.AccountRepository;
@@ -13,10 +11,12 @@ import com.github.mrchcat.accounts.exceptions.TransactionWasCompletedAlready;
 import com.github.mrchcat.accounts.log.mapper.LogMapper;
 import com.github.mrchcat.accounts.log.service.LogService;
 import com.github.mrchcat.accounts.security.OAuthHeaderGetter;
-import com.github.mrchcat.accounts.user.dto.BankUserDto;
 import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.model.BankUser;
 import com.github.mrchcat.accounts.user.service.UserService;
+import com.github.mrchcat.shared.accounts.AccountCashTransactionDto;
+import com.github.mrchcat.shared.accounts.BankUserDto;
+import com.github.mrchcat.shared.accounts.TransactionConfirmation;
 import com.github.mrchcat.shared.enums.BankCurrency;
 import com.github.mrchcat.shared.enums.TransactionStatus;
 import com.github.mrchcat.shared.notification.BankNotificationDto;
@@ -111,7 +111,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public TransactionConfirmation processCashTransaction(CashTransactionDto cashTransactionDto) {
+    public TransactionConfirmation processCashTransaction(AccountCashTransactionDto cashTransactionDto) {
         validateCashTransaction(cashTransactionDto);
         return switch (cashTransactionDto.action()) {
             case DEPOSIT -> processCashDeposit(cashTransactionDto);
@@ -135,7 +135,7 @@ public class AccountServiceImpl implements AccountService {
                 List.of(TransactionStatus.DEPOSIT_PROCESSED, TransactionStatus.CASH_WAS_GIVEN));
     }
 
-    private void validateCashTransaction(CashTransactionDto cashTransactionDto) {
+    private void validateCashTransaction(AccountCashTransactionDto cashTransactionDto) {
         // отклоняем операцию, если аккаунт не активен или не существует
         UUID accountId = cashTransactionDto.accountId();
         if (!accountRepository.isExistActive(accountId)) {
@@ -160,7 +160,7 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    private TransactionConfirmation processCashDeposit(CashTransactionDto cashTransactionDto) {
+    private TransactionConfirmation processCashDeposit(AccountCashTransactionDto cashTransactionDto) {
         logService.saveTransactionLogRecord(LogMapper.toCashLogRecord(cashTransactionDto));
         switch (cashTransactionDto.status()) {
             case CASH_RECEIVED -> {
@@ -173,7 +173,7 @@ public class AccountServiceImpl implements AccountService {
         return new TransactionConfirmation(cashTransactionDto.transactionId(), cashTransactionDto.status());
     }
 
-    private TransactionConfirmation processCashWithdrawal(CashTransactionDto cashTransactionDto) {
+    private TransactionConfirmation processCashWithdrawal(AccountCashTransactionDto cashTransactionDto) {
         logService.saveTransactionLogRecord(LogMapper.toCashLogRecord(cashTransactionDto));
         switch (cashTransactionDto.status()) {
             case BLOCKING_REQUEST -> {

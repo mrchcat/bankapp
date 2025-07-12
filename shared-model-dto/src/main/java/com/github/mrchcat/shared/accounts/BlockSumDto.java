@@ -1,4 +1,4 @@
-package com.github.mrchcat.accounts.account.dto;
+package com.github.mrchcat.shared.accounts;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

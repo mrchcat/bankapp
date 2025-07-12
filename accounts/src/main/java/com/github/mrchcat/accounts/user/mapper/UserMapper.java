@@ -2,8 +2,8 @@ package com.github.mrchcat.accounts.user.mapper;
 
 import com.github.mrchcat.accounts.account.mapper.AccountMapper;
 import com.github.mrchcat.accounts.account.model.Account;
-import com.github.mrchcat.accounts.user.dto.BankUserDto;
 import com.github.mrchcat.accounts.user.model.BankUser;
+import com.github.mrchcat.shared.accounts.BankUserDto;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 

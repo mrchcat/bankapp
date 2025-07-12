@@ -1,15 +1,15 @@
 package com.github.mrchcat.profile.service;
 
-import com.github.mrchcat.profile.dto.BlockerResponseDto;
-import com.github.mrchcat.profile.dto.NonCashTransferBlockerRequestDto;
+import com.github.mrchcat.shared.blocker.BlockerResponseDto;
 import com.github.mrchcat.shared.cash.CashTransactionDto;
+import com.github.mrchcat.shared.transfer.NonCashTransferDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class BlockerServiceImpl implements BlockerService {
-    private final double CONFIRM_PROBABILITY = 0.5;
+    private final double CONFIRM_PROBABILITY = 0.99;
 
     private final List<String> rejectReasons = List.of(
             "сомнительные источники поступлений",
@@ -25,7 +25,7 @@ public class BlockerServiceImpl implements BlockerService {
     }
 
     @Override
-    public BlockerResponseDto checkNonCashTransaction(NonCashTransferBlockerRequestDto nonCashTransferBlockerRequestDto) {
+    public BlockerResponseDto checkNonCashTransaction(NonCashTransferDto nonCashTransferDto) {
         return getRandom();
     }
 

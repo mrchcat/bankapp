@@ -1,4 +1,4 @@
-package com.github.mrchcat.cash.dto;
+package com.github.mrchcat.shared.accounts;
 
 import lombok.Builder;
 

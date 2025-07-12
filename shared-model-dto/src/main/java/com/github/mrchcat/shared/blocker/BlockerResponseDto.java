@@ -1,4 +1,4 @@
-package com.github.mrchcat.cash.dto;
+package com.github.mrchcat.shared.blocker;
 
 import jakarta.validation.constraints.NotNull;
 

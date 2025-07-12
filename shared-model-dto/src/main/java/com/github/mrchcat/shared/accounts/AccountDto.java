@@ -1,4 +1,4 @@
-package com.github.mrchcat.front.dto;
+package com.github.mrchcat.shared.accounts;
 
 import lombok.Builder;
 

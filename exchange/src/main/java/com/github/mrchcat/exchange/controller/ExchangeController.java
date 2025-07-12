@@ -1,10 +1,10 @@
 package com.github.mrchcat.exchange.controller;
 
-import com.github.mrchcat.exchange.dto.CurrencyExchangeRateDto;
-import com.github.mrchcat.exchange.dto.CurrencyExchangeRatesDto;
-import com.github.mrchcat.exchange.dto.CurrencyRate;
 import com.github.mrchcat.exchange.service.ExchangeService;
 import com.github.mrchcat.shared.enums.BankCurrency;
+import com.github.mrchcat.shared.exchange.CurrencyExchangeRateDto;
+import com.github.mrchcat.shared.exchange.CurrencyExchangeRatesDto;
+import com.github.mrchcat.shared.exchange.CurrencyRate;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

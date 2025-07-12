@@ -1,9 +1,9 @@
 package com.github.mrchcat.profile.controller;
 
-import com.github.mrchcat.profile.dto.BlockerResponseDto;
-import com.github.mrchcat.profile.dto.NonCashTransferBlockerRequestDto;
 import com.github.mrchcat.profile.service.BlockerService;
+import com.github.mrchcat.shared.blocker.BlockerResponseDto;
 import com.github.mrchcat.shared.cash.CashTransactionDto;
+import com.github.mrchcat.shared.transfer.NonCashTransferDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,8 +21,8 @@ public class BlockerController {
     }
 
     @PostMapping("/blocker/noncash")
-    BlockerResponseDto checkCashTransaction(@RequestBody @Valid NonCashTransferBlockerRequestDto nonCashTransferBlockerRequestDto) {
-        return blockerService.checkNonCashTransaction(nonCashTransferBlockerRequestDto);
+    BlockerResponseDto checkCashTransaction(@RequestBody @Valid NonCashTransferDto nonCashTransferDto) {
+        return blockerService.checkNonCashTransaction(nonCashTransferDto);
     }
 
 }

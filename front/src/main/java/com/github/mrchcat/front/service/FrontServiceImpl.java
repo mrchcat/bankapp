@@ -1,22 +1,22 @@
 package com.github.mrchcat.front.service;
 
-import com.github.mrchcat.front.dto.BankUserDto;
 import com.github.mrchcat.front.dto.FrontCashTransactionDto;
-import com.github.mrchcat.front.dto.CurrencyRate;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.FrontRate;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
 import com.github.mrchcat.front.dto.NonCashTransfer;
-import com.github.mrchcat.front.dto.NonCashTransferRequest;
 import com.github.mrchcat.front.dto.UserDetailsDto;
 import com.github.mrchcat.front.exception.ExchangeServiceException;
 import com.github.mrchcat.front.mapper.FrontMapper;
 import com.github.mrchcat.front.model.FrontCurrencies;
 import com.github.mrchcat.front.security.OAuthHeaderGetter;
+import com.github.mrchcat.shared.accounts.BankUserDto;
 import com.github.mrchcat.shared.cash.CashTransactionDto;
 import com.github.mrchcat.shared.enums.BankCurrency;
 import com.github.mrchcat.shared.enums.CashAction;
+import com.github.mrchcat.shared.exchange.CurrencyRate;
+import com.github.mrchcat.shared.transfer.NonCashTransferDto;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -153,7 +153,7 @@ public class FrontServiceImpl implements FrontService {
 
     @Override
     public void processNonCashOperation(NonCashTransfer nonCashTransfer) throws AuthException {
-        NonCashTransferRequest requestDto = FrontMapper.toRequestDto(nonCashTransfer);
+        NonCashTransferDto requestDto = FrontMapper.toRequestDto(nonCashTransfer);
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         restClientBuilder.build()
                 .post()

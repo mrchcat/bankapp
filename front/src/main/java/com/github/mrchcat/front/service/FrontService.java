@@ -1,12 +1,12 @@
 package com.github.mrchcat.front.service;
 
-import com.github.mrchcat.front.dto.BankUserDto;
 import com.github.mrchcat.front.dto.FrontCashTransactionDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.FrontRate;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
 import com.github.mrchcat.front.dto.NonCashTransfer;
+import com.github.mrchcat.shared.accounts.BankUserDto;
 import com.github.mrchcat.shared.enums.CashAction;
 import jakarta.security.auth.message.AuthException;
 import org.springframework.security.core.userdetails.UserDetails;

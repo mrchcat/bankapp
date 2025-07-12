@@ -1,7 +1,5 @@
 package com.github.mrchcat.front.mapper;
 
-import com.github.mrchcat.front.dto.AccountDto;
-import com.github.mrchcat.front.dto.BankUserDto;
 import com.github.mrchcat.front.dto.FrontCashTransactionDto;
 import com.github.mrchcat.front.dto.CreateNewClientRequestDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
@@ -10,11 +8,13 @@ import com.github.mrchcat.front.dto.FrontAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
 import com.github.mrchcat.front.dto.NonCashTransfer;
-import com.github.mrchcat.front.dto.NonCashTransferRequest;
 import com.github.mrchcat.front.dto.UserDetailsDto;
 import com.github.mrchcat.front.model.FrontCurrencies;
+import com.github.mrchcat.shared.accounts.AccountDto;
+import com.github.mrchcat.shared.accounts.BankUserDto;
 import com.github.mrchcat.shared.cash.CashTransactionDto;
 import com.github.mrchcat.shared.enums.CashAction;
+import com.github.mrchcat.shared.transfer.NonCashTransferDto;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -119,8 +119,8 @@ public class FrontMapper {
                 .build();
     }
 
-    public static NonCashTransferRequest toRequestDto(NonCashTransfer dto) {
-        return NonCashTransferRequest.builder()
+    public static NonCashTransferDto toRequestDto(NonCashTransfer dto) {
+        return NonCashTransferDto.builder()
                 .direction(dto.direction())
                 .fromCurrency(dto.fromCurrency())
                 .toCurrency(dto.toCurrency())
