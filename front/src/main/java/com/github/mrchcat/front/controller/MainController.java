@@ -138,8 +138,14 @@ public class MainController {
             frontService.editUserAccount(username, editUserAccountDto);
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-                String notUniqueProperties = ex.getResponseHeaders().get("X-not-unique").get(0);
-                userAccountsErrors.add("Ошибка, указанные свойства не уникальны: " + notUniqueProperties);
+                var headers = ex.getResponseHeaders();
+                if (headers != null && !headers.isEmpty()) {
+                    var xUniqueHeaders = headers.get("X-not-unique");
+                    if (xUniqueHeaders != null && !xUniqueHeaders.isEmpty()) {
+                        String notUniqueProperties = xUniqueHeaders.get(0);
+                        userAccountsErrors.add("Ошибка, указанные свойства не уникальны: " + notUniqueProperties);
+                    }
+                }
             }
         } catch (Exception ex) {
             userAccountsErrors.add(ex.getMessage());

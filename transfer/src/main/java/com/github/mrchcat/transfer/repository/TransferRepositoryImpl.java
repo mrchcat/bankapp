@@ -36,7 +36,12 @@ public class TransferRepositoryImpl implements TransferRepository {
             ps.setString(6, transaction.getStatus().name());
             return ps;
         }, keyHolder);
-        Long id = (Long) keyHolder.getKeys().get("id");
+
+        var keys = keyHolder.getKeys();
+        if (keys == null || keys.isEmpty()) {
+            throw new SQLException("при обновлении не вернулся ключ");
+        }
+        Long id = (Long) keys.get("id");
         if (id == null) {
             throw new SQLException("не получен ключ для новой записи");
         }
@@ -49,7 +54,7 @@ public class TransferRepositoryImpl implements TransferRepository {
                 FROM transfers
                 WHERE id=?
                 """;
-        return jdbc.queryForObject(query,transferRowMapper,id);
+        return jdbc.queryForObject(query, transferRowMapper, id);
     }
 
     @Override

@@ -10,7 +10,6 @@ import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.model.BankUser;
 import com.github.mrchcat.accounts.user.model.UserRole;
 import com.github.mrchcat.accounts.user.repository.UserRepository;
-import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -52,7 +51,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetails registerNewClient(CreateNewClientDto upDto) throws AuthException {
+    public UserDetails registerNewClient(CreateNewClientDto upDto) {
         validateIfClientPropertiesExistAlready(upDto);
         BankUser newClient = BankUser.builder()
                 .fullName(upDto.fullName())
@@ -78,7 +77,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void editClientData(String username, EditUserAccountDto dto) throws AuthException {
+    public void editClientData(String username, EditUserAccountDto dto) {
         BankUser client = getClient(username);
         boolean hasNewProperties = false;
         String newEmail = dto.email();

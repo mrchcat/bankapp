@@ -52,8 +52,14 @@ public class RegistrationController {
             model.addAttribute("isNewClientRegistered", true);
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
-                String notUniqueProperties = ex.getResponseHeaders().get("X-not-unique").get(0);
-                errors.add("Ошибка, указанные свойства не уникальны: " + notUniqueProperties);
+                var headers = ex.getResponseHeaders();
+                if (headers != null && !headers.isEmpty()) {
+                    var xUniqueHeaders = headers.get("X-not-unique");
+                    if (xUniqueHeaders != null && !xUniqueHeaders.isEmpty()) {
+                        String notUniqueProperties = xUniqueHeaders.get(0);
+                        errors.add("Ошибка, указанные свойства не уникальны: " + notUniqueProperties);
+                    }
+                }
             }
         } catch (Exception ex) {
             errors.add(ex.getMessage());

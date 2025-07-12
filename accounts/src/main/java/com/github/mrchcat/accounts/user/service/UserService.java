@@ -15,7 +15,7 @@ public interface UserService {
 
     UserDetails updateUserDetails(String username, String passwordHash);
 
-    UserDetails registerNewClient(CreateNewClientDto newClientDto) throws AuthException;
+    UserDetails registerNewClient(CreateNewClientDto newClientDto);
 
     BankUser getClient(String username);
 
