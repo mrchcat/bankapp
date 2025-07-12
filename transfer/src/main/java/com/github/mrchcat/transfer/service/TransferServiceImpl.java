@@ -1,7 +1,7 @@
 package com.github.mrchcat.transfer.service;
 
+import com.github.mrchcat.notifications.dto.BankNotificationDto;
 import com.github.mrchcat.transfer.dto.AccountDto;
-import com.github.mrchcat.transfer.dto.BankNotificationDtoRequest;
 import com.github.mrchcat.transfer.dto.BankUserDto;
 import com.github.mrchcat.transfer.dto.BlockerResponseDto;
 import com.github.mrchcat.transfer.dto.CurrencyExchangeRateDto;
@@ -246,7 +246,7 @@ public class TransferServiceImpl implements TransferService {
 
     private void sendNotification(BankUserDto client, String message) {
         try {
-            var notification = BankNotificationDtoRequest.builder()
+            var notification = BankNotificationDto.builder()
                     .service(TRANSFER_SERVICE)
                     .username(client.username())
                     .fullName(client.fullName())

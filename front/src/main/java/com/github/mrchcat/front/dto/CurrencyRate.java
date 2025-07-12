@@ -1,6 +1,6 @@
 package com.github.mrchcat.front.dto;
 
-import com.github.mrchcat.front.model.BankCurrency;
+import com.github.mrchcat.shared.enums.BankCurrency;
 import lombok.Builder;
 
 import java.math.BigDecimal;

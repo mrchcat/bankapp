@@ -1,7 +1,7 @@
 package com.github.mrchcat.accounts.account.dto;
 
-import com.github.mrchcat.accounts.account.model.CashAction;
-import com.github.mrchcat.accounts.account.model.TransactionStatus;
+import com.github.mrchcat.shared.enums.CashAction;
+import com.github.mrchcat.shared.enums.TransactionStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 

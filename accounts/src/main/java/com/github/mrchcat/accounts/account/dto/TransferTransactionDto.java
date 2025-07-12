@@ -1,6 +1,6 @@
 package com.github.mrchcat.accounts.account.dto;
 
-import com.github.mrchcat.accounts.account.model.TransactionStatus;
+import com.github.mrchcat.shared.enums.TransactionStatus;
 import jakarta.validation.constraints.AssertFalse;
 import jakarta.validation.constraints.NotNull;
 

@@ -1,7 +1,7 @@
-package com.github.mrchcat.cash.dto;
+package com.github.mrchcat.shared.cash;
 
-import com.github.mrchcat.cash.model.BankCurrency;
-import com.github.mrchcat.cash.model.CashAction;
+import com.github.mrchcat.shared.enums.BankCurrency;
+import com.github.mrchcat.shared.enums.CashAction;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

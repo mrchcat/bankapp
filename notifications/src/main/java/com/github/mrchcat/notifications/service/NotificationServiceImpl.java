@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -16,6 +18,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void save(BankNotificationDto dto) {
+        System.out.println("получили " + dto);
         var notification = BankNotification.builder()
                 .service(dto.service())
                 .username(dto.username())
@@ -23,6 +26,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .email(dto.email())
                 .message(dto.message())
                 .isProcessed(false)
+                .createdAt(LocalDateTime.now())
                 .build();
         notificationRepository.save(notification);
     }
@@ -38,7 +42,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     private void sendByEmail(BankNotification notification) {
         log.info(notification.toString());
-        //        отправляем по почте
     }
 
 }

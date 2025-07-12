@@ -1,7 +1,7 @@
 package com.github.mrchcat.accounts.account.repository;
 
 import com.github.mrchcat.accounts.account.model.Account;
-import com.github.mrchcat.accounts.account.model.BankCurrency;
+import com.github.mrchcat.shared.enums.BankCurrency;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -3,13 +3,13 @@ package com.github.mrchcat.accounts.user.service;
 import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
 import com.github.mrchcat.accounts.exceptions.UserNotUniqueProperties;
 import com.github.mrchcat.accounts.security.OAuthHeaderGetter;
-import com.github.mrchcat.accounts.user.dto.BankNotificationDtoRequest;
 import com.github.mrchcat.accounts.user.dto.BankUserDto;
 import com.github.mrchcat.accounts.user.dto.CreateNewClientDto;
 import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.model.BankUser;
 import com.github.mrchcat.accounts.user.model.UserRole;
 import com.github.mrchcat.accounts.user.repository.UserRepository;
+import com.github.mrchcat.notifications.dto.BankNotificationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
 
     private void sendNotification(BankUser client, String message) {
         try {
-            var notification = BankNotificationDtoRequest.builder()
+            var notification = BankNotificationDto.builder()
                     .service(ACCOUNT_SERVICE)
                     .username(client.getUsername())
                     .fullName(client.getFullName())

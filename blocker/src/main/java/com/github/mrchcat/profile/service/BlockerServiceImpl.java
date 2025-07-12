@@ -1,8 +1,8 @@
 package com.github.mrchcat.profile.service;
 
 import com.github.mrchcat.profile.dto.BlockerResponseDto;
-import com.github.mrchcat.profile.dto.CashTransactionDto;
-import com.github.mrchcat.profile.dto.NonCashTransferDto;
+import com.github.mrchcat.profile.dto.NonCashTransferBlockerRequestDto;
+import com.github.mrchcat.shared.cash.CashTransactionDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class BlockerServiceImpl implements BlockerService {
     }
 
     @Override
-    public BlockerResponseDto checkNonCashTransaction(NonCashTransferDto nonCashTransferDto) {
+    public BlockerResponseDto checkNonCashTransaction(NonCashTransferBlockerRequestDto nonCashTransferBlockerRequestDto) {
         return getRandom();
     }
 

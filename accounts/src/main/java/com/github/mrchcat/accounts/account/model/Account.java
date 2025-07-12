@@ -1,5 +1,6 @@
 package com.github.mrchcat.accounts.account.model;
 
+import com.github.mrchcat.shared.enums.BankCurrency;
 import lombok.Builder;
 import lombok.Getter;
 

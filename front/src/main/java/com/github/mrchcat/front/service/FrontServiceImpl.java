@@ -1,8 +1,7 @@
 package com.github.mrchcat.front.service;
 
 import com.github.mrchcat.front.dto.BankUserDto;
-import com.github.mrchcat.front.dto.CashTransactionDto;
-import com.github.mrchcat.front.dto.CashTransactionRequestDto;
+import com.github.mrchcat.front.dto.FrontCashTransactionDto;
 import com.github.mrchcat.front.dto.CurrencyRate;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
@@ -13,10 +12,11 @@ import com.github.mrchcat.front.dto.NonCashTransferRequest;
 import com.github.mrchcat.front.dto.UserDetailsDto;
 import com.github.mrchcat.front.exception.ExchangeServiceException;
 import com.github.mrchcat.front.mapper.FrontMapper;
-import com.github.mrchcat.front.model.BankCurrency;
-import com.github.mrchcat.front.model.CashAction;
 import com.github.mrchcat.front.model.FrontCurrencies;
 import com.github.mrchcat.front.security.OAuthHeaderGetter;
+import com.github.mrchcat.shared.cash.CashTransactionDto;
+import com.github.mrchcat.shared.enums.BankCurrency;
+import com.github.mrchcat.shared.enums.CashAction;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -47,7 +47,7 @@ public class FrontServiceImpl implements FrontService {
     private final String ACCOUNTS_PATCH_CLIENT_API = "/account";
 
     private final String CASH_SERVICE = "bankCash";
-    private final String CASH_PROCESS_API = "/cash";
+    private final String CASH_PROCESS_API = "/com/github/mrchcat/shared/enums/cash";
 
     private final String TRANSFER_SERVICE = "bankTransfer";
     private final String TRANSFER_PROCESS_API = "/transfer";
@@ -123,8 +123,8 @@ public class FrontServiceImpl implements FrontService {
     }
 
     @Override
-    public void processCashOperation(String username, CashTransactionDto cashOperationDto, CashAction action) throws AuthException {
-        CashTransactionRequestDto requestDto = FrontMapper.toRequestDto(username, cashOperationDto, action);
+    public void processCashOperation(String username, FrontCashTransactionDto cashOperationDto, CashAction action) throws AuthException {
+        CashTransactionDto requestDto = FrontMapper.toRequestDto(username, cashOperationDto, action);
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         restClientBuilder.build()
                 .post()

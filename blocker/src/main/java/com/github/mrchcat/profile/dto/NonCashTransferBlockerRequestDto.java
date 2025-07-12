@@ -1,15 +1,15 @@
 package com.github.mrchcat.profile.dto;
 
 
-import com.github.mrchcat.profile.model.BankCurrency;
 import com.github.mrchcat.profile.model.TransferDirection;
+import com.github.mrchcat.shared.enums.BankCurrency;
 import jakarta.validation.constraints.AssertFalse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public record NonCashTransferDto(
+public record NonCashTransferBlockerRequestDto(
         @NotNull
         TransferDirection direction,
         @NotNull

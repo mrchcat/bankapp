@@ -1,7 +1,7 @@
 package com.github.mrchcat.accounts.log.model;
 
-import com.github.mrchcat.accounts.account.model.CashAction;
-import com.github.mrchcat.accounts.account.model.TransactionStatus;
+import com.github.mrchcat.shared.enums.CashAction;
+import com.github.mrchcat.shared.enums.TransactionStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

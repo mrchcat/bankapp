@@ -2,9 +2,9 @@ package com.github.mrchcat.accounts.log.mapper;
 
 import com.github.mrchcat.accounts.account.dto.CashTransactionDto;
 import com.github.mrchcat.accounts.account.dto.TransferTransactionDto;
-import com.github.mrchcat.accounts.account.model.CashAction;
-import com.github.mrchcat.accounts.account.model.TransactionStatus;
 import com.github.mrchcat.accounts.log.model.TransactionLogRecord;
+import com.github.mrchcat.shared.enums.CashAction;
+import com.github.mrchcat.shared.enums.TransactionStatus;
 
 public class LogMapper {
 

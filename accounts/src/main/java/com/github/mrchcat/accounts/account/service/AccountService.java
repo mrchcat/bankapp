@@ -4,8 +4,8 @@ import com.github.mrchcat.accounts.account.dto.CashTransactionDto;
 import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
 import com.github.mrchcat.accounts.account.dto.TransactionConfirmation;
 import com.github.mrchcat.accounts.account.dto.TransferTransactionDto;
-import com.github.mrchcat.accounts.account.model.BankCurrency;
 import com.github.mrchcat.accounts.user.dto.BankUserDto;
+import com.github.mrchcat.shared.enums.BankCurrency;
 
 public interface AccountService {
 

@@ -1,9 +1,9 @@
 package com.github.mrchcat.cash.repository;
 
-import com.github.mrchcat.cash.model.BankCurrency;
-import com.github.mrchcat.cash.model.CashAction;
 import com.github.mrchcat.cash.model.CashTransaction;
 import com.github.mrchcat.cash.model.TransactionStatus;
+import com.github.mrchcat.shared.enums.BankCurrency;
+import com.github.mrchcat.shared.enums.CashAction;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 

@@ -5,8 +5,6 @@ import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
 import com.github.mrchcat.accounts.account.dto.TransactionConfirmation;
 import com.github.mrchcat.accounts.account.dto.TransferTransactionDto;
 import com.github.mrchcat.accounts.account.model.Account;
-import com.github.mrchcat.accounts.account.model.BankCurrency;
-import com.github.mrchcat.accounts.account.model.TransactionStatus;
 import com.github.mrchcat.accounts.account.repository.AccountRepository;
 import com.github.mrchcat.accounts.blocks.model.AccountBlock;
 import com.github.mrchcat.accounts.blocks.service.AccountBlockService;
@@ -15,11 +13,13 @@ import com.github.mrchcat.accounts.exceptions.TransactionWasCompletedAlready;
 import com.github.mrchcat.accounts.log.mapper.LogMapper;
 import com.github.mrchcat.accounts.log.service.LogService;
 import com.github.mrchcat.accounts.security.OAuthHeaderGetter;
-import com.github.mrchcat.accounts.user.dto.BankNotificationDtoRequest;
 import com.github.mrchcat.accounts.user.dto.BankUserDto;
 import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.model.BankUser;
 import com.github.mrchcat.accounts.user.service.UserService;
+import com.github.mrchcat.shared.enums.BankCurrency;
+import com.github.mrchcat.shared.enums.TransactionStatus;
+import com.github.mrchcat.notifications.dto.BankNotificationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -249,7 +249,7 @@ public class AccountServiceImpl implements AccountService {
 
     private void sendNotification(BankUser client, String message) {
         try {
-            var notification = BankNotificationDtoRequest.builder()
+            var notification = BankNotificationDto.builder()
                     .service(ACCOUNT_SERVICE)
                     .username(client.getUsername())
                     .fullName(client.getFullName())

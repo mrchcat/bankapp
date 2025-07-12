@@ -1,14 +1,14 @@
 package com.github.mrchcat.front.controller;
 
-import com.github.mrchcat.front.dto.CashTransactionDto;
+import com.github.mrchcat.front.dto.FrontCashTransactionDto;
 import com.github.mrchcat.front.dto.EditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NonCashTransfer;
 import com.github.mrchcat.front.dto.PasswordUpdateDto;
-import com.github.mrchcat.front.model.CashAction;
 import com.github.mrchcat.front.model.UserRole;
 import com.github.mrchcat.front.service.FrontService;
+import com.github.mrchcat.shared.enums.CashAction;
 import jakarta.security.auth.message.AuthException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -177,7 +177,7 @@ public class MainController {
      */
     @PostMapping(path = "/user/{username}/сash")
     RedirectView depositCash(@PathVariable @NotNull @NotBlank String username,
-                             @ModelAttribute @Valid CashTransactionDto cashOperationDto,
+                             @ModelAttribute @Valid FrontCashTransactionDto cashOperationDto,
                              @RequestParam("action") @NotNull CashAction action,
                              BindingResult bindingResult,
                              RedirectAttributes redirectAttributes) {

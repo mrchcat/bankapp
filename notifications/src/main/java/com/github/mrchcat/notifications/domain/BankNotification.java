@@ -8,6 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Getter
 @Setter
@@ -28,4 +30,6 @@ public class BankNotification {
     String message;
     @Column("is_processed")
     boolean isProcessed;
+    @Column("created_at")
+    LocalDateTime createdAt;
 }

@@ -1,7 +1,7 @@
 package com.github.mrchcat.accounts.log.repository;
 
-import com.github.mrchcat.accounts.account.model.TransactionStatus;
 import com.github.mrchcat.accounts.log.model.TransactionLogRecord;
+import com.github.mrchcat.shared.enums.TransactionStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;

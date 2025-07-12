@@ -1,22 +1,21 @@
 package com.github.mrchcat.cash.service;
 
 import com.github.mrchcat.cash.dto.AccountDto;
-import com.github.mrchcat.cash.dto.BankNotificationDtoRequest;
 import com.github.mrchcat.cash.dto.BankUserDto;
 import com.github.mrchcat.cash.dto.BlockerResponseDto;
-import com.github.mrchcat.cash.dto.CashTransactionDto;
 import com.github.mrchcat.cash.dto.CashTransactionRequestDto;
 import com.github.mrchcat.cash.dto.TransactionConfirmation;
 import com.github.mrchcat.cash.exceptions.BlockerException;
 import com.github.mrchcat.cash.exceptions.NotEnoughMoney;
 import com.github.mrchcat.cash.exceptions.RejectedByClient;
 import com.github.mrchcat.cash.mapper.CashMapper;
-import com.github.mrchcat.cash.model.BankCurrency;
-import com.github.mrchcat.cash.model.CashAction;
 import com.github.mrchcat.cash.model.CashTransaction;
 import com.github.mrchcat.cash.model.TransactionStatus;
 import com.github.mrchcat.cash.repository.CashRepository;
 import com.github.mrchcat.cash.security.OAuthHeaderGetter;
+import com.github.mrchcat.shared.cash.CashTransactionDto;
+import com.github.mrchcat.shared.enums.BankCurrency;
+import com.github.mrchcat.notifications.dto.BankNotificationDto;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +27,10 @@ import org.springframework.web.client.RestClient;
 
 import javax.naming.ServiceUnavailableException;
 import java.util.UUID;
+
+import static com.github.mrchcat.shared.enums.CashAction.DEPOSIT;
+import static com.github.mrchcat.shared.enums.CashAction.WITHDRAWAL;
+
 
 @Service
 @RequiredArgsConstructor
@@ -83,7 +86,7 @@ public class CashServiceImpl implements CashService {
         AccountDto processedAccount = client.accounts().get(0);
         CashTransaction transaction = CashTransaction.builder()
                 .transactionId(UUID.randomUUID())
-                .action(CashAction.DEPOSIT)
+                .action(DEPOSIT)
                 .userId(client.id())
                 .username(client.username())
                 .accountId(processedAccount.id())
@@ -172,7 +175,7 @@ public class CashServiceImpl implements CashService {
         AccountDto processedAccount = client.accounts().get(0);
         CashTransaction transaction = CashTransaction.builder()
                 .transactionId(UUID.randomUUID())
-                .action(CashAction.WITHDRAWAL)
+                .action(WITHDRAWAL)
                 .userId(client.id())
                 .username(client.username())
                 .accountId(processedAccount.id())
@@ -240,7 +243,7 @@ public class CashServiceImpl implements CashService {
 
     private void sendNotification(BankUserDto client, String message) {
         try {
-            var notification = BankNotificationDtoRequest.builder()
+            var notification = BankNotificationDto.builder()
                     .service(CASH_SERVICE)
                     .username(client.username())
                     .fullName(client.fullName())

@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS notifications(
     full_name VARCHAR(256),
     email VARCHAR(256) NOT NULL,
 	message TEXT NOT NULL,
-	is_processed BOOLEAN
+	is_processed BOOLEAN,
+	created_at TIMESTAMP NOT NULL
 );
