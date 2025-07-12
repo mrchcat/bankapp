@@ -1,8 +1,8 @@
 package com.github.mrchcat.accounts.user.controllers;
 
-import com.github.mrchcat.accounts.user.dto.CreateNewClientDto;
-import com.github.mrchcat.accounts.user.dto.UpdatePasswordRequestDto;
 import com.github.mrchcat.accounts.user.service.UserService;
+import com.github.mrchcat.shared.accounts.CreateNewClientDto;
+import com.github.mrchcat.shared.accounts.UpdatePasswordRequestDto;
 import jakarta.security.auth.message.AuthException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

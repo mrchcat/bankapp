@@ -1,7 +1,7 @@
 package com.github.mrchcat.front.service;
 
 import com.github.mrchcat.front.dto.FrontCashTransactionDto;
-import com.github.mrchcat.front.dto.EditUserAccountDto;
+import com.github.mrchcat.front.dto.FrontEditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.FrontRate;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
@@ -25,7 +25,7 @@ public interface FrontService {
 
     List<FrontBankUserDto> getAllClientsWithActiveAccounts() throws AuthException, ServiceUnavailableException;
 
-    BankUserDto editUserAccount(String username, EditUserAccountDto editUserAccountDto) throws AuthException;
+    BankUserDto editUserAccount(String username, FrontEditUserAccountDto frontEditUserAccountDto) throws AuthException;
 
     void processCashOperation(String username, FrontCashTransactionDto cashOperationDto, CashAction action) throws AuthException;
 

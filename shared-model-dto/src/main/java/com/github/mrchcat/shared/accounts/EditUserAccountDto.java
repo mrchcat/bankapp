@@ -1,9 +1,11 @@
-package com.github.mrchcat.accounts.account.dto;
+package com.github.mrchcat.shared.accounts;
 
 import jakarta.validation.constraints.AssertTrue;
+import lombok.Builder;
 
 import java.util.Map;
 
+@Builder
 public record EditUserAccountDto(
         String fullName,
         String email,

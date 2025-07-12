@@ -1,13 +1,13 @@
 package com.github.mrchcat.accounts.user.service;
 
-import com.github.mrchcat.accounts.account.dto.EditUserAccountDto;
 import com.github.mrchcat.accounts.exceptions.UserNotUniqueProperties;
 import com.github.mrchcat.accounts.security.OAuthHeaderGetter;
-import com.github.mrchcat.accounts.user.dto.CreateNewClientDto;
 import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.model.BankUser;
 import com.github.mrchcat.accounts.user.repository.UserRepository;
 import com.github.mrchcat.shared.accounts.BankUserDto;
+import com.github.mrchcat.shared.accounts.CreateNewClientDto;
+import com.github.mrchcat.shared.accounts.EditUserAccountDto;
 import com.github.mrchcat.shared.enums.UserRole;
 import com.github.mrchcat.shared.notification.BankNotificationDto;
 import lombok.RequiredArgsConstructor;

@@ -4,7 +4,7 @@ import jakarta.validation.constraints.AssertTrue;
 
 import java.util.List;
 
-public record EditUserAccountDto(
+public record FrontEditUserAccountDto(
         String fullName,
         String email,
         List<String> account

@@ -1,10 +1,10 @@
 package com.github.mrchcat.front.service;
 
 
-import com.github.mrchcat.front.dto.PasswordUpdateRequestDto;
 import com.github.mrchcat.front.dto.UserDetailsDto;
 import com.github.mrchcat.front.mapper.FrontMapper;
 import com.github.mrchcat.front.security.OAuthHeaderGetter;
+import com.github.mrchcat.shared.accounts.UpdatePasswordRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -60,7 +60,7 @@ public class CredentialsService implements UserDetailsService, UserDetailsPasswo
                     .post()
                     .uri("http://" + ACCOUNT_SERVICE + ACCOUNTS_UPDATE_USER_PASSWORD_API + "/" + user.getUsername())
                     .header(oAuthHeader.name(), oAuthHeader.value())
-                    .body(new PasswordUpdateRequestDto(passwordHash))
+                    .body(new UpdatePasswordRequestDto(passwordHash))
                     .retrieve()
                     .body(UserDetailsDto.class);
             if (response == null) {

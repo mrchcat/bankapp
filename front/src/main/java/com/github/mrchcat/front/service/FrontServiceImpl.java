@@ -1,7 +1,7 @@
 package com.github.mrchcat.front.service;
 
 import com.github.mrchcat.front.dto.FrontCashTransactionDto;
-import com.github.mrchcat.front.dto.EditUserAccountDto;
+import com.github.mrchcat.front.dto.FrontEditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.FrontRate;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
@@ -107,13 +107,13 @@ public class FrontServiceImpl implements FrontService {
     }
 
     @Override
-    public BankUserDto editUserAccount(String username, EditUserAccountDto editUserAccountDto) throws AuthException {
+    public BankUserDto editUserAccount(String username, FrontEditUserAccountDto frontEditUserAccountDto) throws AuthException {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         var response = restClientBuilder.build()
                 .patch()
                 .uri("http://" + ACCOUNT_SERVICE + ACCOUNTS_PATCH_CLIENT_API + "/" + username)
                 .header(oAuthHeader.name(), oAuthHeader.value())
-                .body(FrontMapper.toRequestDto(editUserAccountDto))
+                .body(FrontMapper.toRequestDto(frontEditUserAccountDto))
                 .retrieve()
                 .body(BankUserDto.class);
         if (response == null) {

@@ -1,7 +1,7 @@
 package com.github.mrchcat.front.controller;
 
 import com.github.mrchcat.front.dto.FrontCashTransactionDto;
-import com.github.mrchcat.front.dto.EditUserAccountDto;
+import com.github.mrchcat.front.dto.FrontEditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NonCashTransfer;
@@ -115,7 +115,7 @@ public class MainController {
      */
     @PostMapping("/user/{username}/editUserAccounts")
     RedirectView editUserAccounts(@PathVariable @NotNull @NotBlank String username,
-                                  @ModelAttribute @Valid EditUserAccountDto editUserAccountDto,
+                                  @ModelAttribute @Valid FrontEditUserAccountDto frontEditUserAccountDto,
                                   BindingResult bindingResult,
                                   RedirectAttributes redirectAttributes
     ) {
@@ -130,12 +130,12 @@ public class MainController {
                     .map(ObjectError::getDefaultMessage)
                     .forEach(userAccountsErrors::add);
         }
-        validateCheckBoxes(username, editUserAccountDto, userAccountsErrors);
+        validateCheckBoxes(username, frontEditUserAccountDto, userAccountsErrors);
         if (!userAccountsErrors.isEmpty()) {
             return redirectView;
         }
         try {
-            frontService.editUserAccount(username, editUserAccountDto);
+            frontService.editUserAccount(username, frontEditUserAccountDto);
         } catch (HttpClientErrorException ex) {
             if (ex.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
                 var headers = ex.getResponseHeaders();
@@ -153,8 +153,8 @@ public class MainController {
         return redirectView;
     }
 
-    private void validateCheckBoxes(String username, EditUserAccountDto editUserAccountDto, List<String> userAccountsErrors) {
-        List<String> activeAccountsFromFront = (editUserAccountDto.account() == null) ? Collections.emptyList() : editUserAccountDto.account();
+    private void validateCheckBoxes(String username, FrontEditUserAccountDto frontEditUserAccountDto, List<String> userAccountsErrors) {
+        List<String> activeAccountsFromFront = (frontEditUserAccountDto.account() == null) ? Collections.emptyList() : frontEditUserAccountDto.account();
         List<FrontAccountDto> existingAccounts = frontService.getClientDetailsAndAccounts(username).accounts();
         List<String> notEmptyAccounts = frontService.getClientDetailsAndAccounts(username)
                 .accounts().stream()

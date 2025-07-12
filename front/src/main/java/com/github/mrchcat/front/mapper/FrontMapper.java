@@ -1,9 +1,7 @@
 package com.github.mrchcat.front.mapper;
 
 import com.github.mrchcat.front.dto.FrontCashTransactionDto;
-import com.github.mrchcat.front.dto.CreateNewClientRequestDto;
-import com.github.mrchcat.front.dto.EditUserAccountDto;
-import com.github.mrchcat.front.dto.EditUserAccountRequestDto;
+import com.github.mrchcat.front.dto.FrontEditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
@@ -12,6 +10,8 @@ import com.github.mrchcat.front.dto.UserDetailsDto;
 import com.github.mrchcat.front.model.FrontCurrencies;
 import com.github.mrchcat.shared.accounts.AccountDto;
 import com.github.mrchcat.shared.accounts.BankUserDto;
+import com.github.mrchcat.shared.accounts.CreateNewClientDto;
+import com.github.mrchcat.shared.accounts.EditUserAccountDto;
 import com.github.mrchcat.shared.cash.CashTransactionDto;
 import com.github.mrchcat.shared.enums.CashAction;
 import com.github.mrchcat.shared.transfer.NonCashTransferDto;
@@ -41,8 +41,8 @@ public class FrontMapper {
                 .build();
     }
 
-    public static CreateNewClientRequestDto toCreateNewClientRequestDto(NewClientRegisterDto dto, String passwordHash) {
-        return CreateNewClientRequestDto.builder()
+    public static CreateNewClientDto toCreateNewClientRequestDto(NewClientRegisterDto dto, String passwordHash) {
+        return CreateNewClientDto.builder()
                 .fullName(dto.fullName())
                 .email(dto.email())
                 .username(dto.login())
@@ -92,7 +92,7 @@ public class FrontMapper {
         return null;
     }
 
-    public static EditUserAccountRequestDto toRequestDto(EditUserAccountDto dto) {
+    public static EditUserAccountDto toRequestDto(FrontEditUserAccountDto dto) {
         List<String> accountDtos = dto.account();
         Map<String, Boolean> accountMap = FrontCurrencies.getaccountsMap();
         if (accountDtos != null && !accountDtos.isEmpty()) {
@@ -103,7 +103,7 @@ public class FrontMapper {
                 accountMap.replace(currencyStringCode, true);
             }
         }
-        return EditUserAccountRequestDto.builder()
+        return EditUserAccountDto.builder()
                 .fullName(dto.fullName())
                 .email(dto.email())
                 .accounts(accountMap)
