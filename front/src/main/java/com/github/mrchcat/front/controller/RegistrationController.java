@@ -23,7 +23,7 @@ import java.util.List;
 public class RegistrationController {
     private final FrontService frontService;
 
-    @GetMapping("/registration")
+    @GetMapping({"/registration","/signup"})
     String registerNewClient(Model model) {
         return "signup";
     }

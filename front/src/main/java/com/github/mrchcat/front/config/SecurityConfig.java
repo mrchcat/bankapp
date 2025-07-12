@@ -23,13 +23,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/login", "/logout/**").permitAll()
-                        .requestMatchers("/registration").hasAuthority("MANAGER")
+                        .requestMatchers("/registration","/signup").hasAuthority("MANAGER")
                         .anyRequest().hasAnyAuthority("CLIENT", "MANAGER")
 //                                .anyRequest().permitAll()
                 )
                 .oauth2Client(Customizer.withDefaults())
                 .formLogin(cst -> cst
                         .defaultSuccessUrl("/defaultAfterLogin", true)
+                        .failureUrl("/error.html")
                 )
                 .logout(cst -> cst
                         .invalidateHttpSession(true)
