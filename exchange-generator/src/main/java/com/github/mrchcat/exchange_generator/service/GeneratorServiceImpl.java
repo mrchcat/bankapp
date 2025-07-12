@@ -57,7 +57,7 @@ public class GeneratorServiceImpl implements GeneratorService {
         try {
             var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
             String url = "http://" + EXCHANGE_SERVICE + EXCHANGE_SEND_RATES;
-            var response = restClientBuilder.build()
+            restClientBuilder.build()
                     .post()
                     .uri(url)
                     .header(oAuthHeader.name(), oAuthHeader.value())

@@ -168,8 +168,8 @@ public class CashServiceImpl implements CashService {
             if (ex.getStatusCode().isSameCodeAs(HttpStatus.NOT_FOUND)) {
                 throw new UsernameNotFoundException(ex.getMessage());
             }
+            throw new RuntimeException();
         }
-        return null;
     }
 
     private void withdrawal(BankUserDto client, CashTransactionDto cashOperationDto) throws AuthException, ServiceUnavailableException {

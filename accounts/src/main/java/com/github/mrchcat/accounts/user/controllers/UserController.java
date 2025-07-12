@@ -3,7 +3,6 @@ package com.github.mrchcat.accounts.user.controllers;
 import com.github.mrchcat.accounts.user.service.UserService;
 import com.github.mrchcat.shared.accounts.CreateNewClientDto;
 import com.github.mrchcat.shared.accounts.UpdatePasswordRequestDto;
-import jakarta.security.auth.message.AuthException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -41,7 +40,7 @@ public class UserController {
      * регистрация нового пользователя
      */
     @PostMapping("/registration")
-    UserDetails registerNewClient(@RequestBody @Valid CreateNewClientDto newClientDto) throws AuthException {
+    UserDetails registerNewClient(@RequestBody @Valid CreateNewClientDto newClientDto) {
         return userService.registerNewClient(newClientDto);
     }
 

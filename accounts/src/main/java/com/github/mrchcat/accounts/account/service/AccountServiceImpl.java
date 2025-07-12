@@ -19,7 +19,6 @@ import com.github.mrchcat.shared.accounts.EditUserAccountDto;
 import com.github.mrchcat.shared.accounts.TransactionConfirmation;
 import com.github.mrchcat.shared.enums.BankCurrency;
 import com.github.mrchcat.shared.enums.TransactionStatus;
-import com.github.mrchcat.shared.notification.BankNotificationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -204,9 +203,7 @@ public class AccountServiceImpl implements AccountService {
                 logService.saveTransactionLogRecord(LogMapper.toCashLogRecord(cashTransactionDto,
                         TransactionStatus.SUCCESS));
             }
-            case CANCEL -> {
-                accountBlockService.free(cashTransactionDto.transactionId());
-            }
+            case CANCEL -> accountBlockService.free(cashTransactionDto.transactionId());
             case ERROR, SUCCESS -> {
             }
         }
@@ -245,27 +242,5 @@ public class AccountServiceImpl implements AccountService {
         // логируем
         logService.saveTransactionLogRecord(LogMapper.toNonCashLogRecord(transactionDto, TransactionStatus.SUCCESS));
         return new TransactionConfirmation(transactionDto.transactionId(), transactionDto.status());
-    }
-
-    private void sendNotification(BankUser client, String message) {
-        try {
-            var notification = BankNotificationDto.builder()
-                    .service(ACCOUNT_SERVICE)
-                    .username(client.getUsername())
-                    .fullName(client.getFullName())
-                    .email(client.getEmail())
-                    .message(message)
-                    .build();
-            var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
-            String requestUrl = "http://" + NOTIFICATION_SERVICE + NOTIFICATION_SEND_NOTIFICATION;
-            restClientBuilder.build()
-                    .post()
-                    .uri(requestUrl)
-                    .header(oAuthHeader.name(), oAuthHeader.value())
-                    .body(notification)
-                    .retrieve()
-                    .toBodilessEntity();
-        } catch (Exception ignore) {
-        }
     }
 }

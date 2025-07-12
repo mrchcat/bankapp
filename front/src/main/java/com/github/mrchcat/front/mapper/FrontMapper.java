@@ -1,9 +1,9 @@
 package com.github.mrchcat.front.mapper;
 
-import com.github.mrchcat.front.dto.FrontCashTransactionDto;
-import com.github.mrchcat.front.dto.FrontEditUserAccountDto;
 import com.github.mrchcat.front.dto.FrontAccountDto;
 import com.github.mrchcat.front.dto.FrontBankUserDto;
+import com.github.mrchcat.front.dto.FrontCashTransactionDto;
+import com.github.mrchcat.front.dto.FrontEditUserAccountDto;
 import com.github.mrchcat.front.dto.NewClientRegisterDto;
 import com.github.mrchcat.front.dto.NonCashTransfer;
 import com.github.mrchcat.front.dto.UserDetailsDto;

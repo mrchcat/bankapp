@@ -33,9 +33,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import static com.github.mrchcat.shared.enums.TransferDirection.OTHER;
-import static com.github.mrchcat.shared.enums.TransferDirection.YOURSELF;
-
 @Service
 @RequiredArgsConstructor
 public class TransferServiceImpl implements TransferService {
@@ -228,8 +225,8 @@ public class TransferServiceImpl implements TransferService {
                     throw new UsernameNotFoundException(details.getDetail());
                 }
             }
+            throw new RuntimeException(ex);
         }
-        return null;
     }
 
     private BlockerResponseDto checkCashTransaction(NonCashTransferDto transaction) throws AuthException, ServiceUnavailableException {
