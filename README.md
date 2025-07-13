@@ -15,10 +15,12 @@ Externalized Config - Consul.
 * Spring Security
 * Spring WebMVC
 * Spring Data
-* Contract Verifier
+* Spring Cloud
+* Spring Contract Verifier
 * Postgres
 * Keycloak
 * Consul
+* Resilience4j
 * Thymeleaf
 * Maven
 * JUnit 5
