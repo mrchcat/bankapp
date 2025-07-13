@@ -38,24 +38,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class TransferServiceImpl implements TransferService {
-    private final String ACCOUNT_SERVICE = "bankAccounts";
-    private final String BLOCKER_SERVICE = "bankBlocker";
-    private final String EXCHANGE_SERVICE = "bankExchange";
-
-
-    private final String ACCOUNTS_GET_CLIENT_API = "/account";
-    private final String ACCOUNTS_SEND_TRANSFER_TRANSACTION_API = "/account/transfer";
-    private final String BLOCKER_ASK_PERMISSION = "/blocker/noncash";
-    private final String EXCHANGE_GET_EXCHANGE_RATE = "/exchange";
-
-    private final String NOTIFICATION_SERVICE = "bankNotifications";
-    private final String NOTIFICATION_SEND_NOTIFICATION = "/notification";
-
-    private final String TRANSFER_SERVICE = "bankTransfer";
-
-    private final RestClient.Builder restClientBuilder;
-    private final OAuthHeaderGetter oAuthHeaderGetter;
     private final TransferRepository transferRepository;
+    private final Notifications notifications;
+    private final Exchange exchange;
+    private final Blocker blocker;
+    private final Account account;
 
     BankUserDto senderClient;
     BankUserDto receiverClient;
@@ -69,7 +56,7 @@ public class TransferServiceImpl implements TransferService {
             case YOURSELF -> getToAccountAndValidate(transaction.fromUsername(), transaction.toCurrency());
             case OTHER -> getToAccountAndValidate(transaction.toUsername(), transaction.toCurrency());
         };
-        var blockerResponse = checkCashTransaction(transaction);
+        var blockerResponse = blocker.checkCashTransaction(transaction);
         if (!blockerResponse.isConfirmed()) {
             throw new BlockerException(blockerResponse.reason());
         }
@@ -80,7 +67,7 @@ public class TransferServiceImpl implements TransferService {
             toAmount = fromAmount;
             exchangeRate = BigDecimal.ONE;
         } else {
-            exchangeRate = getExchangeRate(transaction.fromCurrency(), transaction.toCurrency());
+            exchangeRate = exchange.getExchangeRate(transaction.fromCurrency(), transaction.toCurrency());
             toAmount = fromAmount.multiply(exchangeRate);
         }
         TransferTransaction transferTransaction = TransferTransaction.builder()
@@ -92,20 +79,20 @@ public class TransferServiceImpl implements TransferService {
                 .status(TransactionStatus.STARTED)
                 .build();
         TransferTransaction newTransaction = transferRepository.createNewTransaction(transferTransaction);
-        var confirmation = sendTransaction(newTransaction);
+        var confirmation = account.sendTransaction(newTransaction);
         try {
             if (validateTransaction(confirmation, newTransaction.getTransactionId(), newTransaction.getStatus())) {
                 transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.SUCCESS);
                 String messageToSender = String.format("Со счета %s списаны средства в размере %s %s",
                         fromAccountId, newTransaction.getFromAmount(), senderAccount.currencyStringCode());
                 try {
-                    sendNotification(senderClient, messageToSender);
+                    notifications.sendNotification(senderClient, messageToSender);
                 } catch (Exception ignore) {
                 }
                 String message2ToSender = String.format("На счет %s начислены средства в размере %s %s",
                         toAccountId, newTransaction.getToAmount(), senderAccount.currencyStringCode());
                 try {
-                    sendNotification(senderClient, message2ToSender);
+                    notifications.sendNotification(senderClient, message2ToSender);
                 } catch (Exception ignore) {
                 }
 
@@ -113,21 +100,21 @@ public class TransferServiceImpl implements TransferService {
                     String messageToReceiver = String.format("На счет %s зачислены средства в размере %s %s",
                             toAccountId, newTransaction.getToAmount(), receiverAccount.currencyStringCode());
                     try {
-                        sendNotification(receiverClient, messageToReceiver);
+                        notifications.sendNotification(receiverClient, messageToReceiver);
                     } catch (Exception ignore) {
                     }
                 }
             } else {
                 transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.ERROR);
                 String messageToSender = String.format("Ошибка при попытке списания средств со счета %s", fromAccountId);
-                try{
-                    sendNotification(senderClient, messageToSender);
-                } catch (Exception ignore){
+                try {
+                    notifications.sendNotification(senderClient, messageToSender);
+                } catch (Exception ignore) {
                 }
                 if (transaction.direction().equals(TransferDirection.OTHER)) {
                     String messageToReceiver = String.format("Ошибка при попытке зачисления средств на счет %s", toAccountId);
                     try {
-                        sendNotification(receiverClient, messageToReceiver);
+                        notifications.sendNotification(receiverClient, messageToReceiver);
                     } catch (Exception ignore) {
                     }
                 }
@@ -139,31 +126,6 @@ public class TransferServiceImpl implements TransferService {
         }
     }
 
-    @CircuitBreaker(name = "exchange")
-    @Retry(name = "exchange")
-    private BigDecimal getExchangeRate(BankCurrency fromCurrency, BankCurrency toCurrency) throws AuthException {
-        if (fromCurrency.equals(toCurrency)) {
-            return BigDecimal.ONE;
-        }
-        var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
-        String requestUrl = "http://"
-                + EXCHANGE_SERVICE + EXCHANGE_GET_EXCHANGE_RATE + "/" + fromCurrency.name() + "?toCurrency=" + toCurrency.name();
-        try {
-            var exchangeRate = restClientBuilder.build()
-                    .get()
-                    .uri(requestUrl)
-                    .header(oAuthHeader.name(), oAuthHeader.value())
-                    .retrieve()
-                    .body(CurrencyExchangeRateDto.class);
-            if (exchangeRate == null) {
-                throw new ExchangeServiceException("");
-            }
-            return exchangeRate.getRate();
-        } catch (Exception ex) {
-            throw new ExchangeServiceException("");
-        }
-    }
-
     private boolean validateTransaction(TransactionConfirmation confirmation, UUID transactionId, TransactionStatus status) {
         if (!transactionId.equals(confirmation.transactionId())) {
             return false;
@@ -171,26 +133,8 @@ public class TransferServiceImpl implements TransferService {
         return status.equals(confirmation.status());
     }
 
-    @CircuitBreaker(name = "accounts")
-    @Retry(name = "accounts")
-    private TransactionConfirmation sendTransaction(TransferTransaction transferTransaction) throws AuthException, ServiceUnavailableException {
-        var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
-        String requestUrl = "http://" + ACCOUNT_SERVICE + ACCOUNTS_SEND_TRANSFER_TRANSACTION_API;
-        var confirmation = restClientBuilder.build()
-                .post()
-                .uri(requestUrl)
-                .header(oAuthHeader.name(), oAuthHeader.value())
-                .body(TransferMapper.toRequestDto(transferTransaction))
-                .retrieve()
-                .body(TransactionConfirmation.class);
-        if (confirmation == null) {
-            throw new ServiceUnavailableException("Сервис аккаунтов не доступен");
-        }
-        return confirmation;
-    }
-
     private UUID getToAccountAndValidate(String username, BankCurrency currency) throws AuthException {
-        BankUserDto receiver = getClient(username, currency);
+        BankUserDto receiver = account.getClient(username, currency);
         receiverClient = receiver;
         List<AccountDto> accounts = receiver.accounts();
         if (accounts == null || accounts.isEmpty()) {
@@ -201,9 +145,8 @@ public class TransferServiceImpl implements TransferService {
         return toAccount.id();
     }
 
-
     private UUID getFromAccountAndValidate(String username, BigDecimal fromAmount, BankCurrency currency) throws AuthException {
-        BankUserDto sender = getClient(username, currency);
+        BankUserDto sender = account.getClient(username, currency);
         senderClient = sender;
         List<AccountDto> accounts = sender.accounts();
         if (accounts == null) {
@@ -219,79 +162,4 @@ public class TransferServiceImpl implements TransferService {
         senderAccount = fromAccountDto;
         return fromAccountDto.id();
     }
-
-    @CircuitBreaker(name = "accounts")
-    @Retry(name = "accounts")
-    private BankUserDto getClient(String username, BankCurrency currency) throws AuthException {
-        var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
-        String requestUrl = "http://" + ACCOUNT_SERVICE + ACCOUNTS_GET_CLIENT_API + "/" + username + "?currency=" + currency.name();
-        try {
-            var client = restClientBuilder.build()
-                    .get()
-                    .uri(requestUrl)
-                    .header(oAuthHeader.name(), oAuthHeader.value())
-                    .retrieve()
-                    .body(BankUserDto.class);
-            if (client == null) {
-                throw new UsernameNotFoundException("Клиент не найден:" + username);
-            }
-            if (client.accounts().isEmpty()) {
-                String message = "Пользователь " + client.fullName() + " не имеет аккаунта в валюте " + currency.name();
-                throw new IllegalArgumentException(message);
-            }
-            return client;
-        } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode().isSameCodeAs(HttpStatus.NOT_FOUND)) {
-                var details = ex.getResponseBodyAs(ProblemDetail.class);
-                if (details != null && details.getDetail() != null) {
-                    throw new UsernameNotFoundException(details.getDetail());
-                }
-            }
-            throw new RuntimeException(ex);
-        }
-    }
-
-    @CircuitBreaker(name = "blocker", fallbackMethod = "fallbackBlocker")
-    @Retry(name = "blocker", fallbackMethod = "fallbackBlocker")
-    public BlockerResponseDto checkCashTransaction(NonCashTransferDto transaction) throws AuthException, ServiceUnavailableException {
-        var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
-        var blockerResponse = restClientBuilder.build()
-                .post()
-                .uri("http://" + BLOCKER_SERVICE + BLOCKER_ASK_PERMISSION)
-                .header(oAuthHeader.name(), oAuthHeader.value())
-                .body(transaction)
-                .retrieve()
-                .body(BlockerResponseDto.class);
-        if (blockerResponse == null) {
-            throw new ServiceUnavailableException("сервис подтверждения не доступен");
-        }
-        return blockerResponse;
-    }
-
-    private BlockerResponseDto fallbackBlocker(Throwable t) {
-        return new BlockerResponseDto(false, "service unavalable");
-    }
-
-
-    @CircuitBreaker(name = "notifications")
-    @Retry(name = "notifications")
-    private void sendNotification(BankUserDto client, String message) throws AuthException {
-        var notification = BankNotificationDto.builder()
-                .service(TRANSFER_SERVICE)
-                .username(client.username())
-                .fullName(client.fullName())
-                .email(client.email())
-                .message(message)
-                .build();
-        var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
-        String requestUrl = "http://" + NOTIFICATION_SERVICE + NOTIFICATION_SEND_NOTIFICATION;
-        restClientBuilder.build()
-                .post()
-                .uri(requestUrl)
-                .header(oAuthHeader.name(), oAuthHeader.value())
-                .body(notification)
-                .retrieve()
-                .toBodilessEntity();
-    }
-
 }

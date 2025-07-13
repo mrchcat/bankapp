@@ -42,14 +42,6 @@ public class AccountServiceImpl implements AccountService {
     private final LogService logService;
     private final AccountBlockService accountBlockService;
 
-    private final String NOTIFICATION_SERVICE = "bankNotifications";
-    private final String NOTIFICATION_SEND_NOTIFICATION = "/notification";
-    private final String ACCOUNT_SERVICE = "bankAccounts";
-
-    private final RestClient.Builder restClientBuilder;
-    private final OAuthHeaderGetter oAuthHeaderGetter;
-
-
     @Override
     public BankUserDto getClient(String username, BankCurrency currency) {
         BankUser client = userService.getClient(username);

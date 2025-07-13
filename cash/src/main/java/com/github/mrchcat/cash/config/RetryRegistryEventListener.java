@@ -16,7 +16,7 @@ public class RetryRegistryEventListener {
     @PostConstruct
     public void postConstruct() {
         //registry.retry(<resilience retry instance name>)
-        registry.retry("test").getEventPublisher()
+        registry.retry("blocker").getEventPublisher()
                 .onRetry(ev -> log.info("#### RetryRegistryEventListener message: {}", ev));
     }
 }

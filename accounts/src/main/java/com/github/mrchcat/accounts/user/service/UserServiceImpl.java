@@ -27,13 +27,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final String NOTIFICATION_SERVICE = "bankNotifications";
-    private final String NOTIFICATION_SEND_NOTIFICATION = "/notification";
-    private final String ACCOUNT_SERVICE = "bankAccounts";
-
-    private final RestClient.Builder restClientBuilder;
-    private final OAuthHeaderGetter oAuthHeaderGetter;
     private final UserRepository userRepository;
+    private final Notifications notifications;
 
 
     @Override
@@ -70,7 +65,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(newClient);
         String message = "Зарегистрирован новый клиент ФИО: " + newClient.getFullName();
         try {
-            sendNotification(newClient, message);
+            notifications.sendNotification(newClient, message);
         } catch (Exception ignore) {
         }
         return getUserDetails(upDto.username());
@@ -105,7 +100,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(client);
             String message = "Клиент с username " + client.getUsername() + " обновил свои данные";
             try {
-                sendNotification(client, message);
+                notifications.sendNotification(client, message);
             } catch (Exception ignore) {
             }
         }
@@ -136,26 +131,4 @@ public class UserServiceImpl implements UserService {
     public List<BankUserDto> getAllActiveClients() {
         return UserMapper.toDto(userRepository.findAllActive());
     }
-
-    @CircuitBreaker(name = "notifications")
-    @Retry(name = "notifications")
-    public void sendNotification(BankUser client, String message) throws AuthException {
-        var notification = BankNotificationDto.builder()
-                .service(ACCOUNT_SERVICE)
-                .username(client.getUsername())
-                .fullName(client.getFullName())
-                .email(client.getEmail())
-                .message(message)
-                .build();
-        var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
-        String requestUrl = "http://" + NOTIFICATION_SERVICE + NOTIFICATION_SEND_NOTIFICATION;
-        restClientBuilder.build()
-                .post()
-                .uri(requestUrl)
-                .header(oAuthHeader.name(), oAuthHeader.value())
-                .body(notification)
-                .retrieve()
-                .toBodilessEntity();
-    }
-
 }

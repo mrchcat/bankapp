@@ -2,10 +2,12 @@ package com.github.mrchcat.cash.controller;
 
 import com.github.mrchcat.cash.service.CashService;
 import com.github.mrchcat.shared.cash.CashTransactionDto;
+import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.security.auth.message.AuthException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -18,7 +20,7 @@ import javax.naming.ServiceUnavailableException;
 public class CashController {
     private final CashService cashService;
 
-    @PostMapping("/com/github/mrchcat/shared/enums/cash")
+    @PostMapping("/cash")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void processOperation(@RequestBody @Valid CashTransactionDto cashTransactionDto) throws AuthException, ServiceUnavailableException {
         cashService.processCashOperation(cashTransactionDto);

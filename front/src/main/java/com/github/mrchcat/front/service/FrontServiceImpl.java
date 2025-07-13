@@ -57,7 +57,7 @@ public class FrontServiceImpl implements FrontService {
     private final String ACCOUNTS_PATCH_CLIENT_API = "/account";
 
     private final String CASH_SERVICE = "bankCash";
-    private final String CASH_PROCESS_API = "/com/github/mrchcat/shared/enums/cash";
+    private final String CASH_PROCESS_API = "/cash";
 
     private final String TRANSFER_SERVICE = "bankTransfer";
     private final String TRANSFER_PROCESS_API = "/transfer";
