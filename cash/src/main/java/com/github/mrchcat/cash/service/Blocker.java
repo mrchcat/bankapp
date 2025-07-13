@@ -1,6 +1,5 @@
 package com.github.mrchcat.cash.service;
 
-import com.github.mrchcat.cash.repository.CashRepository;
 import com.github.mrchcat.cash.security.OAuthHeaderGetter;
 import com.github.mrchcat.shared.blocker.BlockerResponseDto;
 import com.github.mrchcat.shared.cash.CashTransactionDto;

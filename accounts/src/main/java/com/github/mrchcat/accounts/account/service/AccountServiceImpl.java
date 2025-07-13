@@ -8,7 +8,6 @@ import com.github.mrchcat.accounts.exceptions.NotEnoughMoney;
 import com.github.mrchcat.accounts.exceptions.TransactionWasCompletedAlready;
 import com.github.mrchcat.accounts.log.mapper.LogMapper;
 import com.github.mrchcat.accounts.log.service.LogService;
-import com.github.mrchcat.accounts.security.OAuthHeaderGetter;
 import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.model.BankUser;
 import com.github.mrchcat.accounts.user.service.UserService;
@@ -22,7 +21,6 @@ import com.github.mrchcat.shared.enums.TransactionStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

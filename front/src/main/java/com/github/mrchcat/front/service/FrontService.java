@@ -12,7 +12,6 @@ import jakarta.security.auth.message.AuthException;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.naming.ServiceUnavailableException;
-import java.net.URI;
 import java.util.List;
 
 public interface FrontService {

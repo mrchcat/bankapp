@@ -1,7 +1,6 @@
 package com.github.mrchcat.accounts.user.service;
 
 import com.github.mrchcat.accounts.exceptions.UserNotUniqueProperties;
-import com.github.mrchcat.accounts.security.OAuthHeaderGetter;
 import com.github.mrchcat.accounts.user.mapper.UserMapper;
 import com.github.mrchcat.accounts.user.model.BankUser;
 import com.github.mrchcat.accounts.user.repository.UserRepository;
@@ -9,15 +8,10 @@ import com.github.mrchcat.shared.accounts.BankUserDto;
 import com.github.mrchcat.shared.accounts.CreateNewClientDto;
 import com.github.mrchcat.shared.accounts.EditUserAccountDto;
 import com.github.mrchcat.shared.enums.UserRole;
-import com.github.mrchcat.shared.notification.BankNotificationDto;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.retry.annotation.Retry;
-import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

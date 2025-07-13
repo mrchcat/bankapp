@@ -21,5 +21,5 @@ public interface UserService {
 
     List<BankUserDto> getAllActiveClients();
 
-    void editClientData(String username, EditUserAccountDto editUserAccountDto) throws AuthException;
+    void editClientData(String username, EditUserAccountDto editUserAccountDto);
 }
