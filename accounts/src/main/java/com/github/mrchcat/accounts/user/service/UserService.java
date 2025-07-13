@@ -4,7 +4,6 @@ import com.github.mrchcat.accounts.user.model.BankUser;
 import com.github.mrchcat.shared.accounts.BankUserDto;
 import com.github.mrchcat.shared.accounts.CreateNewClientDto;
 import com.github.mrchcat.shared.accounts.EditUserAccountDto;
-import jakarta.security.auth.message.AuthException;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;

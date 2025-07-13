@@ -36,6 +36,7 @@ public class Blocker {
         }
         return blockerResponse;
     }
+
     private BlockerResponseDto fallbackBlocker(Throwable t) {
         return new BlockerResponseDto(false, "сервис подтверждения не доступен");
     }
