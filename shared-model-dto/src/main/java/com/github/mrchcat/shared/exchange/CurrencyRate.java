@@ -7,5 +7,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Builder
-public record CurrencyRate(BankCurrency currency, BigDecimal buyRate, BigDecimal sellRate, LocalDateTime time) {
+public record CurrencyRate(BankCurrency currency,
+                           BigDecimal buyRate,
+                           BigDecimal sellRate,
+                           LocalDateTime time) {
 }

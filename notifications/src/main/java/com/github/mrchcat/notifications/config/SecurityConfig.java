@@ -17,7 +17,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/actuator/**").permitAll()
                                 .anyRequest().hasAuthority("SCOPE_notifications")
-//                        .anyRequest().hasAuthority("SCOPE_notifications")
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2ResourceServer(oauth2 ->
