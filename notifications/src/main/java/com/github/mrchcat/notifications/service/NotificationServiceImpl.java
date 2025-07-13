@@ -18,7 +18,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void save(BankNotificationDto dto) {
-        System.out.println("получили " + dto);
         var notification = BankNotification.builder()
                 .service(dto.service())
                 .username(dto.username())

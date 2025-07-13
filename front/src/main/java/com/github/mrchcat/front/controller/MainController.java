@@ -70,7 +70,6 @@ public class MainController {
         model.addAttribute("login", username);
 
         FrontBankUserDto clientDetailsAndAccounts = frontService.getClientDetailsAndAccounts(username);
-        System.out.println("получили фаллбек " + clientDetailsAndAccounts);
         model.addAttribute("fullName", clientDetailsAndAccounts.fullName());
         model.addAttribute("birthDate", clientDetailsAndAccounts.birthDay());
         model.addAttribute("email", clientDetailsAndAccounts.email());

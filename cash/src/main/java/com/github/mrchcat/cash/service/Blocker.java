@@ -24,7 +24,6 @@ public class Blocker {
     @CircuitBreaker(name = "blocker", fallbackMethod = "fallbackBlocker")
     @Retry(name = "blocker", fallbackMethod = "fallbackBlocker")
     public BlockerResponseDto checkCashTransaction(CashTransactionDto cashTransactionDto) throws AuthException, ServiceUnavailableException {
-        System.out.println("блокер");
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         var blockerResponse = restClientBuilder.build()
                 .post()

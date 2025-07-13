@@ -129,7 +129,6 @@ public class FrontServiceImpl implements FrontService {
     @CircuitBreaker(name = "accounts", fallbackMethod = "fallBackBankUserDto")
     @Retry(name = "accounts", fallbackMethod = "fallBackBankUserDto")
     public BankUserDto editUserAccount(String username, FrontEditUserAccountDto frontEditUserAccountDto) throws AuthException {
-        System.out.println("вошли в editUserAccount");
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         var response = restClientBuilder.build()
                 .patch()

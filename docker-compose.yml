@@ -36,8 +36,8 @@ services:
       - ./consul/config/key_value.json:/consul/tmp/key_value.json
     ports:
       - "8500:8500"
+      - "8600:8600/udp"
     command: "agent -dev -node=myNode -client=0.0.0.0 -log-level=INFO"
-    #     consul kv import @consul/tmp/key_value.json
     networks:
       - backend
 
