@@ -1,0 +1,162 @@
+[
+  {
+    "key": "config/bankAccounts/",
+    "flags": 0,
+    "value": ""
+  },
+  {
+    "key": "config/bankAccounts/logging.level.root",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankAccounts/logging.org.zalando.logbook",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankAccounts/logging.pattern.file",
+    "flags": 0,
+    "value": "JWR7SEg6bW06c3N9ICUtNWxldmVsICVsb2dnZXJ7MzZ9IC0gJW1zZyVu"
+  },
+  {
+    "key": "config/bankBlocker/",
+    "flags": 0,
+    "value": ""
+  },
+  {
+    "key": "config/bankBlocker/logging.level.root",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankBlocker/logging.org.zalando.logbook",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankBlocker/logging.pattern.file",
+    "flags": 0,
+    "value": "JWR7SEg6bW06c3N9ICUtNWxldmVsICVsb2dnZXJ7MzZ9IC0gJW1zZyVu"
+  },
+  {
+    "key": "config/bankCash/",
+    "flags": 0,
+    "value": ""
+  },
+  {
+    "key": "config/bankCash/logging.level.root",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankCash/logging.org.zalando.logbook",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankCash/logging.pattern.file",
+    "flags": 0,
+    "value": "JWR7SEg6bW06c3N9ICUtNWxldmVsICVsb2dnZXJ7MzZ9IC0gJW1zZyVu"
+  },
+  {
+    "key": "config/bankExchange/",
+    "flags": 0,
+    "value": ""
+  },
+  {
+    "key": "config/bankExchange/logging.level.root",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankExchange/logging.org.zalando.logbook",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankExchange/logging.pattern.file",
+    "flags": 0,
+    "value": "JWR7SEg6bW06c3N9ICUtNWxldmVsICVsb2dnZXJ7MzZ9IC0gJW1zZyVu"
+  },
+  {
+    "key": "config/bankExchangeGenerator/",
+    "flags": 0,
+    "value": ""
+  },
+  {
+    "key": "config/bankExchangeGenerator/logging.level.root",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankExchangeGenerator/logging.org.zalando.logbook",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankExchangeGenerator/logging.pattern.file",
+    "flags": 0,
+    "value": "JWR7SEg6bW06c3N9ICUtNWxldmVsICVsb2dnZXJ7MzZ9IC0gJW1zZyVu"
+  },
+  {
+    "key": "config/bankFront/",
+    "flags": 0,
+    "value": ""
+  },
+  {
+    "key": "config/bankFront/logging.level.root",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankFront/logging.org.zalando.logbook",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankFront/logging.pattern.file",
+    "flags": 0,
+    "value": "JWR7SEg6bW06c3N9ICUtNWxldmVsICVsb2dnZXJ7MzZ9IC0gJW1zZyVu"
+  },
+  {
+    "key": "config/bankNotifications/",
+    "flags": 0,
+    "value": ""
+  },
+  {
+    "key": "config/bankNotifications/logging.level.root",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankNotifications/logging.org.zalando.logbook",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankNotifications/logging.pattern.file",
+    "flags": 0,
+    "value": "JWR7SEg6bW06c3N9ICUtNWxldmVsICVsb2dnZXJ7MzZ9IC0gJW1zZyVu"
+  },
+  {
+    "key": "config/bankTransfer/",
+    "flags": 0,
+    "value": ""
+  },
+  {
+    "key": "config/bankTransfer/logging.level.root",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankTransfer/logging.org.zalando.logbook",
+    "flags": 0,
+    "value": "ZXJyb3I="
+  },
+  {
+    "key": "config/bankTransfer/logging.pattern.file",
+    "flags": 0,
+    "value": "JWR7SEg6bW06c3N9ICUtNWxldmVsICVsb2dnZXJ7MzZ9IC0gJW1zZyVu"
+  }
+]

@@ -3,6 +3,8 @@ server.port: 8084
 spring:
   application:
     name: bankCash
+  config:
+    import: 'optional:consul:'
   datasource:
     url: jdbc:postgresql://localhost:5432/cashapp
     username: postgres
@@ -31,7 +33,10 @@ spring:
     consul:
       discovery:
         prefer-ip-address: true
-#        health-check-url: http://host.docker.internal:${server.port}/actuator/health
+      config:
+        enabled: true
+        prefixes:
+          - config
 
 management.endpoints.web.exposure.include: info, health,refresh
 

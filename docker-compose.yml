@@ -29,15 +29,13 @@ services:
 
   bank-consul:
     container_name: bank-consul
-    image: hashicorp/consul:1.21.0
+    build: consul/.
+    image: bank-consul
     hostname: consul-server1
     restart: unless-stopped
-    volumes:
-      - ./consul/config/key_value.json:/consul/tmp/key_value.json
     ports:
       - "8500:8500"
       - "8600:8600/udp"
-    command: "agent -dev -node=myNode -client=0.0.0.0 -log-level=INFO"
     networks:
       - backend
 

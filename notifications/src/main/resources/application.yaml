@@ -3,6 +3,8 @@ server.port: 8089
 spring:
   application:
     name: bankNotifications
+  config:
+    import: 'optional:consul:'
   datasource:
     url: jdbc:postgresql://localhost:5432/notification
     username: postgres
@@ -19,7 +21,10 @@ spring:
     consul:
       discovery:
         prefer-ip-address: true
-#        health-check-url: http://host.docker.internal:${server.port}/actuator/health
+      config:
+        enabled: true
+        prefixes:
+          - config
 
 management.endpoints.web.exposure.include: info, health,refresh
 

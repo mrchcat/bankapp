@@ -3,6 +3,8 @@ server.port: 8080
 spring:
   application:
     name: bankFront
+  config:
+    import: 'optional:consul:'
   security:
     oauth2:
       client:
@@ -20,8 +22,10 @@ spring:
     consul:
       discovery:
         prefer-ip-address: true
-#        health-check-path: /actuator/health
-#        healthCheckInterval: 15s
+      config:
+        enabled: true
+        prefixes:
+          - config
 
 management.endpoints.web.exposure.include: info, health,refresh
 
