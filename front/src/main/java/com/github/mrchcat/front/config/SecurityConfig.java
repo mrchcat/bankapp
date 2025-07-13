@@ -26,8 +26,6 @@ public class SecurityConfig {
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers("/registration", "/signup").hasAuthority("MANAGER")
                                 .anyRequest().hasAnyAuthority("CLIENT", "MANAGER")
-//                                .anyRequest().authenticated()
-//                                .anyRequest().permitAll()
                 )
                 .oauth2Client(Customizer.withDefaults())
                 .formLogin(cst -> cst

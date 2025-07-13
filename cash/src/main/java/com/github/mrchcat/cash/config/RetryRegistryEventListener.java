@@ -1,4 +1,4 @@
-package com.github.mrchcat.front.config;
+package com.github.mrchcat.cash.config;
 
 import io.github.resilience4j.retry.RetryRegistry;
 import jakarta.annotation.PostConstruct;
@@ -16,7 +16,7 @@ public class RetryRegistryEventListener {
     @PostConstruct
     public void postConstruct() {
         //registry.retry(<resilience retry instance name>)
-        registry.retry("accounts").getEventPublisher()
+        registry.retry("test").getEventPublisher()
                 .onRetry(ev -> log.info("#### RetryRegistryEventListener message: {}", ev));
     }
 }

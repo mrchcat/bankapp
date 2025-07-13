@@ -16,6 +16,8 @@ import com.github.mrchcat.shared.cash.CashTransactionDto;
 import com.github.mrchcat.shared.enums.BankCurrency;
 import com.github.mrchcat.shared.enums.TransactionStatus;
 import com.github.mrchcat.shared.notification.BankNotificationDto;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -54,6 +56,7 @@ public class CashServiceImpl implements CashService {
 
     @Override
     public void processCashOperation(CashTransactionDto cashTransactionDto) throws AuthException, ServiceUnavailableException {
+        test();
         BankUserDto client = getClient(cashTransactionDto.username(), cashTransactionDto.currency());
         var blockerResponse = checkCashTransaction(cashTransactionDto);
         if (!blockerResponse.isConfirmed()) {
@@ -66,7 +69,14 @@ public class CashServiceImpl implements CashService {
         }
     }
 
-    private BlockerResponseDto checkCashTransaction(CashTransactionDto cashTransactionDto) throws AuthException, ServiceUnavailableException {
+    @Retry(name = "test")
+    public void test(){
+        throw new org.springframework.web.client.HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @CircuitBreaker(name = "blocker", fallbackMethod = "fallbackBlocker")
+    @Retry(name = "blocker", fallbackMethod = "fallbackBlocker")
+    public BlockerResponseDto checkCashTransaction(CashTransactionDto cashTransactionDto) throws AuthException, ServiceUnavailableException {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         var blockerResponse = restClientBuilder.build()
                 .post()
@@ -81,6 +91,9 @@ public class CashServiceImpl implements CashService {
         return blockerResponse;
     }
 
+//    private BlockerResponseDto fallbackBlocker(Throwable t) {
+//        return new BlockerResponseDto(false, "service unavalable");
+//    }
 
     private void deposit(BankUserDto client, CashTransactionDto cashOperationDto) throws AuthException, ServiceUnavailableException {
         AccountDto processedAccount = client.accounts().get(0);
@@ -105,18 +118,27 @@ public class CashServiceImpl implements CashService {
                 cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.SUCCESS);
                 String message = "приняты наличные в сумме " + newTransaction.getAmount() + " "
                         + newTransaction.getCurrencyStringCodeIso4217();
-                sendNotification(client, message);
+                try {
+                    sendNotification(client, message);
+                } catch (Exception ignore) {
+                }
             } else {
                 String message = "ошибка в процессе внесения наличных денег в сумме" + newTransaction.getAmount() + " "
                         + newTransaction.getCurrencyStringCodeIso4217();
-                sendNotification(client, message);
+                try {
+                    sendNotification(client, message);
+                } catch (Exception ignore) {
+                }
                 cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.ERROR);
                 throw new RuntimeException("ошибка: операция внесения денег не подтверждена");
             }
         } else {
             String message = "деньги не были востребованы в банкомате в сумме" + newTransaction.getAmount() + " "
                     + newTransaction.getCurrencyStringCodeIso4217();
-            sendNotification(client, message);
+            try {
+                sendNotification(client, message);
+            } catch (Exception ignore) {
+            }
             //        если не получили
             cashRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.CANCEL);
             throw new RejectedByClient("");
@@ -130,6 +152,8 @@ public class CashServiceImpl implements CashService {
         return status.equals(confirmation.status());
     }
 
+    @CircuitBreaker(name = "accounts")
+    @Retry(name = "accounts")
     private TransactionConfirmation sendTransactionToAccountService(AccountCashTransactionDto cashTransactionRequestDto)
             throws AuthException, ServiceUnavailableException {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
@@ -146,6 +170,8 @@ public class CashServiceImpl implements CashService {
         return confirmation;
     }
 
+    @CircuitBreaker(name = "accounts")
+    @Retry(name = "accounts")
     private BankUserDto getClient(String username, BankCurrency currency) throws AuthException {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         String requestUrl = "http://" + ACCOUNT_SERVICE + ACCOUNTS_GET_CLIENT_API + "/" + username + "?currency=" + currency.name();
@@ -221,7 +247,10 @@ public class CashServiceImpl implements CashService {
             }
             String message = "выданы наличные в сумме" + newTransaction.getAmount() + " "
                     + newTransaction.getCurrencyStringCodeIso4217();
-            sendNotification(client, message);
+            try {
+                sendNotification(client, message);
+            } catch (Exception ignore) {
+            }
 
 //          если не забрали
         } else {
@@ -229,7 +258,10 @@ public class CashServiceImpl implements CashService {
             sendTransactionToAccountService(CashMapper.toRequestDto(newTransaction, TransactionStatus.CANCEL));
             String message = "деньги не были востребованы в банкомате в сумме" + newTransaction.getAmount() + " "
                     + newTransaction.getCurrencyStringCodeIso4217();
-            sendNotification(client, message);
+            try {
+                sendNotification(client, message);
+            } catch (Exception ignore) {
+            }
             throw new RejectedByClient("");
         }
     }
@@ -242,26 +274,24 @@ public class CashServiceImpl implements CashService {
 //        возвращаем деньги обратно клиенту
     }
 
-    private void sendNotification(BankUserDto client, String message) {
-        try {
-            var notification = BankNotificationDto.builder()
-                    .service(CASH_SERVICE)
-                    .username(client.username())
-                    .fullName(client.fullName())
-                    .email(client.email())
-                    .message(message)
-                    .build();
-            var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
-            String requestUrl = "http://" + NOTIFICATION_SERVICE + NOTIFICATION_SEND_NOTIFICATION;
-            restClientBuilder.build()
-                    .post()
-                    .uri(requestUrl)
-                    .header(oAuthHeader.name(), oAuthHeader.value())
-                    .body(notification)
-                    .retrieve()
-                    .toBodilessEntity();
-
-        } catch (Exception ignore) {
-        }
+    @CircuitBreaker(name = "notifications")
+    @Retry(name = "notifications")
+    public void sendNotification(BankUserDto client, String message) throws AuthException {
+        var notification = BankNotificationDto.builder()
+                .service(CASH_SERVICE)
+                .username(client.username())
+                .fullName(client.fullName())
+                .email(client.email())
+                .message(message)
+                .build();
+        var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
+        String requestUrl = "http://" + NOTIFICATION_SERVICE + NOTIFICATION_SEND_NOTIFICATION;
+        restClientBuilder.build()
+                .post()
+                .uri(requestUrl)
+                .header(oAuthHeader.name(), oAuthHeader.value())
+                .body(notification)
+                .retrieve()
+                .toBodilessEntity();
     }
 }

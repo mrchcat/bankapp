@@ -40,3 +40,21 @@ logging:
   level:
     root: DEBUG
     org.zalando.logbook: DEBUG
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-type: TIME_BASED
+        slidingWindowSize: 100
+        permittedNumberOfCallsInHalfOpenState: 10
+        slowCallDurationThreshold: 4s
+        slowCallRateThreshold: 90
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        minimumNumberOfCalls: 10
+  retry:
+    configs:
+      default:
+        maxAttempts: 7
+        waitDuration: 100ms

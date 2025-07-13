@@ -18,6 +18,8 @@ import com.github.mrchcat.transfer.mapper.TransferMapper;
 import com.github.mrchcat.transfer.model.TransferTransaction;
 import com.github.mrchcat.transfer.repository.TransferRepository;
 import com.github.mrchcat.transfer.security.OAuthHeaderGetter;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -96,23 +98,38 @@ public class TransferServiceImpl implements TransferService {
                 transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.SUCCESS);
                 String messageToSender = String.format("Со счета %s списаны средства в размере %s %s",
                         fromAccountId, newTransaction.getFromAmount(), senderAccount.currencyStringCode());
-                sendNotification(senderClient, messageToSender);
+                try {
+                    sendNotification(senderClient, messageToSender);
+                } catch (Exception ignore) {
+                }
                 String message2ToSender = String.format("На счет %s начислены средства в размере %s %s",
                         toAccountId, newTransaction.getToAmount(), senderAccount.currencyStringCode());
-                sendNotification(senderClient, message2ToSender);
+                try {
+                    sendNotification(senderClient, message2ToSender);
+                } catch (Exception ignore) {
+                }
 
                 if (transaction.direction().equals(TransferDirection.OTHER)) {
                     String messageToReceiver = String.format("На счет %s зачислены средства в размере %s %s",
                             toAccountId, newTransaction.getToAmount(), receiverAccount.currencyStringCode());
-                    sendNotification(receiverClient, messageToReceiver);
+                    try {
+                        sendNotification(receiverClient, messageToReceiver);
+                    } catch (Exception ignore) {
+                    }
                 }
             } else {
                 transferRepository.changeTransactionStatus(newTransaction.getId(), TransactionStatus.ERROR);
                 String messageToSender = String.format("Ошибка при попытке списания средств со счета %s", fromAccountId);
-                sendNotification(senderClient, messageToSender);
+                try{
+                    sendNotification(senderClient, messageToSender);
+                } catch (Exception ignore){
+                }
                 if (transaction.direction().equals(TransferDirection.OTHER)) {
                     String messageToReceiver = String.format("Ошибка при попытке зачисления средств на счет %s", toAccountId);
-                    sendNotification(receiverClient, messageToReceiver);
+                    try {
+                        sendNotification(receiverClient, messageToReceiver);
+                    } catch (Exception ignore) {
+                    }
                 }
                 throw new AccountServiceException("ошибка: операция внесения денег не подтверждена");
             }
@@ -122,6 +139,8 @@ public class TransferServiceImpl implements TransferService {
         }
     }
 
+    @CircuitBreaker(name = "exchange")
+    @Retry(name = "exchange")
     private BigDecimal getExchangeRate(BankCurrency fromCurrency, BankCurrency toCurrency) throws AuthException {
         if (fromCurrency.equals(toCurrency)) {
             return BigDecimal.ONE;
@@ -152,6 +171,8 @@ public class TransferServiceImpl implements TransferService {
         return status.equals(confirmation.status());
     }
 
+    @CircuitBreaker(name = "accounts")
+    @Retry(name = "accounts")
     private TransactionConfirmation sendTransaction(TransferTransaction transferTransaction) throws AuthException, ServiceUnavailableException {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         String requestUrl = "http://" + ACCOUNT_SERVICE + ACCOUNTS_SEND_TRANSFER_TRANSACTION_API;
@@ -199,7 +220,8 @@ public class TransferServiceImpl implements TransferService {
         return fromAccountDto.id();
     }
 
-
+    @CircuitBreaker(name = "accounts")
+    @Retry(name = "accounts")
     private BankUserDto getClient(String username, BankCurrency currency) throws AuthException {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         String requestUrl = "http://" + ACCOUNT_SERVICE + ACCOUNTS_GET_CLIENT_API + "/" + username + "?currency=" + currency.name();
@@ -229,7 +251,9 @@ public class TransferServiceImpl implements TransferService {
         }
     }
 
-    private BlockerResponseDto checkCashTransaction(NonCashTransferDto transaction) throws AuthException, ServiceUnavailableException {
+    @CircuitBreaker(name = "blocker", fallbackMethod = "fallbackBlocker")
+    @Retry(name = "blocker", fallbackMethod = "fallbackBlocker")
+    public BlockerResponseDto checkCashTransaction(NonCashTransferDto transaction) throws AuthException, ServiceUnavailableException {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         var blockerResponse = restClientBuilder.build()
                 .post()
@@ -244,27 +268,30 @@ public class TransferServiceImpl implements TransferService {
         return blockerResponse;
     }
 
-    private void sendNotification(BankUserDto client, String message) {
-        try {
-            var notification = BankNotificationDto.builder()
-                    .service(TRANSFER_SERVICE)
-                    .username(client.username())
-                    .fullName(client.fullName())
-                    .email(client.email())
-                    .message(message)
-                    .build();
-            var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
-            String requestUrl = "http://" + NOTIFICATION_SERVICE + NOTIFICATION_SEND_NOTIFICATION;
-            restClientBuilder.build()
-                    .post()
-                    .uri(requestUrl)
-                    .header(oAuthHeader.name(), oAuthHeader.value())
-                    .body(notification)
-                    .retrieve()
-                    .toBodilessEntity();
+    private BlockerResponseDto fallbackBlocker(Throwable t) {
+        return new BlockerResponseDto(false, "service unavalable");
+    }
 
-        } catch (Exception ignore) {
-        }
+
+    @CircuitBreaker(name = "notifications")
+    @Retry(name = "notifications")
+    private void sendNotification(BankUserDto client, String message) throws AuthException {
+        var notification = BankNotificationDto.builder()
+                .service(TRANSFER_SERVICE)
+                .username(client.username())
+                .fullName(client.fullName())
+                .email(client.email())
+                .message(message)
+                .build();
+        var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
+        String requestUrl = "http://" + NOTIFICATION_SERVICE + NOTIFICATION_SEND_NOTIFICATION;
+        restClientBuilder.build()
+                .post()
+                .uri(requestUrl)
+                .header(oAuthHeader.name(), oAuthHeader.value())
+                .body(notification)
+                .retrieve()
+                .toBodilessEntity();
     }
 
 }

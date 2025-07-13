@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -109,6 +110,8 @@ public class MainController {
         try {
             UserDetails newUserDetails = frontService.editClientPassword(username, passwordDto.password());
             redirectAttributes.addFlashAttribute("isPasswordUpdated", true);
+        } catch (RuntimeException ex) {
+            passwordErrors.add("сервис не доступен");
         } catch (Exception ex) {
             passwordErrors.add(ex.getMessage());
         }

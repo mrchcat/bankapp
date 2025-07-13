@@ -25,6 +25,7 @@ import lombok.SneakyThrows;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -35,7 +36,9 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 
 import javax.naming.ServiceUnavailableException;
+import java.math.BigDecimal;
 import java.net.URI;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -74,6 +77,7 @@ public class FrontServiceImpl implements FrontService {
     private final DiscoveryClient discoveryClient;
 
     @Override
+    @CircuitBreaker(name = "accounts")
     @Retry(name = "accounts")
     public UserDetails editClientPassword(String username, String password) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -81,7 +85,7 @@ public class FrontServiceImpl implements FrontService {
     }
 
     @Override
-//    @CircuitBreaker(name = "accounts")
+    @CircuitBreaker(name = "accounts")
     @Retry(name = "accounts")
     public UserDetails registerNewClient(NewClientRegisterDto ncrdto) throws AuthException {
         String passwordHash = encoder.encode(ncrdto.password());
@@ -101,11 +105,9 @@ public class FrontServiceImpl implements FrontService {
     }
 
     @Override
-//    @CircuitBreaker(name = "accounts", fallbackMethod = "fallBackFrontBankUserDto")
+    @CircuitBreaker(name = "accounts", fallbackMethod = "fallBackFrontBankUserDto")
     @Retry(name = "accounts", fallbackMethod = "fallBackFrontBankUserDto")
     public FrontBankUserDto getClientDetailsAndAccounts(String username) throws AuthException {
-//        throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "This is a remote exception");
-        System.out.println("вошли getClientDetailsAndAccounts");
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
         BankUserDto bankUserDto = restClientBuilder.build()
                 .get()
@@ -119,18 +121,18 @@ public class FrontServiceImpl implements FrontService {
         return FrontMapper.toFrontBankUserDto(bankUserDto);
     }
 
-    public FrontBankUserDto fallBackFrontBankUserDto(Throwable t) {
+    private FrontBankUserDto fallBackFrontBankUserDto(Throwable t) {
         return FrontBankUserDto.builder()
-                .username("error")
-                .email("error")
-                .birthDay(LocalDate.now())
-                .fullName("error")
+                .username("error: service not available")
+                .email("error: service not available")
+                .birthDay(LocalDate.of(1900, 1, 1))
+                .fullName("error: service not available")
                 .accounts(Collections.emptyList())
                 .build();
     }
 
     @Override
-//    @CircuitBreaker(name = "accounts", fallbackMethod = "fallBackBankUserDto")
+    @CircuitBreaker(name = "accounts", fallbackMethod = "fallBackBankUserDto")
     @Retry(name = "accounts", fallbackMethod = "fallBackBankUserDto")
     public BankUserDto editUserAccount(String username, FrontEditUserAccountDto frontEditUserAccountDto) throws AuthException {
         System.out.println("вошли в editUserAccount");
@@ -148,18 +150,18 @@ public class FrontServiceImpl implements FrontService {
         return response;
     }
 
-    public  BankUserDto fallBackBankUserDto(Throwable t) {
+    private BankUserDto fallBackBankUserDto(Throwable t) {
         return BankUserDto.builder()
                 .id(UUID.randomUUID())
-                .username("error")
-                .fullName("error")
-                .birthDay(LocalDate.now())
+                .username("error: service not available")
+                .fullName("error: service not available")
+                .birthDay(LocalDate.of(1900, 1, 1))
                 .accounts(Collections.emptyList())
                 .build();
     }
 
     @Override
-//    @CircuitBreaker(name = "accounts", fallbackMethod = "fallBackList")
+    @CircuitBreaker(name = "accounts", fallbackMethod = "fallBackList")
     @Retry(name = "accounts", fallbackMethod = "fallBackList")
     public List<FrontBankUserDto> getAllClientsWithActiveAccounts() throws AuthException, ServiceUnavailableException {
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
@@ -176,13 +178,13 @@ public class FrontServiceImpl implements FrontService {
         return FrontMapper.toFrontBankUserDto(response);
     }
 
-    public List<FrontBankUserDto> fallBackList(Throwable t) {
+    private List<FrontBankUserDto> fallBackList(Throwable t) {
         return Collections.emptyList();
     }
 
     @Override
-//    @CircuitBreaker(name = "cash")
-//    @Retry(name = "cash")
+    @CircuitBreaker(name = "cash")
+    @Retry(name = "cash")
     public void processCashOperation(String username, FrontCashTransactionDto cashOperationDto, CashAction action) throws AuthException {
         CashTransactionDto requestDto = FrontMapper.toRequestDto(username, cashOperationDto, action);
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
@@ -196,8 +198,8 @@ public class FrontServiceImpl implements FrontService {
     }
 
     @Override
-//    @CircuitBreaker(name = "transfer")
-//    @Retry(name = "transfer")
+    @CircuitBreaker(name = "transfer")
+    @Retry(name = "transfer")
     public void processNonCashOperation(NonCashTransfer nonCashTransfer) throws AuthException {
         NonCashTransferDto requestDto = FrontMapper.toRequestDto(nonCashTransfer);
         var oAuthHeader = oAuthHeaderGetter.getOAuthHeader();
@@ -211,8 +213,8 @@ public class FrontServiceImpl implements FrontService {
     }
 
     @Override
-//    @CircuitBreaker(name = "exchange")
-//    @Retry(name = "exchange")
+    @CircuitBreaker(name = "exchange")
+    @Retry(name = "exchange", fallbackMethod = "fallbackExchange")
     public List<FrontRate> getAllRates() throws AuthException {
         Collection<CurrencyRate> rateList = getAllRatesFromExchange();
         Map<BankCurrency, CurrencyRate> rateMap = new HashMap<>();
@@ -235,6 +237,13 @@ public class FrontServiceImpl implements FrontService {
             }
         }
         return frontRates;
+    }
+
+    private List<FrontRate> fallbackExchange(Throwable t) {
+        return List.of(new FrontRate("error",
+                "service unavailable",
+                BigDecimal.ONE.negate(),
+                BigDecimal.ONE.negate()));
     }
 
     private Collection<CurrencyRate> getAllRatesFromExchange() throws AuthException {
