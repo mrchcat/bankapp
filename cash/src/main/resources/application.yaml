@@ -56,5 +56,5 @@ resilience4j:
   retry:
     configs:
       default:
-        maxAttempts: 7
+        maxAttempts: 3
         waitDuration: 100ms
