@@ -5,6 +5,8 @@
 просмотр динамики курсов валют.  
 Безопасность обмена сообщений между микросервисами обеспечивает Keycloak, а паттерн Service Discovery и 
 Externalized Config - Consul.   
+![](/readme/front.png)
+
 
 Версия: Java 21
 
