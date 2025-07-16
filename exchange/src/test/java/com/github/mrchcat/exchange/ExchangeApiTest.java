@@ -1,4 +1,4 @@
-package com.github.mrchcat.exchange_generator;
+package com.github.mrchcat.exchange;
 
 import com.github.mrchcat.shared.enums.BankCurrency;
 import com.github.mrchcat.shared.exchange.CurrencyExchangeRatesDto;
